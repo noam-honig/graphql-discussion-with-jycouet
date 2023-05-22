@@ -4,6 +4,7 @@ import { Entity, Fields } from "remult";
   allowApiCrud: true,
 })
 export class Task {
+  // @Fields.cuid()
   @Fields.autoIncrement()
   id = 0;
   @Fields.string()
