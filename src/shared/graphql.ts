@@ -1,30 +1,34 @@
 import { RemultServerCore } from "remult/server";
 
+type Field = {
+  key: string;
+  args?: string;
+  value: string;
+  comment?: string;
+  isRelation?: boolean;
+};
+
 export function remultGraphql(api: RemultServerCore<any>) {
   let server = api["get internal server"]();
   const entities = server.getEntities();
 
   let types: {
     key: string;
-    fields: string[];
-    moreFields: string[];
+    fields: Field[];
     resultProcessors: ((item: any) => void)[];
   }[] = [];
 
   let orderByTypes: string[] = [];
   let whereType: string[] = [];
   let whereTypeSubFields: string[] = [];
-  let typeQuery: string[] = [];
+  let typeQuery: Field[] = [];
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
   let resolvers = { Query: resolversQuery };
 
   function getType(key: string) {
     let t = types.find((t) => t.key === key);
-    if (!t)
-      types.push(
-        (t = { fields: [], key, moreFields: [], resultProcessors: [] })
-      );
+    if (!t) types.push((t = { fields: [], key, resultProcessors: [] }));
     return t;
   }
 
@@ -36,13 +40,16 @@ export function remultGraphql(api: RemultServerCore<any>) {
     const currentType = getType(key);
 
     if (key) {
-      typeQuery.push(
-        `${key} ` +
-          `(limit: Int, page: Int, ` +
-          `orderBy: ${key}OrderBy, ` +
-          `where: ${key}Where): ` +
-          `[${key}!]!`
-      );
+      const argsList =
+        `limit: Int, page: Int, ` +
+        `orderBy: ${key}OrderBy, ` +
+        `where: ${key}Where`;
+      typeQuery.push({
+        key,
+        args: argsList,
+        value: `[${key}!]!`,
+        comment: `List all \`${key}\``,
+      });
 
       const whereTypeFields: string[] = [];
       for (const f of meta.fields) {
@@ -67,12 +74,11 @@ export function remultGraphql(api: RemultServerCore<any>) {
         if (info !== undefined) {
           const refKey = info.key;
 
-          currentType.fields.push(
-            fieldFormat({
-              data: `${f.key}: ${refKey}${f.allowNull ? "" : "!"}`,
-              comment: f.caption,
-            })
-          );
+          currentType.fields.push({
+            key: f.key,
+            value: `${refKey}${f.allowNull ? "" : "!"}`,
+            comment: f.caption,
+          });
           currentType.resultProcessors.push((r) => {
             const val = r[f.key];
             if (val === null || val === undefined) return null;
@@ -91,13 +97,15 @@ export function remultGraphql(api: RemultServerCore<any>) {
             };
           });
 
-          // tasks.caterogy => single
-          // categories.tasks => multiple
           let refT = getType(refKey);
-          console.log(`refT`, refT, refKey);
+          refT.fields.push({
+            key,
+            args: argsList,
+            value: `[${key}!]!`,
+            isRelation: true,
+            comment: `List all \`${key}\` of \`${refKey}\``,
+          });
 
-          // JYC TODO: moreFields
-          // refT.moreFields += q;
           refT.resultProcessors.push((r) => {
             const val = r.id;
             r[key] = async (args: any, req: any, gqlInfo: any) => {
@@ -112,17 +120,15 @@ export function remultGraphql(api: RemultServerCore<any>) {
             };
           });
         } else {
-          currentType.fields.push(
-            fieldFormat({
-              data: `${f.key}: ${type}${f.allowNull ? "" : "!"}`,
-              comment: f.caption,
-            })
-          );
+          currentType.fields.push({
+            key: f.key,
+            value: `${type}${f.allowNull ? "" : "!"}`,
+            comment: f.caption,
+          });
         }
         const addFilter = (operator: string, theType?: string) => {
           if (!theType) theType = type;
           whereFields.push(operator + ": " + theType);
-          // whereFieldMap.set(f.key + "." + operator, f.key + operator);
         };
         for (const operator of ["eq", "ne"]) {
           addFilter(operator);
@@ -270,15 +276,18 @@ export function remultGraphql(api: RemultServerCore<any>) {
     rootValue: root,
     schema: `${blockFormat({
       prefix: `type Query`,
-      data: typeQuery,
+      data: typeQuery.map((field) => fieldFormat(field)),
       comment: "Represents all Remult entities.",
     })}
 
 ${types
+  // .sort((a, b) => a.key.localeCompare(b.key))
   .map(({ key, fields }) => {
     return blockFormat({
       prefix: `type ${key}`,
-      data: fields,
+      data: fields
+        .sort((a, b) => (a.isRelation ? 1 : 0) - (b.isRelation ? 1 : 0)) // isRelation last
+        .map((field) => fieldFormat(field)),
       comment: `Represents \`${key}\` entity.`,
     });
   })
@@ -320,13 +329,17 @@ ${obj.prefix} {
 }`;
 }
 
-function fieldFormat(obj: { data: string; comment?: string }) {
-  if (obj.comment) {
+function fieldFormat(field: Field) {
+  const key_value = `${field.key}${field.args ? ` (${field.args})` : ``}: ${
+    field.value
+  }`;
+
+  if (field.comment) {
     return `"""
-  ${obj.comment}
+  ${field.comment}
   """
-  ${obj.data}`;
+  ${key_value}`;
   }
 
-  return obj.data;
+  return key_value;
 }

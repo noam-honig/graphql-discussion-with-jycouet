@@ -19,7 +19,13 @@ describe("test graphql", () => {
         Represents all Remult entities.
         \\"\\"\\"
         type Query {
+          \\"\\"\\"
+          List all \`tasks\`
+          \\"\\"\\"
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [tasks!]!
+          \\"\\"\\"
+          List all \`categories\`
+          \\"\\"\\"
           categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [categories!]!
         }
 
@@ -57,6 +63,10 @@ describe("test graphql", () => {
           Name
           \\"\\"\\"
           name: String!
+          \\"\\"\\"
+          List all \`tasks\` of \`categories\`
+          \\"\\"\\"
+          tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [tasks!]!
         }
 
         \\"\\"\\"
