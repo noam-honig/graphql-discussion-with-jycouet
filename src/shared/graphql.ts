@@ -3,15 +3,18 @@ import { RemultServerCore } from "remult/server";
 export function remultGraphql(api: RemultServerCore<any>) {
   let server = api["get internal server"]();
   const entities = server.getEntities();
+
   let types: {
     key: string;
-    fields: string;
-    moreFields: string;
+    fields: string[];
+    moreFields: string[];
     resultProcessors: ((item: any) => void)[];
   }[] = [];
-  let sortTypes = "";
-  let whereTypes = "";
-  let query = "";
+
+  let orderByTypes: string[] = [];
+  let whereType: string[] = [];
+  let whereTypeSubFields: string[] = [];
+  let typeQuery: string[] = [];
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
   let resolvers = { Query: resolversQuery };
@@ -20,122 +23,155 @@ export function remultGraphql(api: RemultServerCore<any>) {
     let t = types.find((t) => t.key === key);
     if (!t)
       types.push(
-        (t = { fields: "", key, moreFields: "", resultProcessors: [] })
+        (t = { fields: [], key, moreFields: [], resultProcessors: [] })
       );
     return t;
   }
 
   for (const meta of entities) {
-    let whereFields = "";
-    let sortFields = "";
+    const orderByFields: string[] = [];
 
     let key = meta.key;
 
-    const t = getType(key);
-    let q =
-      "\n\t" +
-      key +
-      `(limit: Int, page: Int, ` +
-      `orderBy: ${key}OrderBy, ` +
-      `where: ${key}Where): ` +
-      `[${getTypeName(key)}]`;
+    const currentType = getType(key);
 
     if (key) {
-      const whereFieldMap = new Map<string, string>();
+      typeQuery.push(
+        `${key} ` +
+          `(limit: Int, page: Int, ` +
+          `orderBy: ${key}OrderBy, ` +
+          `where: ${key}Where): ` +
+          `[${key}!]!`
+      );
 
+      const whereTypeFields: string[] = [];
       for (const f of meta.fields) {
-        {
-          let type = "String";
-          switch (f.valueType) {
-            case Boolean:
-              type = "Boolean";
-              break;
-            case Number:
-              {
-                if (f.valueConverter?.fieldTypeInDb == "integer") type = "Int";
-                else type = "Float";
-              }
-              break;
-          }
-          let info = entities.find((i) => i.entityType === f.valueType);
-          if (info !== undefined) {
-            const refKey = info.key;
-            t.fields += "\n\t" + f.key + ":" + getTypeName(refKey);
-            t.resultProcessors.push((r) => {
-              const val = r[f.key];
-              if (val === null || val === undefined) return null;
-              r[f.key] = async (args: any, req: any, gqlInfo: any) => {
-                const queryResult: any[] = await root[refKey](
-                  {
-                    ...args.where,
-                    filter: { id: val },
-                    options: { limit: 1 },
-                  },
-                  req,
-                  gqlInfo
-                );
-                if (queryResult.length > 0) return queryResult[0];
-                return null;
-              };
-            });
-            let refT = getType(refKey);
-            refT.moreFields += q;
-            refT.resultProcessors.push((r) => {
-              const val = r.id;
-              r[key] = async (args: any, req: any, gqlInfo: any) => {
-                return await root[key](
-                  {
-                    filter: { ...args.where, [f.key]: val },
-                    options: args.options,
-                  },
-                  req,
-                  gqlInfo
-                );
-              };
-            });
-          } else t.fields += "\n\t" + f.key + ":" + type;
-          const addFilter = (operator: string, theType?: string) => {
-            if (!theType) theType = type;
-            whereFields += "\n\t" + f.key + operator + ":" + theType;
-            whereFieldMap.set(
-              f.key + operator.replace("_", "."),
-              f.key + operator
-            );
-          };
-          for (const operator of ["", "_ne"]) {
+        let whereFields: string[] = [];
+        let type = "String";
+        switch (f.valueType) {
+          case Boolean:
+            type = "Boolean";
+            break;
+          case Number:
+            {
+              if (
+                f.valueConverter?.fieldTypeInDb === "integer" ||
+                f.valueConverter?.fieldTypeInDb === "autoincrement"
+              )
+                type = "Int";
+              else type = "Float";
+            }
+            break;
+        }
+        let info = entities.find((i) => i.entityType === f.valueType);
+        if (info !== undefined) {
+          const refKey = info.key;
+
+          currentType.fields.push(
+            fieldFormat({
+              data: `${f.key}: ${refKey}${f.allowNull ? "" : "!"}`,
+              comment: f.caption,
+            })
+          );
+          currentType.resultProcessors.push((r) => {
+            const val = r[f.key];
+            if (val === null || val === undefined) return null;
+            r[f.key] = async (args: any, req: any, gqlInfo: any) => {
+              const queryResult: any[] = await root[refKey](
+                {
+                  ...args.where,
+                  where: { id: val },
+                  options: { limit: 1 },
+                },
+                req,
+                gqlInfo
+              );
+              if (queryResult.length > 0) return queryResult[0];
+              return null;
+            };
+          });
+
+          // tasks.caterogy => single
+          // categories.tasks => multiple
+          let refT = getType(refKey);
+          console.log(`refT`, refT, refKey);
+
+          // JYC TODO: moreFields
+          // refT.moreFields += q;
+          refT.resultProcessors.push((r) => {
+            const val = r.id;
+            r[key] = async (args: any, req: any, gqlInfo: any) => {
+              return await root[key](
+                {
+                  where: { ...args.where, [f.key]: val },
+                  options: args.options,
+                },
+                req,
+                gqlInfo
+              );
+            };
+          });
+        } else {
+          currentType.fields.push(
+            fieldFormat({
+              data: `${f.key}: ${type}${f.allowNull ? "" : "!"}`,
+              comment: f.caption,
+            })
+          );
+        }
+        const addFilter = (operator: string, theType?: string) => {
+          if (!theType) theType = type;
+          whereFields.push(operator + ": " + theType);
+          // whereFieldMap.set(f.key + "." + operator, f.key + operator);
+        };
+        for (const operator of ["eq", "ne"]) {
+          addFilter(operator);
+        }
+        if (f.valueType === String || f.valueType === Number)
+          for (const operator of ["gt", "gte", "lt", "lte"]) {
             addFilter(operator);
           }
-          if (f.valueType === String || f.valueType === Number)
-            for (const operator of ["_gt", "_gte", "_lt", "_lte"]) {
-              addFilter(operator);
-            }
-          if (f.valueType === String)
-            for (const operator of ["_st", "_contains"]) {
-              addFilter(operator);
-            }
-          if (f.allowNull) addFilter("_null", "Boolean");
-          addFilter("_in", "[" + type + "]");
-        }
+        if (f.valueType === String)
+          for (const operator of ["st", "contains"]) {
+            addFilter(operator);
+          }
+        if (f.allowNull) addFilter("null", "Boolean");
+        addFilter("in", "[" + type + "!]");
 
         // sorting
-        sortFields += "\n\t" + f.key + ":OrderBydirection";
+        orderByFields.push(`${f.key}: OrderBydirection`);
+
+        // where
+        whereTypeFields.push(`${f.key}: ${key}Where${f.key}`);
+
+        whereTypeSubFields.push(
+          blockFormat({
+            prefix: `input ${key}Where${f.key}`,
+            data: whereFields,
+            comment: `Where options for \`${key}.${f.key}\``,
+          })
+        );
       }
 
-      sortTypes += `input ${key}OrderBy {
-        ${sortFields}
-}\n`;
+      orderByTypes.push(
+        blockFormat({
+          prefix: `input ${key}OrderBy`,
+          data: orderByFields,
+          comment: `OrderBy options for \`${key}\``,
+        })
+      );
 
-      whereTypes +=
-        "input " +
-        key +
-        "Where{" +
-        whereFields +
-        "\n\tOR:[" +
-        key +
-        "Where]\n}\n";
-      query += q;
+      whereTypeFields.push(`OR: [${key}Where!]`);
+      whereType.push(
+        blockFormat({
+          prefix: `input ${key}Where`,
+          data: whereTypeFields,
+          comment: `Where options for \`${key}\``,
+        })
+      );
+
       root[key] = async (arg1: any, req: any) => {
-        const { limit, page, orderBy, filter } = arg1;
+        const { limit, page, orderBy, where } = arg1;
 
         return new Promise(async (res, error) => {
           server.run(req, async () => {
@@ -144,11 +180,12 @@ export function remultGraphql(api: RemultServerCore<any>) {
             let err: any;
             await dApi.getArray(
               {
-                success: (x) =>
-                  (result = x.map((y: any) => {
-                    t.resultProcessors.forEach((z) => z(y));
+                success: (x) => {
+                  return (result = x.map((y: any) => {
+                    currentType.resultProcessors.forEach((z) => z(y));
                     return y;
-                  })),
+                  }));
+                },
                 created: () => {},
                 deleted: () => {},
                 error: (x) => (err = x),
@@ -184,11 +221,28 @@ export function remultGraphql(api: RemultServerCore<any>) {
                       }
                     }
                   }
-                  if (filter) {
-                    console.log(`filter`, filter);
+                  if (where) {
+                    // TODO: OR management?
 
-                    let f = whereFieldMap.get(key);
-                    if (f) return filter[f];
+                    const whereAND: string[] = [];
+                    Object.keys(where).forEach((w) => {
+                      const subWhere = where[w];
+                      Object.keys(subWhere).forEach((sw) => {
+                        let map = `${w}.${sw}`;
+
+                        if (map.endsWith(".eq")) {
+                          map = `${w}`;
+                        }
+
+                        if (map === key) {
+                          whereAND.push(subWhere[sw]);
+                          return subWhere[sw];
+                        }
+                      });
+                    });
+                    if (whereAND.length > 0) {
+                      return whereAND.join(",");
+                    }
                   }
                 },
               }
@@ -201,6 +255,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
           });
         });
       };
+
       resolversQuery[key] = (
         origItem: any,
         args: any,
@@ -210,31 +265,68 @@ export function remultGraphql(api: RemultServerCore<any>) {
     }
   }
 
-  if (query.length > 0) {
-    query = `type Query {${query}
-}`;
-  }
-
   return {
     resolvers,
     rootValue: root,
-    schema: `${types
-      .map(
-        ({ key, fields, moreFields }) =>
-          "type " + getTypeName(key) + "{" + fields + moreFields + "\n}\n"
-      )
-      .join("")}
-${query}
-${whereTypes}
-${sortTypes}
-enum OrderBydirection {
-  ASC
-  DESC
-}
+    schema: `${blockFormat({
+      prefix: `type Query`,
+      data: typeQuery,
+      comment: "Represents all Remult entities.",
+    })}
+
+${types
+  .map(({ key, fields }) => {
+    return blockFormat({
+      prefix: `type ${key}`,
+      data: fields,
+      comment: `Represents \`${key}\` entity.`,
+    });
+  })
+  .join(`\n\n`)}
+
+${orderByTypes.map((x) => x).join("\n\n")}
+
+${whereType.map((x) => x).join("\n\n")}
+${whereTypeSubFields.map((x) => x).join("\n\n")}
+
+${schemaGlobal}
 `,
   };
 }
 
-function getTypeName(key: string) {
-  return key;
+const schemaGlobal = `"""
+Determines the order of items returned
+"""
+enum OrderBydirection {
+  """
+  Sort data in ascending order
+  """
+  ASC
+  """
+  Sort data in descending order
+  """
+  DESC
+}`;
+
+function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
+  if (obj.data.length === 0) {
+    return ``;
+  }
+  return `"""
+${obj.comment}
+"""
+${obj.prefix} {
+  ${obj.data.join("\n  ")}
+}`;
+}
+
+function fieldFormat(obj: { data: string; comment?: string }) {
+  if (obj.comment) {
+    return `"""
+  ${obj.comment}
+  """
+  ${obj.data}`;
+  }
+
+  return obj.data;
 }

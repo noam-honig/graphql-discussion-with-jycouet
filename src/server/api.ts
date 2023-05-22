@@ -1,8 +1,9 @@
 import { remultExpress } from "remult/remult-express";
 import { Task } from "../shared/task";
+import { Category } from "../shared/Category";
 
 export const api = remultExpress({
-  entities: [Task],
+  entities: [Task, Category],
 });
 
 // const fn = async () => {
@@ -11,11 +12,10 @@ export const api = remultExpress({
 //     limit: 2,
 //     page: 1,
 //     where: {
-// id: {
-
-// }
+//       id: {},
 //     },
 //     orderBy: {
+//       category: 'asc', JYC TODO: Should we be able to do this?
 //       completed: "asc",
 //     },
 //   });
