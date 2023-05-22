@@ -4,19 +4,18 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "dev-node": "tsx watch src/server",
+    "dev-node": "tsx watch --inspect src/server",
     "start": "node dist/server/",
     "build": "tsc && vite build && tsc -p tsconfig.server.json",
     "preview": "vite preview"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "express-graphql": "^0.12.0",
     "graphql": "^16.6.0",
     "graphql-yoga": "^3.9.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "remult": "^0.20.0"
+    "remult": "^0.20.3-exp.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

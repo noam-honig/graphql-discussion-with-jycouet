@@ -1,31 +1,22 @@
 import express from "express";
 import { api } from "./api";
 import { buildSchema } from "graphql";
-import { graphqlHTTP } from "express-graphql";
+
 import { remultGraphql } from "remult/graphql";
 import { createSchema, createYoga } from "graphql-yoga";
 
 const app = express();
 app.use(api);
-const { schema, rootValue } = remultGraphql(api);
-app.use(
-  "/api/graphql",
-  graphqlHTTP({
-    schema: buildSchema(schema),
-    rootValue,
-    graphiql: true,
-  })
-);
+const { schema, resolvers } = remultGraphql(api);
 
 const yoga = createYoga({
   graphiql: true,
-  graphqlEndpoint:'/api/yoga',
+  graphqlEndpoint: "/api/yoga",
   schema: createSchema({
     typeDefs: schema,
-    resolvers: rootValue,
+    resolvers,
   }),
 });
-
 // Bind GraphQL Yoga to the graphql endpoint to avoid rendering the playground on any path
 app.use(yoga.graphqlEndpoint, yoga);
 
