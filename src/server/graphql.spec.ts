@@ -22,11 +22,11 @@ describe("test graphql", () => {
         \\"\\"\\"
         type Query {
           \\"\\"\\"
-          List all \`Task\`
+          List all \`Task\` entity (with pagination, sorting and filtering)
           \\"\\"\\"
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
           \\"\\"\\"
-          List all \`Category\`
+          List all \`Category\` entity (with pagination, sorting and filtering)
           \\"\\"\\"
           categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
         }

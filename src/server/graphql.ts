@@ -62,7 +62,9 @@ export function remultGraphql(api: RemultServerCore<any>) {
         key,
         args: argsList,
         value: `[${getMetaType(meta)}!]!`,
-        comment: `List all \`${getMetaType(meta)}\``,
+        comment: `List all \`${getMetaType(
+          meta
+        )}\` entity (with pagination, sorting and filtering)`,
         order: 0,
       });
 
