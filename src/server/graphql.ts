@@ -111,8 +111,8 @@ export function remultGraphql(
       const root_mutation = upsertTypes("Mutation", "type", -9);
 
       // create
-      const createInput = `${getMetaType(meta)}CreateInput`;
-      const createPayload = `${getMetaType(meta)}CreatePayload`;
+      const createInput = `Create${getMetaType(meta)}Input`;
+      const createPayload = `Create${getMetaType(meta)}Payload`;
       root_mutation.fields.push({
         key: `create${getMetaType(meta)}`,
         args: `input: ${createInput}!`,
@@ -128,8 +128,8 @@ export function remultGraphql(
       });
 
       // update
-      const updateInput = `${getMetaType(meta)}UpdateInput`;
-      const updatePayload = `${getMetaType(meta)}UpdatePayload`;
+      const updateInput = `Update${getMetaType(meta)}Input`;
+      const updatePayload = `Update${getMetaType(meta)}Payload`;
       root_mutation.fields.push({
         key: `update${getMetaType(meta)}`,
         args: `id: ID!, patch: ${updateInput}!`,
@@ -146,7 +146,7 @@ export function remultGraphql(
       });
 
       // delete
-      const deletePayload = `${getMetaType(meta)}DeletePayload`;
+      const deletePayload = `Delete${getMetaType(meta)}Payload`;
       root_mutation.fields.push({
         key: `delete${getMetaType(meta)}`,
         args: `id: ID!`,
@@ -257,28 +257,34 @@ export function remultGraphql(
         orderByFields.push(`${f.key}: OrderBydirection`);
 
         // where
-        whereTypeFields.push(`${f.key}: ${key}Where${f.key}`);
+        const whereType_Fields = `${key}Where_${f.key}`;
+        whereTypeFields.push(`${f.key}: ${whereType_Fields}`);
         currentType.query.whereTypeSubFields.push(
           blockFormat({
-            prefix: `input ${key}Where${f.key}`,
+            prefix: `input ${whereType_Fields}`,
             data: whereFields,
             comment: `Where options for \`${key}.${f.key}\``,
           })
         );
 
+        // Todo => Complete should not be a MUST. Where to look?
+        // helper
+        const it_is_not_at_ref = ref === undefined;
         // create
-        // JYC TODO rmv id
-        currentType.mutation.create.input.fields.push({
-          key: f.key,
-          value: `${type}${f.allowNull ? "" : "!"}`,
-        });
+        if (!f.dbReadOnly && it_is_not_at_ref) {
+          currentType.mutation.create.input.fields.push({
+            key: f.key,
+            value: `${type}${f.allowNull ? "" : "!"}`,
+          });
+        }
 
-        // create
-        // JYC TODO rmv id
-        currentType.mutation.update.input.fields.push({
-          key: f.key,
-          value: `${type}${f.allowNull ? "" : "!"}`,
-        });
+        // update
+        if (!f.dbReadOnly && it_is_not_at_ref) {
+          currentType.mutation.update.input.fields.push({
+            key: f.key,
+            value: `${type}${f.allowNull ? "" : "!"}`,
+          });
+        }
       }
 
       currentType.query.orderBy.push(

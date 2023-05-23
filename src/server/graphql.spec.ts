@@ -28,12 +28,12 @@ describe("test graphql", () => {
         }
 
         type Mutation {
-          createTask (input: TaskCreateInput!): TaskCreatePayload
-          updateTask (id: ID!, patch: TaskUpdateInput!): TaskUpdatePayload
-          deleteTask (id: ID!): TaskDeletePayload
-          createCategory (input: CategoryCreateInput!): CategoryCreatePayload
-          updateCategory (id: ID!, patch: CategoryUpdateInput!): CategoryUpdatePayload
-          deleteCategory (id: ID!): CategoryDeletePayload
+          createTask (input: CreateTaskInput!): CreateTaskPayload
+          updateTask (id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+          deleteTask (id: ID!): DeleteTaskPayload
+          createCategory (input: CreateCategoryInput!): CreateCategoryPayload
+          updateCategory (id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+          deleteCategory (id: ID!): DeleteCategoryPayload
         }
 
         type Task {
@@ -51,14 +51,14 @@ describe("test graphql", () => {
         }
 
         input tasksWhere {
-          id: tasksWhereid
-          title: tasksWheretitle
-          completed: tasksWherecompleted
-          category: tasksWherecategory
+          id: tasksWhere_id
+          title: tasksWhere_title
+          completed: tasksWhere_completed
+          category: tasksWhere_category
           OR: [tasksWhere!]
         }
 
-        input tasksWhereid {
+        input tasksWhere_id {
           eq: Int
           ne: Int
           gt: Int
@@ -68,7 +68,7 @@ describe("test graphql", () => {
           in: [Int!]
         }
 
-        input tasksWheretitle {
+        input tasksWhere_title {
           eq: String
           ne: String
           gt: String
@@ -80,42 +80,38 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        input tasksWherecompleted {
+        input tasksWhere_completed {
           eq: Boolean
           ne: Boolean
           in: [Boolean!]
         }
 
-        input tasksWherecategory {
+        input tasksWhere_category {
           eq: String
           ne: String
           null: Boolean
           in: [String!]
         }
 
-        input TaskCreateInput {
-          id: Int!
+        input CreateTaskInput {
           title: String!
           completed: Boolean!
-          category: String
         }
 
-        type TaskCreatePayload {
+        type CreateTaskPayload {
           task: Task
         }
 
-        input TaskUpdateInput {
-          id: Int!
+        input UpdateTaskInput {
           title: String!
           completed: Boolean!
-          category: String
         }
 
-        type TaskUpdatePayload {
+        type UpdateTaskPayload {
           task: Task
         }
 
-        type TaskDeletePayload {
+        type DeleteTaskPayload {
           deletedTaskId: ID
         }
 
@@ -131,12 +127,12 @@ describe("test graphql", () => {
         }
 
         input categoriesWhere {
-          id: categoriesWhereid
-          name: categoriesWherename
+          id: categoriesWhere_id
+          name: categoriesWhere_name
           OR: [categoriesWhere!]
         }
 
-        input categoriesWhereid {
+        input categoriesWhere_id {
           eq: String
           ne: String
           gt: String
@@ -148,7 +144,7 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        input categoriesWherename {
+        input categoriesWhere_name {
           eq: String
           ne: String
           gt: String
@@ -160,25 +156,25 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        input CategoryCreateInput {
+        input CreateCategoryInput {
           id: String!
           name: String!
         }
 
-        type CategoryCreatePayload {
+        type CreateCategoryPayload {
           category: Category
         }
 
-        input CategoryUpdateInput {
+        input UpdateCategoryInput {
           id: String!
           name: String!
         }
 
-        type CategoryUpdatePayload {
+        type UpdateCategoryPayload {
           category: Category
         }
 
-        type CategoryDeletePayload {
+        type DeleteCategoryPayload {
           deletedCategoryId: ID
         }
 
