@@ -1,9 +1,17 @@
 import { remultExpress } from "remult/remult-express";
 import { Task } from "../shared/task";
 import { Category } from "../shared/Category";
+// import { createPostgresConnection } from "remult/postgres";
+
+// const connectionString =
+//   "postgres://postgres:example@127.0.0.1:5433/remult-demo-1";
 
 export const api = remultExpress({
   entities: [Task, Category],
+  // dataProvider: createPostgresConnection({
+  //   configuration: {},
+  //   connectionString, // default: process.env["DATABASE_URL"]
+  // }),
 });
 
 // const fn = async () => {

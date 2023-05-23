@@ -14,6 +14,7 @@
     "express": "^4.18.2",
     "graphql": "^16.6.0",
     "graphql-yoga": "^3.9.1",
+    "pg": "^8.11.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remult": "^0.20.3-exp.0"

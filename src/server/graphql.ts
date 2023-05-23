@@ -579,7 +579,7 @@ enum OrderBydirection {
 }
 
 """
-Node interface of remult entities
+Node interface of remult entities (eg: nodeId: \`Task:1\` so \`Typename:id\`)
 """
 interface Node {
   nodeId: ID!
