@@ -22,19 +22,19 @@ describe("test graphql", () => {
         \\"\\"\\"
         type Query {
           \\"\\"\\"
-          List all \`tasks\`
+          List all \`Task\`
           \\"\\"\\"
-          tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [tasks!]!
+          tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
           \\"\\"\\"
-          List all \`categories\`
+          List all \`Category\`
           \\"\\"\\"
-          categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [categories!]!
+          categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
         }
 
         \\"\\"\\"
-        Represents \`tasks\` entity.
+        Represents \`Task\` entity.
         \\"\\"\\"
-        type tasks {
+        type Task {
           \\"\\"\\"
           Id
           \\"\\"\\"
@@ -50,25 +50,7 @@ describe("test graphql", () => {
           \\"\\"\\"
           Category
           \\"\\"\\"
-          category: categories
-        }
-
-        \\"\\"\\"
-        Represents \`categories\` entity.
-        \\"\\"\\"
-        type categories {
-          \\"\\"\\"
-          Id
-          \\"\\"\\"
-          id: String!
-          \\"\\"\\"
-          Name
-          \\"\\"\\"
-          name: String!
-          \\"\\"\\"
-          List all \`tasks\` of \`categories\`
-          \\"\\"\\"
-          tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [tasks!]!
+          category: Category
         }
 
         \\"\\"\\"
@@ -82,14 +64,6 @@ describe("test graphql", () => {
         }
 
         \\"\\"\\"
-        OrderBy options for \`categories\`
-        \\"\\"\\"
-        input categoriesOrderBy {
-          id: OrderBydirection
-          name: OrderBydirection
-        }
-
-        \\"\\"\\"
         Where options for \`tasks\`
         \\"\\"\\"
         input tasksWhere {
@@ -100,14 +74,6 @@ describe("test graphql", () => {
           OR: [tasksWhere!]
         }
 
-        \\"\\"\\"
-        Where options for \`categories\`
-        \\"\\"\\"
-        input categoriesWhere {
-          id: categoriesWhereid
-          name: categoriesWherename
-          OR: [categoriesWhere!]
-        }
         \\"\\"\\"
         Where options for \`tasks.id\`
         \\"\\"\\"
@@ -153,6 +119,41 @@ describe("test graphql", () => {
           ne: String
           null: Boolean
           in: [String!]
+        }
+
+        \\"\\"\\"
+        Represents \`Category\` entity.
+        \\"\\"\\"
+        type Category {
+          \\"\\"\\"
+          Id
+          \\"\\"\\"
+          id: String!
+          \\"\\"\\"
+          Name
+          \\"\\"\\"
+          name: String!
+          \\"\\"\\"
+          List all \`Task\` of \`categories\`
+          \\"\\"\\"
+          tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+        }
+
+        \\"\\"\\"
+        OrderBy options for \`categories\`
+        \\"\\"\\"
+        input categoriesOrderBy {
+          id: OrderBydirection
+          name: OrderBydirection
+        }
+
+        \\"\\"\\"
+        Where options for \`categories\`
+        \\"\\"\\"
+        input categoriesWhere {
+          id: categoriesWhereid
+          name: categoriesWherename
+          OR: [categoriesWhere!]
         }
 
         \\"\\"\\"

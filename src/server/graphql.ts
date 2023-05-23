@@ -1,3 +1,4 @@
+import { EntityMetadata } from "remult";
 import { RemultServerCore } from "remult/server";
 
 type Field = {
@@ -15,20 +16,31 @@ export function remultGraphql(api: RemultServerCore<any>) {
   let types: {
     key: string;
     fields: Field[];
+    orderBy: string[];
+    whereType: string[];
+    whereTypeSubFields: string[];
     resultProcessors: ((item: any) => void)[];
     order: number;
   }[] = [];
 
-  let orderByTypes: string[] = [];
-  let whereType: string[] = [];
-  let whereTypeSubFields: string[] = [];
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
   let resolvers = { Query: resolversQuery };
 
-  function getType(key: string, order: number = 0) {
+  function get_and_build_Types(key: string, order: number = 0) {
     let t = types.find((t) => t.key === key);
-    if (!t) types.push((t = { fields: [], key, resultProcessors: [], order }));
+    if (!t)
+      types.push(
+        (t = {
+          fields: [],
+          key,
+          resultProcessors: [],
+          order,
+          orderBy: [],
+          whereType: [],
+          whereTypeSubFields: [],
+        })
+      );
     return t;
   }
 
@@ -37,27 +49,30 @@ export function remultGraphql(api: RemultServerCore<any>) {
 
     let key = meta.key;
 
-    const currentType = getType(key);
+    const currentType = get_and_build_Types(getMetaType(meta));
 
     if (key) {
-      const root_query = getType("Query", -10);
+      const root_query = get_and_build_Types("Query", -10);
       const argsList =
         `limit: Int, page: Int, ` +
         `orderBy: ${key}OrderBy, ` +
         `where: ${key}Where`;
+
       root_query.fields.push({
         key,
         args: argsList,
-        value: `[${key}!]!`,
-        comment: `List all \`${key}\``,
+        value: `[${getMetaType(meta)}!]!`,
+        comment: `List all \`${getMetaType(meta)}\``,
         order: 0,
       });
 
-      // typeQuery.push({
-      //   key,
-      //   args: argsList,
-      //   value: `[${key}!]!`,
-      //   comment: `List all \`${key}\``,
+      // const root_mutation = getType("Mutation", -9);
+      // root_mutation.fields.push({
+      //   key: `create${key}`,
+      //   args: `${key}: ${key}Input!`,
+      //   value: `${key}!`,
+      //   comment: `Add a new \`${key}\``,
+      //   order: 0,
       // });
 
       const whereTypeFields: string[] = [];
@@ -79,16 +94,16 @@ export function remultGraphql(api: RemultServerCore<any>) {
             }
             break;
         }
-        let info = entities.find((i) => i.entityType === f.valueType);
-        if (info !== undefined) {
-          const refKey = info.key;
-
+        let ref = entities.find((i) => i.entityType === f.valueType);
+        if (ref !== undefined) {
+          // will do: Task.category
           currentType.fields.push({
             key: f.key,
-            value: `${refKey}${f.allowNull ? "" : "!"}`,
+            value: `${getMetaType(ref)}${f.allowNull ? "" : "!"}`,
             comment: f.caption,
             order: 0,
           });
+          const refKey = ref.key;
           currentType.resultProcessors.push((r) => {
             const val = r[f.key];
             if (val === null || val === undefined) return null;
@@ -107,22 +122,22 @@ export function remultGraphql(api: RemultServerCore<any>) {
             };
           });
 
-          let refT = getType(refKey);
+          // will do: Category.tasks
+          let refT = get_and_build_Types(getMetaType(ref));
           refT.fields.push({
             key,
             args: argsList,
-            value: `[${key}!]!`,
+            value: `[${getMetaType(meta)}!]!`,
             order: 10,
-            comment: `List all \`${key}\` of \`${refKey}\``,
+            comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           });
-
           refT.resultProcessors.push((r) => {
             const val = r.id;
             r[key] = async (args: any, req: any, gqlInfo: any) => {
               return await root[key](
                 {
                   where: { ...args.where, [f.key]: val },
-                  options: args.options,
+                  options: { ...args.limit, ...args.page, ...args.orderBy },
                 },
                 req,
                 gqlInfo
@@ -161,7 +176,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
         // where
         whereTypeFields.push(`${f.key}: ${key}Where${f.key}`);
 
-        whereTypeSubFields.push(
+        currentType.whereTypeSubFields.push(
           blockFormat({
             prefix: `input ${key}Where${f.key}`,
             data: whereFields,
@@ -170,7 +185,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
         );
       }
 
-      orderByTypes.push(
+      currentType.orderBy.push(
         blockFormat({
           prefix: `input ${key}OrderBy`,
           data: orderByFields,
@@ -179,7 +194,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
       );
 
       whereTypeFields.push(`OR: [${key}Where!]`);
-      whereType.push(
+      currentType.whereType.push(
         blockFormat({
           prefix: `input ${key}Where`,
           data: whereTypeFields,
@@ -287,8 +302,8 @@ export function remultGraphql(api: RemultServerCore<any>) {
     rootValue: root,
     schema: `${types
       .sort((a, b) => a.order - b.order)
-      .map(({ key, fields }) => {
-        return blockFormat({
+      .map(({ key, fields, orderBy, whereType, whereTypeSubFields }) => {
+        const type = blockFormat({
           prefix: `type ${key}`,
           data: fields
             .sort((a, b) => a.order - b.order)
@@ -300,13 +315,18 @@ export function remultGraphql(api: RemultServerCore<any>) {
               ? `Represents all Remult Mutations available on Remult.`
               : `Represents \`${key}\` entity.`,
         });
+
+        const orderByStr =
+          orderBy.length > 0 ? `\n\n${orderBy.join("\n\n")}` : ``;
+        const whereTypeStr =
+          whereType.length > 0 ? `\n\n${whereType.join("\n\n")}` : ``;
+        const whereTypeSubFieldsStr =
+          whereTypeSubFields.length > 0
+            ? `\n\n${whereTypeSubFields.join("\n\n")}`
+            : ``;
+        return `${type}${orderByStr}${whereTypeStr}${whereTypeSubFieldsStr}`;
       })
       .join(`\n\n`)}
-
-${orderByTypes.map((x) => x).join("\n\n")}
-
-${whereType.map((x) => x).join("\n\n")}
-${whereTypeSubFields.map((x) => x).join("\n\n")}
 
 ${schemaGlobal}
 `,
@@ -326,6 +346,10 @@ enum OrderBydirection {
   """
   DESC
 }`;
+
+function getMetaType(meta: EntityMetadata) {
+  return meta.entityType.name;
+}
 
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
