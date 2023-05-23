@@ -38,9 +38,13 @@ type GraphQLType = {
 let _removeComments = false;
 export function remultGraphql(
   api: RemultServerCore<any>,
-  options?: { removeComments?: Boolean }
+  options?: { removeComments?: Boolean; withConnection?: Boolean }
 ) {
-  const { removeComments } = { removeComments: false, ...options };
+  const { removeComments, withConnection } = {
+    removeComments: false,
+    withConnection: false,
+    ...options,
+  };
 
   if (removeComments) {
     _removeComments = true;
@@ -154,8 +158,13 @@ export function remultGraphql(
 
     if (key) {
       const root_query = upsertTypes("Query", "type", -10);
+
+      const queryArgsListPagination = withConnection
+        ? `first: Int, after: String, last: Int, befor: String`
+        : `limit: Int, page: Int`;
+
       const queryArgsList =
-        `limit: Int, page: Int, ` +
+        `${queryArgsListPagination}, ` +
         `orderBy: ${key}OrderBy, ` +
         `where: ${key}Where`;
 
