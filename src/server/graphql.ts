@@ -1,4 +1,4 @@
-import { EntityMetadata } from "remult";
+import { EntityMetadata, Field } from "remult";
 import { RemultServerCore } from "remult/server";
 
 type Field = {
@@ -6,39 +6,80 @@ type Field = {
   args?: string;
   value: string;
   comment?: string;
-  order: number;
+  order?: number;
 };
 
-export function remultGraphql(api: RemultServerCore<any>) {
-  let server = api["get internal server"]();
-  const entities = server.getEntities();
-
-  let types: {
-    key: string;
-    fields: Field[];
+type GraphQLType = {
+  key: string;
+  kind: "type" | "input";
+  fields: Field[];
+  query: {
     orderBy: string[];
     whereType: string[];
     whereTypeSubFields: string[];
     resultProcessors: ((item: any) => void)[];
-    order: number;
-  }[] = [];
+  };
+  mutation: {
+    create: {
+      input?: GraphQLType;
+      payload?: GraphQLType;
+    };
+    update: {
+      input?: GraphQLType;
+      payload?: GraphQLType;
+    };
+    delete: {
+      payload?: GraphQLType;
+    };
+  };
+  order?: number;
+};
+
+let _removeComments = false;
+export function remultGraphql(
+  api: RemultServerCore<any>,
+  options?: { removeComments?: Boolean }
+) {
+  const { removeComments } = { removeComments: false, ...options };
+
+  if (removeComments) {
+    _removeComments = true;
+  }
+
+  let server = api["get internal server"]();
+  const entities = server.getEntities();
+
+  let types: GraphQLType[] = [];
 
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
   let resolvers = { Query: resolversQuery };
 
-  function get_and_build_Types(key: string, order: number = 0) {
+  function upsertTypes(
+    key: string,
+    kind: "type" | "input" = "type",
+    order: number = 0
+  ) {
     let t = types.find((t) => t.key === key);
     if (!t)
       types.push(
         (t = {
-          fields: [],
           key,
-          resultProcessors: [],
+          kind,
+          fields: [],
+          query: {
+            orderBy: [],
+            whereType: [],
+            whereTypeSubFields: [],
+
+            resultProcessors: [],
+          },
+          mutation: {
+            create: {},
+            update: {},
+            delete: {},
+          },
           order,
-          orderBy: [],
-          whereType: [],
-          whereTypeSubFields: [],
         })
       );
     return t;
@@ -49,33 +90,75 @@ export function remultGraphql(api: RemultServerCore<any>) {
 
     let key = meta.key;
 
-    const currentType = get_and_build_Types(getMetaType(meta));
+    const currentType = upsertTypes(getMetaType(meta));
 
     if (key) {
-      const root_query = get_and_build_Types("Query", -10);
-      const argsList =
+      const root_query = upsertTypes("Query", "type", -10);
+      const queryArgsList =
         `limit: Int, page: Int, ` +
         `orderBy: ${key}OrderBy, ` +
         `where: ${key}Where`;
 
       root_query.fields.push({
         key,
-        args: argsList,
+        args: queryArgsList,
         value: `[${getMetaType(meta)}!]!`,
         comment: `List all \`${getMetaType(
           meta
         )}\` entity (with pagination, sorting and filtering)`,
-        order: 0,
       });
 
-      // const root_mutation = getType("Mutation", -9);
-      // root_mutation.fields.push({
-      //   key: `create${key}`,
-      //   args: `${key}: ${key}Input!`,
-      //   value: `${key}!`,
-      //   comment: `Add a new \`${key}\``,
-      //   order: 0,
-      // });
+      const root_mutation = upsertTypes("Mutation", "type", -9);
+
+      // create
+      const createInput = `${getMetaType(meta)}CreateInput`;
+      const createPayload = `${getMetaType(meta)}CreatePayload`;
+      root_mutation.fields.push({
+        key: `create${getMetaType(meta)}`,
+        args: `input: ${createInput}!`,
+        value: `${createPayload}`,
+        comment: `Create a new \`${getMetaType(meta)}\``,
+      });
+      currentType.mutation.create.input = upsertTypes(createInput, "input");
+
+      currentType.mutation.create.payload = upsertTypes(createPayload);
+      currentType.mutation.create.payload.fields.push({
+        key: `${toPascalCase(getMetaType(meta))}`,
+        value: `${getMetaType(meta)}`,
+      });
+
+      // update
+      const updateInput = `${getMetaType(meta)}UpdateInput`;
+      const updatePayload = `${getMetaType(meta)}UpdatePayload`;
+      root_mutation.fields.push({
+        key: `update${getMetaType(meta)}`,
+        args: `id: ID!, patch: ${updateInput}!`,
+        value: `${updatePayload}`,
+        comment: `Update a \`${getMetaType(meta)}\``,
+      });
+
+      currentType.mutation.update.input = upsertTypes(updateInput, "input");
+
+      currentType.mutation.update.payload = upsertTypes(updatePayload);
+      currentType.mutation.update.payload.fields.push({
+        key: `${toPascalCase(getMetaType(meta))}`,
+        value: `${getMetaType(meta)}`,
+      });
+
+      // delete
+      const deletePayload = `${getMetaType(meta)}DeletePayload`;
+      root_mutation.fields.push({
+        key: `delete${getMetaType(meta)}`,
+        args: `id: ID!`,
+        value: `${deletePayload}`,
+        comment: `Delete a \`${getMetaType(meta)}\``,
+      });
+
+      currentType.mutation.delete.payload = upsertTypes(deletePayload);
+      currentType.mutation.delete.payload.fields.push({
+        key: `deleted${getMetaType(meta)}Id`,
+        value: "ID",
+      });
 
       const whereTypeFields: string[] = [];
       for (const f of meta.fields) {
@@ -103,10 +186,9 @@ export function remultGraphql(api: RemultServerCore<any>) {
             key: f.key,
             value: `${getMetaType(ref)}${f.allowNull ? "" : "!"}`,
             comment: f.caption,
-            order: 0,
           });
           const refKey = ref.key;
-          currentType.resultProcessors.push((r) => {
+          currentType.query.resultProcessors.push((r) => {
             const val = r[f.key];
             if (val === null || val === undefined) return null;
             r[f.key] = async (args: any, req: any, gqlInfo: any) => {
@@ -125,15 +207,15 @@ export function remultGraphql(api: RemultServerCore<any>) {
           });
 
           // will do: Category.tasks
-          let refT = get_and_build_Types(getMetaType(ref));
+          let refT = upsertTypes(getMetaType(ref));
           refT.fields.push({
             key,
-            args: argsList,
+            args: queryArgsList,
             value: `[${getMetaType(meta)}!]!`,
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           });
-          refT.resultProcessors.push((r) => {
+          refT.query.resultProcessors.push((r) => {
             const val = r.id;
             r[key] = async (args: any, req: any, gqlInfo: any) => {
               return await root[key](
@@ -151,7 +233,6 @@ export function remultGraphql(api: RemultServerCore<any>) {
             key: f.key,
             value: `${type}${f.allowNull ? "" : "!"}`,
             comment: f.caption,
-            order: 0,
           });
         }
         const addFilter = (operator: string, theType?: string) => {
@@ -177,17 +258,30 @@ export function remultGraphql(api: RemultServerCore<any>) {
 
         // where
         whereTypeFields.push(`${f.key}: ${key}Where${f.key}`);
-
-        currentType.whereTypeSubFields.push(
+        currentType.query.whereTypeSubFields.push(
           blockFormat({
             prefix: `input ${key}Where${f.key}`,
             data: whereFields,
             comment: `Where options for \`${key}.${f.key}\``,
           })
         );
+
+        // create
+        // JYC TODO rmv id
+        currentType.mutation.create.input.fields.push({
+          key: f.key,
+          value: `${type}${f.allowNull ? "" : "!"}`,
+        });
+
+        // create
+        // JYC TODO rmv id
+        currentType.mutation.update.input.fields.push({
+          key: f.key,
+          value: `${type}${f.allowNull ? "" : "!"}`,
+        });
       }
 
-      currentType.orderBy.push(
+      currentType.query.orderBy.push(
         blockFormat({
           prefix: `input ${key}OrderBy`,
           data: orderByFields,
@@ -196,7 +290,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
       );
 
       whereTypeFields.push(`OR: [${key}Where!]`);
-      currentType.whereType.push(
+      currentType.query.whereType.push(
         blockFormat({
           prefix: `input ${key}Where`,
           data: whereTypeFields,
@@ -216,7 +310,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
               {
                 success: (x) => {
                   return (result = x.map((y: any) => {
-                    currentType.resultProcessors.forEach((z) => z(y));
+                    currentType.query.resultProcessors.forEach((z) => z(y));
                     return y;
                   }));
                 },
@@ -303,12 +397,13 @@ export function remultGraphql(api: RemultServerCore<any>) {
     resolvers,
     rootValue: root,
     schema: `${types
-      .sort((a, b) => a.order - b.order)
-      .map(({ key, fields, orderBy, whereType, whereTypeSubFields }) => {
+      .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
+      .map(({ key, kind, fields, query }) => {
+        const { orderBy, whereType, whereTypeSubFields } = query;
         const type = blockFormat({
-          prefix: `type ${key}`,
+          prefix: `${kind} ${key}`,
           data: fields
-            .sort((a, b) => a.order - b.order)
+            .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
             .map((field) => fieldFormat(field)),
           comment:
             key === "Query"
@@ -349,20 +444,25 @@ enum OrderBydirection {
   DESC
 }`;
 
-function getMetaType(meta: EntityMetadata) {
-  return meta.entityType.name;
-}
-
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
     return ``;
   }
-  return `"""
-${obj.comment}
-"""
-${obj.prefix} {
+
+  const str = `${obj.prefix} {
   ${obj.data.join("\n  ")}
 }`;
+
+  let commentsStr = `"""
+${obj.comment}
+"""
+`;
+
+  if (_removeComments) {
+    commentsStr = ``;
+  }
+
+  return `${commentsStr}${str}`;
 }
 
 function fieldFormat(field: Field) {
@@ -370,7 +470,7 @@ function fieldFormat(field: Field) {
     field.value
   }`;
 
-  if (field.comment) {
+  if (!_removeComments && field.comment) {
     return `"""
   ${field.comment}
   """
@@ -378,4 +478,15 @@ function fieldFormat(field: Field) {
   }
 
   return key_value;
+}
+
+function getMetaType(entityMeta: EntityMetadata) {
+  return entityMeta.entityType.name;
+}
+
+function toPascalCase(str: string) {
+  return str
+    .split("")
+    .map((c, i) => (i === 0 ? c.toLowerCase() : c))
+    .join("");
 }

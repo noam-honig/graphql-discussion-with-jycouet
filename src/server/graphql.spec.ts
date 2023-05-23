@@ -14,48 +14,31 @@ describe("test graphql", () => {
     });
   }),
     it("test basics", async () => {
-      const { schema } = remultGraphql(api);
+      // rmv removeComments is very handy for testing!
+      const { schema } = remultGraphql(api, { removeComments: true });
 
       expect(schema).toMatchInlineSnapshot(`
-        "\\"\\"\\"
-        Represents all Remult entities.
-        \\"\\"\\"
-        type Query {
-          \\"\\"\\"
-          List all \`Task\` entity (with pagination, sorting and filtering)
-          \\"\\"\\"
+        "type Query {
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-          \\"\\"\\"
-          List all \`Category\` entity (with pagination, sorting and filtering)
-          \\"\\"\\"
           categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
         }
 
-        \\"\\"\\"
-        Represents \`Task\` entity.
-        \\"\\"\\"
+        type Mutation {
+          createTask (input: TaskCreateInput!): TaskCreatePayload
+          updateTask (id: ID!, patch: TaskUpdateInput!): TaskUpdatePayload
+          deleteTask (id: ID!): TaskDeletePayload
+          createCategory (input: CategoryCreateInput!): CategoryCreatePayload
+          updateCategory (id: ID!, patch: CategoryUpdateInput!): CategoryUpdatePayload
+          deleteCategory (id: ID!): CategoryDeletePayload
+        }
+
         type Task {
-          \\"\\"\\"
-          Id
-          \\"\\"\\"
           id: Int!
-          \\"\\"\\"
-          The Title
-          \\"\\"\\"
           title: String!
-          \\"\\"\\"
-          Is it completed?
-          \\"\\"\\"
           completed: Boolean!
-          \\"\\"\\"
-          Category
-          \\"\\"\\"
           category: Category
         }
 
-        \\"\\"\\"
-        OrderBy options for \`tasks\`
-        \\"\\"\\"
         input tasksOrderBy {
           id: OrderBydirection
           title: OrderBydirection
@@ -63,9 +46,6 @@ describe("test graphql", () => {
           category: OrderBydirection
         }
 
-        \\"\\"\\"
-        Where options for \`tasks\`
-        \\"\\"\\"
         input tasksWhere {
           id: tasksWhereid
           title: tasksWheretitle
@@ -74,9 +54,6 @@ describe("test graphql", () => {
           OR: [tasksWhere!]
         }
 
-        \\"\\"\\"
-        Where options for \`tasks.id\`
-        \\"\\"\\"
         input tasksWhereid {
           eq: Int
           ne: Int
@@ -87,9 +64,6 @@ describe("test graphql", () => {
           in: [Int!]
         }
 
-        \\"\\"\\"
-        Where options for \`tasks.title\`
-        \\"\\"\\"
         input tasksWheretitle {
           eq: String
           ne: String
@@ -102,18 +76,12 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        \\"\\"\\"
-        Where options for \`tasks.completed\`
-        \\"\\"\\"
         input tasksWherecompleted {
           eq: Boolean
           ne: Boolean
           in: [Boolean!]
         }
 
-        \\"\\"\\"
-        Where options for \`tasks.category\`
-        \\"\\"\\"
         input tasksWherecategory {
           eq: String
           ne: String
@@ -121,44 +89,49 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        \\"\\"\\"
-        Represents \`Category\` entity.
-        \\"\\"\\"
+        input TaskCreateInput {
+          id: Int!
+          title: String!
+          completed: Boolean!
+          category: String
+        }
+
+        type TaskCreatePayload {
+          task: Task
+        }
+
+        input TaskUpdateInput {
+          id: Int!
+          title: String!
+          completed: Boolean!
+          category: String
+        }
+
+        type TaskUpdatePayload {
+          task: Task
+        }
+
+        type TaskDeletePayload {
+          deletedTaskId: ID
+        }
+
         type Category {
-          \\"\\"\\"
-          Id
-          \\"\\"\\"
           id: String!
-          \\"\\"\\"
-          Name
-          \\"\\"\\"
           name: String!
-          \\"\\"\\"
-          List all \`Task\` of \`categories\`
-          \\"\\"\\"
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
         }
 
-        \\"\\"\\"
-        OrderBy options for \`categories\`
-        \\"\\"\\"
         input categoriesOrderBy {
           id: OrderBydirection
           name: OrderBydirection
         }
 
-        \\"\\"\\"
-        Where options for \`categories\`
-        \\"\\"\\"
         input categoriesWhere {
           id: categoriesWhereid
           name: categoriesWherename
           OR: [categoriesWhere!]
         }
 
-        \\"\\"\\"
-        Where options for \`categories.id\`
-        \\"\\"\\"
         input categoriesWhereid {
           eq: String
           ne: String
@@ -171,9 +144,6 @@ describe("test graphql", () => {
           in: [String!]
         }
 
-        \\"\\"\\"
-        Where options for \`categories.name\`
-        \\"\\"\\"
         input categoriesWherename {
           eq: String
           ne: String
@@ -184,6 +154,28 @@ describe("test graphql", () => {
           st: String
           contains: String
           in: [String!]
+        }
+
+        input CategoryCreateInput {
+          id: String!
+          name: String!
+        }
+
+        type CategoryCreatePayload {
+          category: Category
+        }
+
+        input CategoryUpdateInput {
+          id: String!
+          name: String!
+        }
+
+        type CategoryUpdatePayload {
+          category: Category
+        }
+
+        type CategoryDeletePayload {
+          deletedCategoryId: ID
         }
 
         \\"\\"\\"
@@ -202,6 +194,7 @@ describe("test graphql", () => {
         "
       `);
     });
+
   it("test get values", async () => {
     api["get internal server"]().run({} as any, async () => {
       await remult.repo(Task).insert([{ title: "task a" }]);
