@@ -1,8 +1,8 @@
 import { RemultExpressServer, remultExpress } from "remult/remult-express";
-import { describe, it, expect, beforeEach } from "vitest";
-import { Task } from "./task";
+import { beforeEach, describe, expect, it } from "vitest";
+import { Category } from "../shared/Category";
+import { Task } from "../shared/task";
 import { remultGraphql } from "./graphql";
-import { Category } from "./Category";
 
 let api: RemultExpressServer;
 describe("test graphql", () => {
