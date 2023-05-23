@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { Category } from "../shared/Category";
 import { Task } from "../shared/task";
 import { remultGraphql } from "./graphql";
+import { InMemoryDataProvider, remult } from "remult";
 
 let api: RemultExpressServer;
 describe("test graphql", () => {
   beforeEach(async () => {
     api = remultExpress({
+      dataProvider: new InMemoryDataProvider(),
       entities: [Task, Category],
     });
   }),
@@ -199,4 +201,14 @@ describe("test graphql", () => {
         "
       `);
     });
+  it("test get values", async () => {
+    api["get internal server"]().run({} as any, async () => {
+      await remult.repo(Task).insert([{ title: "task a" }]);
+      expect(await remult.repo(Task).count()).toBe(1);
+    });
+    const { resolvers } = remultGraphql(api);
+    expect(
+      (await (resolvers.Query.tasks as any)(undefined, {}, {})).length
+    ).toBe(1);
+  });
 });
