@@ -4,6 +4,10 @@ import { Category } from "../shared/Category";
 import { Task } from "../shared/task";
 import { remultGraphql } from "./graphql";
 import { InMemoryDataProvider, remult } from "remult";
+import { buildHTTPExecutor } from "@graphql-tools/executor-http";
+import { parse } from "graphql";
+
+import { createSchema, createYoga } from "graphql-yoga";
 
 let api: RemultExpressServer;
 describe("test graphql", () => {
@@ -204,5 +208,33 @@ describe("test graphql", () => {
     expect(
       (await (resolvers.Query.tasks as any)(undefined, {}, {})).length
     ).toBe(1);
+  });
+  it("test graphql", async () => {
+    const { schema, resolvers } = remultGraphql(api);
+    api["get internal server"]().run({} as any, async () => {
+      await remult.repo(Task).insert([{ title: "task a" }]);
+      expect(await remult.repo(Task).count()).toBe(1);
+    });
+
+    const yoga = createYoga({
+      schema: createSchema({
+        typeDefs: schema,
+        resolvers,
+      }),
+    });
+    const executor = buildHTTPExecutor({
+      fetch: yoga.fetch,
+    });
+
+    const result:any = await executor({
+      document: parse(/* GraphQL */ `
+        query {
+          tasks {
+            title
+          }
+        }
+      `),
+    });
+    expect(result.data.tasks[0].title).toBe("task a")
   });
 });
