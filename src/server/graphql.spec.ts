@@ -209,6 +209,7 @@ describe("test graphql", () => {
       (await (resolvers.Query.tasks as any)(undefined, {}, {})).length
     ).toBe(1);
   });
+
   it("test graphql", async () => {
     const { schema, resolvers } = remultGraphql(api);
     api["get internal server"]().run({} as any, async () => {
@@ -222,19 +223,32 @@ describe("test graphql", () => {
         resolvers,
       }),
     });
+
     const executor = buildHTTPExecutor({
       fetch: yoga.fetch,
     });
 
-    const result:any = await executor({
+    const result: any = await executor({
       document: parse(/* GraphQL */ `
         query {
           tasks {
+            id
             title
+            completed
           }
         }
       `),
     });
-    expect(result.data.tasks[0].title).toBe("task a")
+    expect(result.data).toMatchInlineSnapshot(`
+      {
+        "tasks": [
+          {
+            "completed": false,
+            "id": 1,
+            "title": "task a",
+          },
+        ],
+      }
+    `);
   });
 });
