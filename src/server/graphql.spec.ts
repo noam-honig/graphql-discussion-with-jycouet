@@ -54,46 +54,10 @@ describe("test graphql", () => {
         }
 
         input tasksWhere {
-          id: tasksWhere_id
-          title: tasksWhere_title
-          completed: tasksWhere_completed
-          category: tasksWhere_category
+          id: WhereInt
+          title: WhereString
+          completed: WhereBoolean
           OR: [tasksWhere!]
-        }
-
-        input tasksWhere_id {
-          eq: Int
-          ne: Int
-          gt: Int
-          gte: Int
-          lt: Int
-          lte: Int
-          in: [Int!]
-        }
-
-        input tasksWhere_title {
-          eq: String
-          ne: String
-          gt: String
-          gte: String
-          lt: String
-          lte: String
-          st: String
-          contains: String
-          in: [String!]
-        }
-
-        input tasksWhere_completed {
-          eq: Boolean
-          ne: Boolean
-          in: [Boolean!]
-        }
-
-        input tasksWhere_category {
-          eq: String
-          ne: String
-          null: Boolean
-          in: [String!]
         }
 
         input CreateTaskInput {
@@ -131,33 +95,9 @@ describe("test graphql", () => {
         }
 
         input categoriesWhere {
-          id: categoriesWhere_id
-          name: categoriesWhere_name
+          id: WhereString
+          name: WhereString
           OR: [categoriesWhere!]
-        }
-
-        input categoriesWhere_id {
-          eq: String
-          ne: String
-          gt: String
-          gte: String
-          lt: String
-          lte: String
-          st: String
-          contains: String
-          in: [String!]
-        }
-
-        input categoriesWhere_name {
-          eq: String
-          ne: String
-          gt: String
-          gte: String
-          lt: String
-          lte: String
-          st: String
-          contains: String
-          in: [String!]
         }
 
         input CreateCategoryInput {
@@ -180,6 +120,97 @@ describe("test graphql", () => {
 
         type DeleteCategoryPayload {
           deletedCategoryId: ID
+        }
+
+        input WhereString {
+          eq: String
+          ne: String
+          in: [String!]
+          gt: String
+          gte: String
+          lt: String
+          lte: String
+          st: String
+        }
+
+        input WhereStringNullable {
+          eq: String
+          ne: String
+          in: [String!]
+          gt: String
+          gte: String
+          lt: String
+          lte: String
+          st: String
+          null: Boolean
+        }
+
+        input WhereInt {
+          eq: Int
+          ne: Int
+          in: [Int!]
+          gt: Int
+          gte: Int
+          lt: Int
+          lte: Int
+        }
+
+        input WhereIntNullable {
+          eq: Int
+          ne: Int
+          in: [Int!]
+          gt: Int
+          gte: Int
+          lt: Int
+          lte: Int
+          null: Boolean
+        }
+
+        input WhereFloat {
+          eq: Float
+          ne: Float
+          in: [Float!]
+          gt: Float
+          gte: Float
+          lt: Float
+          lte: Float
+        }
+
+        input WhereFloatNullable {
+          eq: Float
+          ne: Float
+          in: [Float!]
+          gt: Float
+          gte: Float
+          lt: Float
+          lte: Float
+          null: Boolean
+        }
+
+        input WhereBoolean {
+          eq: Boolean
+          ne: Boolean
+          in: [Boolean!]
+        }
+
+        input WhereBooleanNullable {
+          eq: Boolean
+          ne: Boolean
+          in: [Boolean!]
+          null: Boolean
+        }
+
+        input WhereID {
+          eq: ID
+          ne: ID
+          in: [ID!]
+        }
+
+        input WhereIDNullable {
+          eq: ID
+          ne: ID
+          in: [ID!]
+          null: Boolean
         }
 
         \\"\\"\\"
@@ -220,8 +251,10 @@ describe("test graphql", () => {
   it("test graphql", async () => {
     const { schema, resolvers } = remultGraphql(api);
     api["get internal server"]().run({} as any, async () => {
+      await remult.repo(Task).insert([{ title: "task c" }]);
+      await remult.repo(Task).insert([{ title: "task b" }]);
       await remult.repo(Task).insert([{ title: "task a" }]);
-      expect(await remult.repo(Task).count()).toBe(1);
+      expect(await remult.repo(Task).count()).toBe(3);
     });
 
     const yoga = createYoga({
@@ -237,8 +270,8 @@ describe("test graphql", () => {
 
     const result: any = await executor({
       document: parse(/* GraphQL */ `
-        query {
-          tasks {
+        query Tasks {
+          tasks(orderBy: { title: ASC }) {
             id
             title
             completed
@@ -252,8 +285,18 @@ describe("test graphql", () => {
         "tasks": [
           {
             "completed": false,
-            "id": 1,
+            "id": 3,
             "title": "task a",
+          },
+          {
+            "completed": false,
+            "id": 2,
+            "title": "task b",
+          },
+          {
+            "completed": false,
+            "id": 1,
+            "title": "task c",
           },
         ],
       }

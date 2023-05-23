@@ -92,6 +92,59 @@ export function remultGraphql(
     return t;
   }
 
+  // Where - GraphQL primitives
+  for (const whereType of ["String", "Int", "Float", "Boolean", "ID"]) {
+    const currentWhere = upsertTypes(`Where${whereType}`, "input", 20);
+    const currentWhereNullable = upsertTypes(
+      `Where${whereType}Nullable`,
+      "input",
+      20
+    );
+
+    // For everyone
+    for (const operator of ["eq", "ne", "in"]) {
+      const field = {
+        key: operator,
+        value: operator === "in" ? `[${whereType}!]` : whereType,
+      };
+      currentWhere.fields.push(field);
+      currentWhereNullable.fields.push(field);
+    }
+
+    // only for specific types
+    if (
+      whereType === "String" ||
+      whereType === "Int" ||
+      whereType === "Float"
+    ) {
+      for (const operator of ["gt", "gte", "lt", "lte"]) {
+        const field = {
+          key: operator,
+          value: whereType,
+        };
+        currentWhere.fields.push(field);
+        currentWhereNullable.fields.push(field);
+      }
+    }
+
+    if (whereType === "String") {
+      for (const operator of ["st"]) {
+        const field = {
+          key: operator,
+          value: whereType,
+        };
+        currentWhere.fields.push(field);
+        currentWhereNullable.fields.push(field);
+      }
+    }
+
+    // add only for nullable
+    currentWhereNullable.fields.push({
+      key: "null",
+      value: "Boolean",
+    });
+  }
+
   for (const meta of entities) {
     const orderByFields: string[] = [];
 
@@ -264,41 +317,21 @@ export function remultGraphql(
             comment: f.caption,
           });
         }
-        const addFilter = (operator: string, theType?: string) => {
-          if (!theType) theType = type;
-          whereFields.push(operator + ": " + theType);
-        };
-        for (const operator of ["eq", "ne"]) {
-          addFilter(operator);
-        }
-        if (f.valueType === String || f.valueType === Number)
-          for (const operator of ["gt", "gte", "lt", "lte"]) {
-            addFilter(operator);
-          }
-        if (f.valueType === String)
-          for (const operator of ["st", "contains"]) {
-            addFilter(operator);
-          }
-        if (f.allowNull) addFilter("null", "Boolean");
-        addFilter("in", "[" + type + "!]");
 
         // sorting
         orderByFields.push(`${f.key}: OrderBydirection`);
 
-        // where
-        const whereType_Fields = `${key}Where_${f.key}`;
-        whereTypeFields.push(`${f.key}: ${whereType_Fields}`);
-        currentType.query.whereTypeSubFields.push(
-          blockFormat({
-            prefix: `input ${whereType_Fields}`,
-            data: whereFields,
-            comment: `Where options for \`${key}.${f.key}\``,
-          })
-        );
-
-        // Todo => Complete should not be a MUST. Where to look?
         // helper
         const it_is_not_at_ref = ref === undefined;
+
+        // where
+        if (it_is_not_at_ref) {
+          whereTypeFields.push(
+            `${f.key}: Where${type}${f.allowNull ? "Nullable" : ""}`
+          );
+        }
+
+        // Todo => Complete should not be a MUST. Where to look?
         // create
         if (!f.dbReadOnly && it_is_not_at_ref) {
           currentType.mutation.create.input.fields.push({
