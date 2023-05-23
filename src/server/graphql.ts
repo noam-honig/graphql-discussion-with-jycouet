@@ -5,7 +5,7 @@ type Field = {
   args?: string;
   value: string;
   comment?: string;
-  isRelation?: boolean;
+  order: number;
 };
 
 export function remultGraphql(api: RemultServerCore<any>) {
@@ -16,19 +16,19 @@ export function remultGraphql(api: RemultServerCore<any>) {
     key: string;
     fields: Field[];
     resultProcessors: ((item: any) => void)[];
+    order: number;
   }[] = [];
 
   let orderByTypes: string[] = [];
   let whereType: string[] = [];
   let whereTypeSubFields: string[] = [];
-  let typeQuery: Field[] = [];
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
   let resolvers = { Query: resolversQuery };
 
-  function getType(key: string) {
+  function getType(key: string, order: number = 0) {
     let t = types.find((t) => t.key === key);
-    if (!t) types.push((t = { fields: [], key, resultProcessors: [] }));
+    if (!t) types.push((t = { fields: [], key, resultProcessors: [], order }));
     return t;
   }
 
@@ -40,16 +40,25 @@ export function remultGraphql(api: RemultServerCore<any>) {
     const currentType = getType(key);
 
     if (key) {
+      const root_query = getType("Query", -10);
       const argsList =
         `limit: Int, page: Int, ` +
         `orderBy: ${key}OrderBy, ` +
         `where: ${key}Where`;
-      typeQuery.push({
+      root_query.fields.push({
         key,
         args: argsList,
         value: `[${key}!]!`,
         comment: `List all \`${key}\``,
+        order: 0,
       });
+
+      // typeQuery.push({
+      //   key,
+      //   args: argsList,
+      //   value: `[${key}!]!`,
+      //   comment: `List all \`${key}\``,
+      // });
 
       const whereTypeFields: string[] = [];
       for (const f of meta.fields) {
@@ -78,6 +87,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
             key: f.key,
             value: `${refKey}${f.allowNull ? "" : "!"}`,
             comment: f.caption,
+            order: 0,
           });
           currentType.resultProcessors.push((r) => {
             const val = r[f.key];
@@ -102,7 +112,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
             key,
             args: argsList,
             value: `[${key}!]!`,
-            isRelation: true,
+            order: 10,
             comment: `List all \`${key}\` of \`${refKey}\``,
           });
 
@@ -124,6 +134,7 @@ export function remultGraphql(api: RemultServerCore<any>) {
             key: f.key,
             value: `${type}${f.allowNull ? "" : "!"}`,
             comment: f.caption,
+            order: 0,
           });
         }
         const addFilter = (operator: string, theType?: string) => {
@@ -274,24 +285,23 @@ export function remultGraphql(api: RemultServerCore<any>) {
   return {
     resolvers,
     rootValue: root,
-    schema: `${blockFormat({
-      prefix: `type Query`,
-      data: typeQuery.map((field) => fieldFormat(field)),
-      comment: "Represents all Remult entities.",
-    })}
-
-${types
-  // .sort((a, b) => a.key.localeCompare(b.key))
-  .map(({ key, fields }) => {
-    return blockFormat({
-      prefix: `type ${key}`,
-      data: fields
-        .sort((a, b) => (a.isRelation ? 1 : 0) - (b.isRelation ? 1 : 0)) // isRelation last
-        .map((field) => fieldFormat(field)),
-      comment: `Represents \`${key}\` entity.`,
-    });
-  })
-  .join(`\n\n`)}
+    schema: `${types
+      .sort((a, b) => a.order - b.order)
+      .map(({ key, fields }) => {
+        return blockFormat({
+          prefix: `type ${key}`,
+          data: fields
+            .sort((a, b) => a.order - b.order)
+            .map((field) => fieldFormat(field)),
+          comment:
+            key === "Query"
+              ? `Represents all Remult entities.`
+              : key === "Mutation"
+              ? `Represents all Remult Mutations available on Remult.`
+              : `Represents \`${key}\` entity.`,
+        });
+      })
+      .join(`\n\n`)}
 
 ${orderByTypes.map((x) => x).join("\n\n")}
 
