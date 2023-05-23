@@ -1,8 +1,8 @@
 import express from "express";
 import { api } from "./api";
-import { buildSchema } from "graphql";
 
-import { remultGraphql } from "remult/graphql";
+// import { remultGraphql } from "remult/graphql";
+import { remultGraphql } from "./graphql";
 import { createSchema, createYoga } from "graphql-yoga";
 
 const app = express();
