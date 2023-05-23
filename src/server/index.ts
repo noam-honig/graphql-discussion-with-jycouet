@@ -20,4 +20,6 @@ const yoga = createYoga({
 // Bind GraphQL Yoga to the graphql endpoint to avoid rendering the playground on any path
 app.use(yoga.graphqlEndpoint, yoga);
 
-app.listen(3002, () => console.log("Server started"));
+app.listen(3002, () =>
+  console.log("Server started on http://localhost:3002/api/yoga")
+);

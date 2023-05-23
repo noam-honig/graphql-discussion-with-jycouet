@@ -28,9 +28,9 @@ describe("graphql-connection", () => {
     expect(schema).toMatchInlineSnapshot(`
       "type Query {
         task (id: ID!): Task
-        tasks (first: Int, after: String, last: Int, befor: String, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+        tasks (first: Int, after: String, last: Int, befor: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
         category (id: ID!): Category
-        categories (first: Int, after: String, last: Int, befor: String, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+        categories (first: Int, after: String, last: Int, befor: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
       }
 
       type Mutation {
@@ -62,6 +62,17 @@ describe("graphql-connection", () => {
         title: WhereString
         completed: WhereBoolean
         OR: [tasksWhere!]
+      }
+
+      type TaskConnection {
+        totalCount: Int!
+        edges: [TaskEdge!]!
+        pageInfo: PageInfo!
+      }
+
+      type TaskEdge {
+        node: Task!
+        cursor: String!
       }
 
       input CreateTaskInput {
@@ -102,6 +113,17 @@ describe("graphql-connection", () => {
         id: WhereString
         name: WhereString
         OR: [categoriesWhere!]
+      }
+
+      type CategoryConnection {
+        totalCount: Int!
+        edges: [CategoryEdge!]!
+        pageInfo: PageInfo!
+      }
+
+      type CategoryEdge {
+        node: Category!
+        cursor: String!
       }
 
       input CreateCategoryInput {
@@ -217,6 +239,12 @@ describe("graphql-connection", () => {
         null: Boolean
       }
 
+      type PageInfo {
+        endCursor: String!
+        hasNextPage: Boolean!
+      	hasPreviousPage: Boolean!
+      	startCursor: String!
+      }
       \\"\\"\\"
       Determines the order of items returned
       \\"\\"\\"

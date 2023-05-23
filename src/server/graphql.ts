@@ -175,14 +175,52 @@ export function remultGraphql(
         comment: `Get \`${getMetaType(meta)}\` entity`,
       });
       // list
-      root_query.fields.push({
-        key,
-        args: queryArgsList,
-        value: `[${getMetaType(meta)}!]!`,
-        comment: `List all \`${getMetaType(
-          meta
-        )}\` entity (with pagination, sorting and filtering)`,
-      });
+      if (withConnection) {
+        root_query.fields.push({
+          key,
+          args: queryArgsList,
+          value: `${getMetaType(meta)}Connection`,
+          comment: `List all \`${getMetaType(
+            meta
+          )}\` entity (with pagination, sorting and filtering)`,
+        });
+
+        const connection = upsertTypes(
+          `${getMetaType(meta)}Connection`,
+          "type"
+        );
+        connection.fields.push({
+          key: "totalCount",
+          value: "Int!",
+        });
+        connection.fields.push({
+          key: "edges",
+          value: `[${getMetaType(meta)}Edge!]!`,
+        });
+        connection.fields.push({
+          key: "pageInfo",
+          value: `PageInfo!`,
+        });
+
+        const edge = upsertTypes(`${getMetaType(meta)}Edge`, "type");
+        edge.fields.push({
+          key: "node",
+          value: `${getMetaType(meta)}!`,
+        });
+        edge.fields.push({
+          key: "cursor",
+          value: `String!`,
+        });
+      } else {
+        root_query.fields.push({
+          key,
+          args: queryArgsList,
+          value: `[${getMetaType(meta)}!]!`,
+          comment: `List all \`${getMetaType(
+            meta
+          )}\` entity (with pagination, sorting and filtering)`,
+        });
+      }
       resolversQuery[key] = (
         origItem: any,
         args: any,
@@ -513,10 +551,18 @@ export function remultGraphql(
       })
       .join(`\n\n`)}
 
-${schemaGlobal}
+${withConnection ? schemaWithConnection : ""}${schemaGlobal}
 `,
   };
 }
+
+const schemaWithConnection = `type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+	hasPreviousPage: Boolean!
+	startCursor: String!
+}
+`;
 
 const schemaGlobal = `"""
 Determines the order of items returned
