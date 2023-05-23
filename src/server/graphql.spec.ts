@@ -23,7 +23,9 @@ describe("test graphql", () => {
 
       expect(schema).toMatchInlineSnapshot(`
         "type Query {
+          task (id: ID!): Task
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+          category (id: ID!): Category
           categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
         }
 
@@ -36,7 +38,8 @@ describe("test graphql", () => {
           deleteCategory (id: ID!): DeleteCategoryPayload
         }
 
-        type Task {
+        type Task implements Node {
+          nodeId: ID!
           id: Int!
           title: String!
           completed: Boolean!
@@ -115,7 +118,8 @@ describe("test graphql", () => {
           deletedTaskId: ID
         }
 
-        type Category {
+        type Category implements Node {
+          nodeId: ID!
           id: String!
           name: String!
           tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
@@ -191,6 +195,13 @@ describe("test graphql", () => {
           \\"\\"\\"
           DESC
         }
+
+        \\"\\"\\"
+        Node interface of remult entities
+        \\"\\"\\"
+        interface Node {
+          nodeId: ID!
+        }
         "
       `);
     });
@@ -235,6 +246,7 @@ describe("test graphql", () => {
         }
       `),
     });
+
     expect(result.data).toMatchInlineSnapshot(`
       {
         "tasks": [

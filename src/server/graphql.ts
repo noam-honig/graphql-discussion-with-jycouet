@@ -11,7 +11,7 @@ type Field = {
 
 type GraphQLType = {
   key: string;
-  kind: "type" | "input";
+  kind: "type_impl_node" | "type" | "input";
   fields: Field[];
   query: {
     orderBy: string[];
@@ -53,15 +53,16 @@ export function remultGraphql(
 
   let root: Record<string, any> = {};
   let resolversQuery: Record<string, unknown> = {};
-  let resolvers = { Query: resolversQuery };
+  let resolversMutation: Record<string, unknown> = {};
+  let resolvers = { Query: resolversQuery, Mutation: resolversMutation };
 
   function upsertTypes(
     key: string,
-    kind: "type" | "input" = "type",
+    kind: "type_impl_node" | "type" | "input" = "type",
     order: number = 0
   ) {
     let t = types.find((t) => t.key === key);
-    if (!t)
+    if (!t) {
       types.push(
         (t = {
           key,
@@ -71,7 +72,6 @@ export function remultGraphql(
             orderBy: [],
             whereType: [],
             whereTypeSubFields: [],
-
             resultProcessors: [],
           },
           mutation: {
@@ -82,6 +82,13 @@ export function remultGraphql(
           order,
         })
       );
+      if (kind === "type_impl_node") {
+        t.fields.push({
+          key: "nodeId",
+          value: "ID!",
+        });
+      }
+    }
     return t;
   }
 
@@ -90,7 +97,7 @@ export function remultGraphql(
 
     let key = meta.key;
 
-    const currentType = upsertTypes(getMetaType(meta));
+    const currentType = upsertTypes(getMetaType(meta), "type_impl_node");
 
     if (key) {
       const root_query = upsertTypes("Query", "type", -10);
@@ -100,6 +107,13 @@ export function remultGraphql(
         `where: ${key}Where`;
 
       root_query.fields.push({
+        key: toPascalCase(getMetaType(meta)),
+        args: `id: ID!`,
+        value: `${getMetaType(meta)}`,
+        comment: `Get \`${getMetaType(meta)}\` entity`,
+      });
+      // list
+      root_query.fields.push({
         key,
         args: queryArgsList,
         value: `[${getMetaType(meta)}!]!`,
@@ -107,18 +121,31 @@ export function remultGraphql(
           meta
         )}\` entity (with pagination, sorting and filtering)`,
       });
+      resolversQuery[key] = (
+        origItem: any,
+        args: any,
+        req: any,
+        gqlInfo: any
+      ) => root[key](args, req, gqlInfo);
 
       const root_mutation = upsertTypes("Mutation", "type", -9);
 
       // create
       const createInput = `Create${getMetaType(meta)}Input`;
       const createPayload = `Create${getMetaType(meta)}Payload`;
+      const createResolverKey = `create${getMetaType(meta)}`;
       root_mutation.fields.push({
-        key: `create${getMetaType(meta)}`,
+        key: createResolverKey,
         args: `input: ${createInput}!`,
         value: `${createPayload}`,
         comment: `Create a new \`${getMetaType(meta)}\``,
       });
+      resolversMutation[createResolverKey] = (
+        origItem: any,
+        args: any,
+        req: any,
+        gqlInfo: any
+      ) => root[createResolverKey](args, req, gqlInfo);
       currentType.mutation.create.input = upsertTypes(createInput, "input");
 
       currentType.mutation.create.payload = upsertTypes(createPayload);
@@ -130,8 +157,9 @@ export function remultGraphql(
       // update
       const updateInput = `Update${getMetaType(meta)}Input`;
       const updatePayload = `Update${getMetaType(meta)}Payload`;
+      const updateResolverKey = `update${getMetaType(meta)}`;
       root_mutation.fields.push({
-        key: `update${getMetaType(meta)}`,
+        key: updateResolverKey,
         args: `id: ID!, patch: ${updateInput}!`,
         value: `${updatePayload}`,
         comment: `Update a \`${getMetaType(meta)}\``,
@@ -147,8 +175,9 @@ export function remultGraphql(
 
       // delete
       const deletePayload = `Delete${getMetaType(meta)}Payload`;
+      const deleteResolverKey = `delete${getMetaType(meta)}`;
       root_mutation.fields.push({
-        key: `delete${getMetaType(meta)}`,
+        key: deleteResolverKey,
         args: `id: ID!`,
         value: `${deletePayload}`,
         comment: `Delete a \`${getMetaType(meta)}\``,
@@ -207,7 +236,7 @@ export function remultGraphql(
           });
 
           // will do: Category.tasks
-          let refT = upsertTypes(getMetaType(ref));
+          let refT = upsertTypes(getMetaType(ref), "type_impl_node");
           refT.fields.push({
             key,
             args: queryArgsList,
@@ -390,12 +419,17 @@ export function remultGraphql(
         });
       };
 
-      resolversQuery[key] = (
-        origItem: any,
-        args: any,
-        req: any,
-        gqlInfo: any
-      ) => root[key](args, req, gqlInfo);
+      root[createResolverKey] = async (arg1: any, req: any) => {
+        console.log(`createResolverKey`, arg1);
+      };
+
+      root[updateResolverKey] = async (arg1: any, req: any) => {
+        console.log(`updateResolverKey`, arg1);
+      };
+
+      root[deleteResolverKey] = async (arg1: any, req: any) => {
+        console.log(`deleteResolverKey`, arg1);
+      };
     }
   }
 
@@ -406,8 +440,14 @@ export function remultGraphql(
       .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
       .map(({ key, kind, fields, query }) => {
         const { orderBy, whereType, whereTypeSubFields } = query;
+
+        let prefix = `${kind} ${key}`;
+        if (kind === "type_impl_node") {
+          prefix = `type ${key} implements Node`;
+        }
+
         const type = blockFormat({
-          prefix: `${kind} ${key}`,
+          prefix,
           data: fields
             .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
             .map((field) => fieldFormat(field)),
@@ -448,6 +488,13 @@ enum OrderBydirection {
   Sort data in descending order
   """
   DESC
+}
+
+"""
+Node interface of remult entities
+"""
+interface Node {
+  nodeId: ID!
 }`;
 
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
