@@ -36,13 +36,9 @@ type GraphQLType = {
 }
 
 let _removeComments = false
-export function remultGraphql(
-	api: RemultServerCore<any>,
-	options?: { removeComments?: boolean; withConnection?: boolean }
-) {
-	const { removeComments, withConnection } = {
+export function remultGraphql(api: RemultServerCore<any>, options?: { removeComments?: boolean }) {
+	const { removeComments } = {
 		removeComments: false,
-		withConnection: false,
 		...options
 	}
 
@@ -147,12 +143,8 @@ export function remultGraphql(
 		if (key) {
 			const root_query = upsertTypes('Query', 'type', -10)
 
-			const queryArgsListPagination = withConnection
-				? `first: Int, after: String, last: Int, befor: String`
-				: `limit: Int, page: Int`
-
-			const queryArgsList =
-				`${queryArgsListPagination}, ` + `orderBy: ${key}OrderBy, ` + `where: ${key}Where`
+			const queryArgsList = `limit: Int, page: Int, orderBy: ${key}OrderBy, where: ${key}Where`
+			const queryArgsConnection = `limit: Int, page: Int, orderBy: ${key}OrderBy, where: ${key}Where`
 
 			root_query.fields.push({
 				key: toPascalCase(getMetaType(meta)),
@@ -161,49 +153,45 @@ export function remultGraphql(
 				comment: `Get \`${getMetaType(meta)}\` entity`
 			})
 			// list
-			if (withConnection) {
-				root_query.fields.push({
-					key,
-					args: queryArgsList,
-					value: `${getMetaType(meta)}Connection`,
-					comment: `List all \`${getMetaType(
-						meta
-					)}\` entity (with pagination, sorting and filtering)`
-				})
+			root_query.fields.push({
+				key,
+				args: queryArgsList,
+				value: `[${getMetaType(meta)}!]!`,
+				comment: `List all \`${getMetaType(meta)}\` entity (with pagination, sorting and filtering)`
+			})
 
-				const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
-				connection.fields.push({
-					key: 'totalCount',
-					value: 'Int!'
-				})
-				connection.fields.push({
-					key: 'edges',
-					value: `[${getMetaType(meta)}Edge!]!`
-				})
-				connection.fields.push({
-					key: 'pageInfo',
-					value: `PageInfo!`
-				})
+			// Connection
+			root_query.fields.push({
+				key: `${key}Connection`,
+				args: queryArgsConnection,
+				value: `${getMetaType(meta)}Connection`,
+				comment: `List all \`${getMetaType(meta)}\` entity (with pagination, sorting and filtering)`
+			})
 
-				const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
-				edge.fields.push({
-					key: 'node',
-					value: `${getMetaType(meta)}!`
-				})
-				edge.fields.push({
-					key: 'cursor',
-					value: `String!`
-				})
-			} else {
-				root_query.fields.push({
-					key,
-					args: queryArgsList,
-					value: `[${getMetaType(meta)}!]!`,
-					comment: `List all \`${getMetaType(
-						meta
-					)}\` entity (with pagination, sorting and filtering)`
-				})
-			}
+			const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
+			connection.fields.push({
+				key: 'totalCount',
+				value: 'Int!'
+			})
+			connection.fields.push({
+				key: 'edges',
+				value: `[${getMetaType(meta)}Edge!]!`
+			})
+			connection.fields.push({
+				key: 'pageInfo',
+				value: `PageInfo!`
+			})
+
+			const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
+			edge.fields.push({
+				key: 'node',
+				value: `${getMetaType(meta)}!`
+			})
+			edge.fields.push({
+				key: 'cursor',
+				value: `String!`
+			})
+
 			resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
 				root[key](args, req, gqlInfo)
 
@@ -523,7 +511,8 @@ export function remultGraphql(
 			})
 			.join(`\n\n`)}
 
-${withConnection ? schemaWithConnection : ''}${schemaGlobal}
+${schemaWithConnection}
+${schemaGlobal}
 `
 	}
 }

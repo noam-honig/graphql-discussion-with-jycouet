@@ -9,7 +9,6 @@ const { typeDefs, resolvers } = remultGraphql(remultApi)
 
 // Houdini needs this file to start! We can write a dummy one so that onstart there is something to real. Then it will be regenerated?
 // TODO JYC
-console.log('coucou')
 fs.writeFile('./src/graphql/schema.graphql', typeDefs)
 
 export const handleGraphql = (options?: { endpoint: string }): Handle => {

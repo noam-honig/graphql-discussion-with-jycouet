@@ -24,16 +24,17 @@ describe('graphql-connection', () => {
 	it('test basics', async () => {
 		// rmv removeComments is very handy for testing!
 		const { typeDefs } = remultGraphql(api, {
-			removeComments: true,
-			withConnection: true
+			removeComments: true
 		})
 
 		expect(typeDefs).toMatchInlineSnapshot(`
 			"type Query {
 			  task (id: ID!): Task
-			  tasks (first: Int, after: String, last: Int, befor: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+			  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+			  tasksConnection (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
 			  category (id: ID!): Category
-			  categories (first: Int, after: String, last: Int, befor: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+			  categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+			  categoriesConnection (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
 			}
 
 			type Mutation {
@@ -104,7 +105,7 @@ describe('graphql-connection', () => {
 			  nodeId: ID!
 			  id: String!
 			  name: String!
-			  tasks (first: Int, after: String, last: Int, befor: String, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+			  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
 			}
 
 			input categoriesOrderBy {
@@ -248,6 +249,7 @@ describe('graphql-connection', () => {
 				hasPreviousPage: Boolean!
 				startCursor: String!
 			}
+
 			\\"\\"\\"
 			Determines the order of items returned
 			\\"\\"\\"
