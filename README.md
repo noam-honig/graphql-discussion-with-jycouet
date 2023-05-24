@@ -1,12 +1,9 @@
-# Helper
+# graphql-discussion-with-jycouet
+
+## How to start?
 
 ```bash
-# install
-npm i
-
-# run the app (http://localhost:3002/api/yoga)
-npm run dev-node
-
-# run tests
-npm run test
+pnpm i
+pnpm dev
 ```
+
