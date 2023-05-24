@@ -1,71 +1,67 @@
-import type { EntityMetadata, Field } from 'remult';
-import type { RemultServerCore } from 'remult/server';
+import type { EntityMetadata, Field } from 'remult'
+import type { RemultServerCore } from 'remult/server'
 
 type Field = {
-	key: string;
-	args?: string;
-	value: string;
-	comment?: string;
-	order?: number;
-};
+	key: string
+	args?: string
+	value: string
+	comment?: string
+	order?: number
+}
 
 type GraphQLType = {
-	key: string;
-	kind: 'type_impl_node' | 'type' | 'input';
-	fields: Field[];
+	key: string
+	kind: 'type_impl_node' | 'type' | 'input'
+	fields: Field[]
 	query: {
-		orderBy: string[];
-		whereType: string[];
-		whereTypeSubFields: string[];
-		resultProcessors: ((item: any) => void)[];
-	};
+		orderBy: string[]
+		whereType: string[]
+		whereTypeSubFields: string[]
+		resultProcessors: ((item: any) => void)[]
+	}
 	mutation: {
 		create: {
-			input?: GraphQLType;
-			payload?: GraphQLType;
-		};
+			input?: GraphQLType
+			payload?: GraphQLType
+		}
 		update: {
-			input?: GraphQLType;
-			payload?: GraphQLType;
-		};
+			input?: GraphQLType
+			payload?: GraphQLType
+		}
 		delete: {
-			payload?: GraphQLType;
-		};
-	};
-	order?: number;
-};
+			payload?: GraphQLType
+		}
+	}
+	order?: number
+}
 
-let _removeComments = false;
+let _removeComments = false
 export function remultGraphql(
 	api: RemultServerCore<any>,
-	options?: { removeComments?: Boolean; withConnection?: Boolean }
+	options?: { removeComments?: boolean; withConnection?: boolean }
 ) {
 	const { removeComments, withConnection } = {
 		removeComments: false,
 		withConnection: false,
 		...options
-	};
-
-	if (removeComments) {
-		_removeComments = true;
 	}
 
-	let server = api['get internal server']();
-	const entities = server.getEntities();
+	if (removeComments) {
+		_removeComments = true
+	}
 
-	let types: GraphQLType[] = [];
+	const server = api['get internal server']()
+	const entities = server.getEntities()
 
-	let root: Record<string, any> = {};
-	let resolversQuery: Record<string, unknown> = {};
-	let resolversMutation: Record<string, unknown> = {};
-	let resolvers = { Query: resolversQuery, Mutation: resolversMutation };
+	const types: GraphQLType[] = []
 
-	function upsertTypes(
-		key: string,
-		kind: 'type_impl_node' | 'type' | 'input' = 'type',
-		order: number = 0
-	) {
-		let t = types.find((t) => t.key === key);
+	const root: Record<string, any> = {}
+	const resolversQuery: Record<string, unknown> = {}
+	const resolversMutation: Record<string, unknown> = {}
+	const resolvers = { Query: resolversQuery, Mutation: resolversMutation }
+
+	function upsertTypes(key: string, kind: 'type_impl_node' | 'type' | 'input' = 'type', order = 0) {
+		let t = types.find((t) => t.key === key)
 		if (!t) {
 			types.push(
 				(t = {
@@ -85,30 +81,30 @@ export function remultGraphql(
 					},
 					order
 				})
-			);
+			)
 			if (kind === 'type_impl_node') {
 				t.fields.push({
 					key: 'nodeId',
 					value: 'ID!'
-				});
+				})
 			}
 		}
-		return t;
+		return t
 	}
 
 	// Where - GraphQL primitives
 	for (const whereType of ['String', 'Int', 'Float', 'Boolean', 'ID']) {
-		const currentWhere = upsertTypes(`Where${whereType}`, 'input', 20);
-		const currentWhereNullable = upsertTypes(`Where${whereType}Nullable`, 'input', 20);
+		const currentWhere = upsertTypes(`Where${whereType}`, 'input', 20)
+		const currentWhereNullable = upsertTypes(`Where${whereType}Nullable`, 'input', 20)
 
 		// For everyone
 		for (const operator of ['eq', 'ne', 'in']) {
 			const field = {
 				key: operator,
 				value: operator === 'in' ? `[${whereType}!]` : whereType
-			};
-			currentWhere.fields.push(field);
-			currentWhereNullable.fields.push(field);
+			}
+			currentWhere.fields.push(field)
+			currentWhereNullable.fields.push(field)
 		}
 
 		// only for specific types
@@ -117,9 +113,9 @@ export function remultGraphql(
 				const field = {
 					key: operator,
 					value: whereType
-				};
-				currentWhere.fields.push(field);
-				currentWhereNullable.fields.push(field);
+				}
+				currentWhere.fields.push(field)
+				currentWhereNullable.fields.push(field)
 			}
 		}
 
@@ -128,9 +124,9 @@ export function remultGraphql(
 				const field = {
 					key: operator,
 					value: whereType
-				};
-				currentWhere.fields.push(field);
-				currentWhereNullable.fields.push(field);
+				}
+				currentWhere.fields.push(field)
+				currentWhereNullable.fields.push(field)
 			}
 		}
 
@@ -138,32 +134,32 @@ export function remultGraphql(
 		currentWhereNullable.fields.push({
 			key: 'null',
 			value: 'Boolean'
-		});
+		})
 	}
 
 	for (const meta of entities) {
-		const orderByFields: string[] = [];
+		const orderByFields: string[] = []
 
-		let key = meta.key;
+		const key = meta.key
 
-		const currentType = upsertTypes(getMetaType(meta), 'type_impl_node');
+		const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
 
 		if (key) {
-			const root_query = upsertTypes('Query', 'type', -10);
+			const root_query = upsertTypes('Query', 'type', -10)
 
 			const queryArgsListPagination = withConnection
 				? `first: Int, after: String, last: Int, befor: String`
-				: `limit: Int, page: Int`;
+				: `limit: Int, page: Int`
 
 			const queryArgsList =
-				`${queryArgsListPagination}, ` + `orderBy: ${key}OrderBy, ` + `where: ${key}Where`;
+				`${queryArgsListPagination}, ` + `orderBy: ${key}OrderBy, ` + `where: ${key}Where`
 
 			root_query.fields.push({
 				key: toPascalCase(getMetaType(meta)),
 				args: `id: ID!`,
 				value: `${getMetaType(meta)}`,
 				comment: `Get \`${getMetaType(meta)}\` entity`
-			});
+			})
 			// list
 			if (withConnection) {
 				root_query.fields.push({
@@ -173,31 +169,31 @@ export function remultGraphql(
 					comment: `List all \`${getMetaType(
 						meta
 					)}\` entity (with pagination, sorting and filtering)`
-				});
+				})
 
-				const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type');
+				const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
 				connection.fields.push({
 					key: 'totalCount',
 					value: 'Int!'
-				});
+				})
 				connection.fields.push({
 					key: 'edges',
 					value: `[${getMetaType(meta)}Edge!]!`
-				});
+				})
 				connection.fields.push({
 					key: 'pageInfo',
 					value: `PageInfo!`
-				});
+				})
 
-				const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type');
+				const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
 				edge.fields.push({
 					key: 'node',
 					value: `${getMetaType(meta)}!`
-				});
+				})
 				edge.fields.push({
 					key: 'cursor',
 					value: `String!`
-				});
+				})
 			} else {
 				root_query.fields.push({
 					key,
@@ -206,98 +202,98 @@ export function remultGraphql(
 					comment: `List all \`${getMetaType(
 						meta
 					)}\` entity (with pagination, sorting and filtering)`
-				});
+				})
 			}
 			resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-				root[key](args, req, gqlInfo);
+				root[key](args, req, gqlInfo)
 
-			const root_mutation = upsertTypes('Mutation', 'type', -9);
+			const root_mutation = upsertTypes('Mutation', 'type', -9)
 
 			// create
-			const createInput = `Create${getMetaType(meta)}Input`;
-			const createPayload = `Create${getMetaType(meta)}Payload`;
-			const createResolverKey = `create${getMetaType(meta)}`;
+			const createInput = `Create${getMetaType(meta)}Input`
+			const createPayload = `Create${getMetaType(meta)}Payload`
+			const createResolverKey = `create${getMetaType(meta)}`
 			root_mutation.fields.push({
 				key: createResolverKey,
 				args: `input: ${createInput}!`,
 				value: `${createPayload}`,
 				comment: `Create a new \`${getMetaType(meta)}\``
-			});
+			})
 			resolversMutation[createResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-				root[createResolverKey](args, req, gqlInfo);
-			currentType.mutation.create.input = upsertTypes(createInput, 'input');
+				root[createResolverKey](args, req, gqlInfo)
+			currentType.mutation.create.input = upsertTypes(createInput, 'input')
 
-			currentType.mutation.create.payload = upsertTypes(createPayload);
+			currentType.mutation.create.payload = upsertTypes(createPayload)
 			currentType.mutation.create.payload.fields.push({
 				key: `${toPascalCase(getMetaType(meta))}`,
 				value: `${getMetaType(meta)}`
-			});
+			})
 
 			// update
-			const updateInput = `Update${getMetaType(meta)}Input`;
-			const updatePayload = `Update${getMetaType(meta)}Payload`;
-			const updateResolverKey = `update${getMetaType(meta)}`;
+			const updateInput = `Update${getMetaType(meta)}Input`
+			const updatePayload = `Update${getMetaType(meta)}Payload`
+			const updateResolverKey = `update${getMetaType(meta)}`
 			root_mutation.fields.push({
 				key: updateResolverKey,
 				args: `id: ID!, patch: ${updateInput}!`,
 				value: `${updatePayload}`,
 				comment: `Update a \`${getMetaType(meta)}\``
-			});
+			})
 
-			currentType.mutation.update.input = upsertTypes(updateInput, 'input');
+			currentType.mutation.update.input = upsertTypes(updateInput, 'input')
 
-			currentType.mutation.update.payload = upsertTypes(updatePayload);
+			currentType.mutation.update.payload = upsertTypes(updatePayload)
 			currentType.mutation.update.payload.fields.push({
 				key: `${toPascalCase(getMetaType(meta))}`,
 				value: `${getMetaType(meta)}`
-			});
+			})
 
 			// delete
-			const deletePayload = `Delete${getMetaType(meta)}Payload`;
-			const deleteResolverKey = `delete${getMetaType(meta)}`;
+			const deletePayload = `Delete${getMetaType(meta)}Payload`
+			const deleteResolverKey = `delete${getMetaType(meta)}`
 			root_mutation.fields.push({
 				key: deleteResolverKey,
 				args: `id: ID!`,
 				value: `${deletePayload}`,
 				comment: `Delete a \`${getMetaType(meta)}\``
-			});
+			})
 
-			currentType.mutation.delete.payload = upsertTypes(deletePayload);
+			currentType.mutation.delete.payload = upsertTypes(deletePayload)
 			currentType.mutation.delete.payload.fields.push({
 				key: `deleted${getMetaType(meta)}Id`,
 				value: 'ID'
-			});
+			})
 
-			const whereTypeFields: string[] = [];
+			const whereTypeFields: string[] = []
 			for (const f of meta.fields) {
-				let type = 'String';
+				let type = 'String'
 				switch (f.valueType) {
 					case Boolean:
-						type = 'Boolean';
-						break;
+						type = 'Boolean'
+						break
 					case Number:
 						{
 							if (
 								f.valueConverter?.fieldTypeInDb === 'integer' ||
 								f.valueConverter?.fieldTypeInDb === 'autoincrement'
 							)
-								type = 'Int';
-							else type = 'Float';
+								type = 'Int'
+							else type = 'Float'
 						}
-						break;
+						break
 				}
-				let ref = entities.find((i: any) => i.entityType === f.valueType);
+				const ref = entities.find((i: any) => i.entityType === f.valueType)
 				if (ref !== undefined) {
 					// will do: Task.category
 					currentType.fields.push({
 						key: f.key,
 						value: `${getMetaType(ref)}${f.allowNull ? '' : '!'}`,
 						comment: f.caption
-					});
-					const refKey = ref.key;
+					})
+					const refKey = ref.key
 					currentType.query.resultProcessors.push((r) => {
-						const val = r[f.key];
-						if (val === null || val === undefined) return null;
+						const val = r[f.key]
+						if (val === null || val === undefined) return null
 						r[f.key] = async (args: any, req: any, gqlInfo: any) => {
 							const queryResult: any[] = await root[refKey](
 								{
@@ -307,23 +303,23 @@ export function remultGraphql(
 								},
 								req,
 								gqlInfo
-							);
-							if (queryResult.length > 0) return queryResult[0];
-							return null;
-						};
-					});
+							)
+							if (queryResult.length > 0) return queryResult[0]
+							return null
+						}
+					})
 
 					// will do: Category.tasks
-					let refT = upsertTypes(getMetaType(ref), 'type_impl_node');
+					const refT = upsertTypes(getMetaType(ref), 'type_impl_node')
 					refT.fields.push({
 						key,
 						args: queryArgsList,
 						value: `[${getMetaType(meta)}!]!`,
 						order: 10,
 						comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``
-					});
+					})
 					refT.query.resultProcessors.push((r) => {
-						const val = r.id;
+						const val = r.id
 						r[key] = async (args: any, req: any, gqlInfo: any) => {
 							return await root[key](
 								{
@@ -332,26 +328,26 @@ export function remultGraphql(
 								},
 								req,
 								gqlInfo
-							);
-						};
-					});
+							)
+						}
+					})
 				} else {
 					currentType.fields.push({
 						key: f.key,
 						value: `${type}${f.allowNull ? '' : '!'}`,
 						comment: f.caption
-					});
+					})
 				}
 
 				// sorting
-				orderByFields.push(`${f.key}: OrderByDirection`);
+				orderByFields.push(`${f.key}: OrderByDirection`)
 
 				// helper
-				const it_is_not_at_ref = ref === undefined;
+				const it_is_not_at_ref = ref === undefined
 
 				// where
 				if (it_is_not_at_ref) {
-					whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`);
+					whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`)
 				}
 
 				// TODO Noam: add a `!` for mandatory fields
@@ -360,7 +356,7 @@ export function remultGraphql(
 					currentType.mutation.create.input.fields.push({
 						key: f.key,
 						value: `${type}`
-					});
+					})
 				}
 
 				// update
@@ -368,7 +364,7 @@ export function remultGraphql(
 					currentType.mutation.update.input.fields.push({
 						key: f.key,
 						value: `${type}`
-					});
+					})
 				}
 			}
 
@@ -378,32 +374,32 @@ export function remultGraphql(
 					data: orderByFields,
 					comment: `OrderBy options for \`${key}\``
 				})
-			);
+			)
 
-			whereTypeFields.push(`OR: [${key}Where!]`);
+			whereTypeFields.push(`OR: [${key}Where!]`)
 			currentType.query.whereType.push(
 				blockFormat({
 					prefix: `input ${key}Where`,
 					data: whereTypeFields,
 					comment: `Where options for \`${key}\``
 				})
-			);
+			)
 
 			root[key] = async (arg1: any, req: any) => {
-				const { limit, page, orderBy, where } = arg1;
+				const { limit, page, orderBy, where } = arg1
 
-				return new Promise(async (res, error) => {
+				return new Promise((res, error) => {
 					server.run(req, async () => {
-						let dApi = await server.getDataApi(req, meta);
-						let result: any;
-						let err: any;
+						const dApi = await server.getDataApi(req, meta)
+						let result: any
+						let err: any
 						await dApi.getArray(
 							{
 								success: (x: any) => {
 									return (result = x.map((y: any) => {
-										currentType.query.resultProcessors.forEach((z) => z(y));
-										return y;
-									}));
+										currentType.query.resultProcessors.forEach((z) => z(y))
+										return y
+									}))
 								},
 								created: () => {},
 								deleted: () => {},
@@ -415,28 +411,28 @@ export function remultGraphql(
 							{
 								get: (key: string) => {
 									if (limit && key === '_limit') {
-										return limit;
+										return limit
 									}
 									if (page && key === '_page') {
-										return page;
+										return page
 									}
 									if (orderBy) {
 										if (key === '_sort') {
-											const sort_keys: string[] = [];
+											const sort_keys: string[] = []
 											Object.keys(orderBy).forEach((sort_key) => {
-												sort_keys.push(sort_key);
-											});
+												sort_keys.push(sort_key)
+											})
 											if (sort_keys.length > 0) {
-												return sort_keys.join(',');
+												return sort_keys.join(',')
 											}
 										} else if (key === '_order') {
-											const sort_directions: string[] = [];
+											const sort_directions: string[] = []
 											Object.keys(orderBy).forEach((sort_key) => {
-												const direction = orderBy[sort_key].toLowerCase();
-												sort_directions.push(direction);
-											});
+												const direction = orderBy[sort_key].toLowerCase()
+												sort_directions.push(direction)
+											})
 											if (sort_directions.length > 0) {
-												return sort_directions.join(',');
+												return sort_directions.join(',')
 											}
 										}
 									}
@@ -444,52 +440,52 @@ export function remultGraphql(
 										// TODO Noam: OR management?
 										// TODO Noam: AND management?
 
-										const whereAND: string[] = [];
+										const whereAND: string[] = []
 										Object.keys(where).forEach((w) => {
-											const subWhere = where[w];
+											const subWhere = where[w]
 											Object.keys(subWhere).forEach((sw) => {
-												let map = `${w}.${sw}`;
+												let map = `${w}.${sw}`
 
 												if (map.endsWith('.eq')) {
-													map = `${w}`;
+													map = `${w}`
 												}
 
 												if (map === key) {
-													whereAND.push(subWhere[sw]);
-													return subWhere[sw];
+													whereAND.push(subWhere[sw])
+													return subWhere[sw]
 												}
-											});
-										});
+											})
+										})
 										if (whereAND.length > 0) {
-											return whereAND.join(',');
+											return whereAND.join(',')
 										}
 									}
 								}
 							}
-						);
+						)
 						if (err) {
-							error(err);
-							return;
+							error(err)
+							return
 						}
-						res(result);
-					});
-				});
-			};
+						res(result)
+					})
+				})
+			}
 
 			root[createResolverKey] = async (arg1: any, req: any) => {
 				// TODO Noam
-				console.log(`createResolverKey`, arg1);
-			};
+				console.log(`createResolverKey`, arg1)
+			}
 
 			root[updateResolverKey] = async (arg1: any, req: any) => {
 				// TODO Noam
-				console.log(`updateResolverKey`, arg1);
-			};
+				console.log(`updateResolverKey`, arg1)
+			}
 
 			root[deleteResolverKey] = async (arg1: any, req: any) => {
 				// TODO Noam
-				console.log(`deleteResolverKey`, arg1);
-			};
+				console.log(`deleteResolverKey`, arg1)
+			}
 		}
 	}
 
@@ -499,11 +495,11 @@ export function remultGraphql(
 		typeDefs: `${types
 			.sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
 			.map(({ key, kind, fields, query }) => {
-				const { orderBy, whereType, whereTypeSubFields } = query;
+				const { orderBy, whereType, whereTypeSubFields } = query
 
-				let prefix = `${kind} ${key}`;
+				let prefix = `${kind} ${key}`
 				if (kind === 'type_impl_node') {
-					prefix = `type ${key} implements Node`;
+					prefix = `type ${key} implements Node`
 				}
 
 				const type = blockFormat({
@@ -517,19 +513,19 @@ export function remultGraphql(
 							: key === 'Mutation'
 							? `Represents all Remult Mutations available on Remult.`
 							: `Represents \`${key}\` entity.`
-				});
+				})
 
-				const orderByStr = orderBy.length > 0 ? `\n\n${orderBy.join('\n\n')}` : ``;
-				const whereTypeStr = whereType.length > 0 ? `\n\n${whereType.join('\n\n')}` : ``;
+				const orderByStr = orderBy.length > 0 ? `\n\n${orderBy.join('\n\n')}` : ``
+				const whereTypeStr = whereType.length > 0 ? `\n\n${whereType.join('\n\n')}` : ``
 				const whereTypeSubFieldsStr =
-					whereTypeSubFields.length > 0 ? `\n\n${whereTypeSubFields.join('\n\n')}` : ``;
-				return `${type}${orderByStr}${whereTypeStr}${whereTypeSubFieldsStr}`;
+					whereTypeSubFields.length > 0 ? `\n\n${whereTypeSubFields.join('\n\n')}` : ``
+				return `${type}${orderByStr}${whereTypeStr}${whereTypeSubFieldsStr}`
 			})
 			.join(`\n\n`)}
 
 ${withConnection ? schemaWithConnection : ''}${schemaGlobal}
 `
-	};
+	}
 }
 
 const schemaWithConnection = `type PageInfo {
@@ -538,7 +534,7 @@ const schemaWithConnection = `type PageInfo {
 	hasPreviousPage: Boolean!
 	startCursor: String!
 }
-`;
+`
 
 const schemaGlobal = `"""
 Determines the order of items returned
@@ -559,49 +555,49 @@ Node interface of remult entities (eg: nodeId: \`Task:1\` so \`Typename:id\`)
 """
 interface Node {
   nodeId: ID!
-}`;
+}`
 
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
 	if (obj.data.length === 0) {
-		return ``;
+		return ``
 	}
 
 	const str = `${obj.prefix} {
   ${obj.data.join('\n  ')}
-}`;
+}`
 
 	let commentsStr = `"""
 ${obj.comment}
 """
-`;
+`
 
 	if (_removeComments) {
-		commentsStr = ``;
+		commentsStr = ``
 	}
 
-	return `${commentsStr}${str}`;
+	return `${commentsStr}${str}`
 }
 
 function fieldFormat(field: Field) {
-	const key_value = `${field.key}${field.args ? ` (${field.args})` : ``}: ${field.value}`;
+	const key_value = `${field.key}${field.args ? ` (${field.args})` : ``}: ${field.value}`
 
 	if (!_removeComments && field.comment) {
 		return `"""
   ${field.comment}
   """
-  ${key_value}`;
+  ${key_value}`
 	}
 
-	return key_value;
+	return key_value
 }
 
 function getMetaType(entityMeta: EntityMetadata) {
-	return entityMeta.entityType.name;
+	return entityMeta.entityType.name
 }
 
 function toPascalCase(str: string) {
 	return str
 		.split('')
 		.map((c, i) => (i === 0 ? c.toLowerCase() : c))
-		.join('');
+		.join('')
 }

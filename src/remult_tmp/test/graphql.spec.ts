@@ -1,16 +1,16 @@
-import { InMemoryDataProvider, remult } from 'remult';
-import { remultExpress, type RemultExpressServer } from 'remult/remult-express';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { Category } from '../../shared/Category';
+import { InMemoryDataProvider, remult } from 'remult'
+import { remultExpress, type RemultExpressServer } from 'remult/remult-express'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { Category } from '../../shared/Category'
 
-import { remultGraphql } from '../graphql';
+import { remultGraphql } from '../graphql'
 
-import { createSchema, createYoga } from 'graphql-yoga';
-import { Task } from '../../shared/Task';
+import { createSchema, createYoga } from 'graphql-yoga'
+import { Task } from '../../shared/Task'
 // import { remultSveltekit, type RemultSveltekitServer } from 'remult/remult-sveltekit';
 
 // let api: RemultSveltekitServer;
-let api: RemultExpressServer;
+let api: RemultExpressServer
 describe('graphql-connection', () => {
 	beforeEach(async () => {
 		// api = remultSveltekit({
@@ -18,15 +18,15 @@ describe('graphql-connection', () => {
 			logApiEndPoints: false, // We don't need this in tests
 			dataProvider: new InMemoryDataProvider(),
 			entities: [Task, Category]
-		});
-	});
+		})
+	})
 
 	it('test basics', async () => {
 		// rmv removeComments is very handy for testing!
 		const { typeDefs } = remultGraphql(api, {
 			removeComments: true,
 			withConnection: true
-		});
+		})
 
 		expect(typeDefs).toMatchInlineSnapshot(`
 			"type Query {
@@ -269,34 +269,34 @@ describe('graphql-connection', () => {
 			  nodeId: ID!
 			}
 			"
-		`);
-	});
+		`)
+	})
 
 	it('test get values', async () => {
 		api['get internal server']().run({} as any, async () => {
-			await remult.repo(Task).insert([{ title: 'task a' }]);
-			expect(await remult.repo(Task).count()).toBe(1);
-		});
-		const { resolvers } = remultGraphql(api);
-		expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1);
-	});
+			await remult.repo(Task).insert([{ title: 'task a' }])
+			expect(await remult.repo(Task).count()).toBe(1)
+		})
+		const { resolvers } = remultGraphql(api)
+		expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1)
+	})
 
 	it('test graphql', async () => {
-		const { typeDefs, resolvers } = remultGraphql(api);
+		const { typeDefs, resolvers } = remultGraphql(api)
 
 		const yoga = createYoga({
 			schema: createSchema({
 				typeDefs,
 				resolvers
 			})
-		});
+		})
 
 		await api['get internal server']().run({} as any, async () => {
-			await remult.repo(Task).insert([{ title: 'task c' }]);
-			await remult.repo(Task).insert([{ title: 'task b' }]);
-			await remult.repo(Task).insert([{ title: 'task a' }]);
-			expect(await remult.repo(Task).count()).toBe(3);
-		});
+			await remult.repo(Task).insert([{ title: 'task c' }])
+			await remult.repo(Task).insert([{ title: 'task b' }])
+			await remult.repo(Task).insert([{ title: 'task a' }])
+			expect(await remult.repo(Task).count()).toBe(3)
+		})
 
 		const result = await yoga.getResultForParams({
 			request: new Request('http://...'),
@@ -311,7 +311,7 @@ describe('graphql-connection', () => {
 					}
 				`
 			}
-		});
+		})
 
 		expect(result).toMatchInlineSnapshot(`
 			{
@@ -335,6 +335,6 @@ describe('graphql-connection', () => {
 			    ],
 			  },
 			}
-		`);
-	});
-});
+		`)
+	})
+})

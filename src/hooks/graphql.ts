@@ -1,22 +1,22 @@
-import type { Handle } from '@sveltejs/kit';
-import { remultGraphql } from '../remult_tmp/graphql';
+import type { Handle } from '@sveltejs/kit'
+import { remultGraphql } from '../remult_tmp/graphql'
 
-import { createSchema, createYoga } from 'graphql-yoga';
-import { remultApi } from './remult';
-import { fs } from 'houdini';
+import { createSchema, createYoga } from 'graphql-yoga'
+import { remultApi } from './remult'
+import { fs } from 'houdini'
 
-const { typeDefs, resolvers } = remultGraphql(remultApi);
+const { typeDefs, resolvers } = remultGraphql(remultApi)
 
 // Houdini needs this file to start! We can write a dummy one so that onstart there is something to real. Then it will be regenerated?
 // TODO JYC
-console.log('coucou');
-fs.writeFile('./src/graphql/schema.graphql', typeDefs);
+console.log('coucou')
+fs.writeFile('./src/graphql/schema.graphql', typeDefs)
 
 export const handleGraphql = (options?: { endpoint: string }): Handle => {
 	const { endpoint } = {
 		endpoint: '/api/graphql',
 		...options
-	};
+	}
 
 	const yoga = createYoga({
 		graphiql: {
@@ -40,11 +40,11 @@ query My_First_Query {
 			typeDefs,
 			resolvers
 		})
-	});
+	})
 	return async ({ event, resolve }) => {
 		if (event.url && event.url.pathname === endpoint) {
-			return await yoga.handleRequest(event.request, {});
+			return await yoga.handleRequest(event.request, {})
 		}
-		return resolve(event);
-	};
-};
+		return resolve(event)
+	}
+}

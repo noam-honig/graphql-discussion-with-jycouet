@@ -12,6 +12,6 @@ const config = {
 			client: 'src/graphql/client.ts'
 		}
 	}
-};
+}
 
-export default config;
+export default config
