@@ -1,33 +1,33 @@
+import { createSchema, createYoga } from 'graphql-yoga'
 import { InMemoryDataProvider, remult } from 'remult'
 import { remultExpress, type RemultExpressServer } from 'remult/remult-express'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { Category } from '../../shared/Category'
 
+import { Category } from '../../shared/Category'
+import { Task } from '../../shared/Task'
 import { remultGraphql } from '../graphql'
 
-import { createSchema, createYoga } from 'graphql-yoga'
-import { Task } from '../../shared/Task'
 // import { remultSveltekit, type RemultSveltekitServer } from 'remult/remult-sveltekit';
 
 // let api: RemultSveltekitServer;
 let api: RemultExpressServer
 describe('graphql-connection', () => {
-	beforeEach(async () => {
-		// api = remultSveltekit({
-		api = remultExpress({
-			logApiEndPoints: false, // We don't need this in tests
-			dataProvider: new InMemoryDataProvider(),
-			entities: [Task, Category]
-		})
-	})
+  beforeEach(async () => {
+    // api = remultSveltekit({
+    api = remultExpress({
+      logApiEndPoints: false, // We don't need this in tests
+      dataProvider: new InMemoryDataProvider(),
+      entities: [Task, Category],
+    })
+  })
 
-	it('test basics', async () => {
-		// rmv removeComments is very handy for testing!
-		const { typeDefs } = remultGraphql(api, {
-			removeComments: true
-		})
+  it('test basics', async () => {
+    // rmv removeComments is very handy for testing!
+    const { typeDefs } = remultGraphql(api, {
+      removeComments: true,
+    })
 
-		expect(typeDefs).toMatchInlineSnapshot(`
+    expect(typeDefs).toMatchInlineSnapshot(`
 			"type Query {
 			  task (id: ID!): Task
 			  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
@@ -272,50 +272,50 @@ describe('graphql-connection', () => {
 			}
 			"
 		`)
-	})
+  })
 
-	it('test get values', async () => {
-		api['get internal server']().run({} as any, async () => {
-			await remult.repo(Task).insert([{ title: 'task a' }])
-			expect(await remult.repo(Task).count()).toBe(1)
-		})
-		const { resolvers } = remultGraphql(api)
-		expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1)
-	})
+  it('test get values', async () => {
+    api['get internal server']().run({} as any, async () => {
+      await remult.repo(Task).insert([{ title: 'task a' }])
+      expect(await remult.repo(Task).count()).toBe(1)
+    })
+    const { resolvers } = remultGraphql(api)
+    expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1)
+  })
 
-	it('test graphql', async () => {
-		const { typeDefs, resolvers } = remultGraphql(api)
+  it('test graphql', async () => {
+    const { typeDefs, resolvers } = remultGraphql(api)
 
-		const yoga = createYoga({
-			schema: createSchema({
-				typeDefs,
-				resolvers
-			})
-		})
+    const yoga = createYoga({
+      schema: createSchema({
+        typeDefs,
+        resolvers,
+      }),
+    })
 
-		await api['get internal server']().run({} as any, async () => {
-			await remult.repo(Task).insert([{ title: 'task c' }])
-			await remult.repo(Task).insert([{ title: 'task b' }])
-			await remult.repo(Task).insert([{ title: 'task a' }])
-			expect(await remult.repo(Task).count()).toBe(3)
-		})
+    await api['get internal server']().run({} as any, async () => {
+      await remult.repo(Task).insert([{ title: 'task c' }])
+      await remult.repo(Task).insert([{ title: 'task b' }])
+      await remult.repo(Task).insert([{ title: 'task a' }])
+      expect(await remult.repo(Task).count()).toBe(3)
+    })
 
-		const result = await yoga.getResultForParams({
-			request: new Request('http://...'),
-			params: {
-				query: /* GraphQL */ `
-					query Tasks {
-						tasks(orderBy: { title: ASC }) {
-							id
-							title
-							completed
-						}
-					}
-				`
-			}
-		})
+    const result = await yoga.getResultForParams({
+      request: new Request('http://...'),
+      params: {
+        query: /* GraphQL */ `
+          query Tasks {
+            tasks(orderBy: { title: ASC }) {
+              id
+              title
+              completed
+            }
+          }
+        `,
+      },
+    })
 
-		expect(result).toMatchInlineSnapshot(`
+    expect(result).toMatchInlineSnapshot(`
 			{
 			  "data": {
 			    "tasks": [
@@ -338,5 +338,5 @@ describe('graphql-connection', () => {
 			  },
 			}
 		`)
-	})
+  })
 })

@@ -1,9 +1,9 @@
 <script lang="ts">
-	// import type { PageData } from './$houdini';
+  // import type { PageData } from './$houdini';
 
-	// export let data: PageData;
+  // export let data: PageData;
 
-	// $: ({ Tasks } = data)
+  // $: ({ Tasks } = data)
 </script>
 
 <h2>Tasks Connection</h2>

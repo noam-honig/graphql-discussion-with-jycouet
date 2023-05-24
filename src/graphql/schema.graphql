@@ -5,27 +5,37 @@ type Query {
   """
   Get `Task` entity
   """
-  task (id: ID!): Task
+  task(id: ID!): Task
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasksConnection (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+  tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
   """
   Get `Category` entity
   """
-  category (id: ID!): Category
+  category(id: ID!): Category
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+  categories(
+    limit: Int
+    page: Int
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): [Category!]!
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categoriesConnection (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+  categoriesConnection(
+    limit: Int
+    page: Int
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): CategoryConnection
 }
 
 """
@@ -35,27 +45,27 @@ type Mutation {
   """
   Create a new `Task`
   """
-  createTask (input: CreateTaskInput!): CreateTaskPayload
+  createTask(input: CreateTaskInput!): CreateTaskPayload
   """
   Update a `Task`
   """
-  updateTask (id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+  updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
   """
   Delete a `Task`
   """
-  deleteTask (id: ID!): DeleteTaskPayload
+  deleteTask(id: ID!): DeleteTaskPayload
   """
   Create a new `Category`
   """
-  createCategory (input: CreateCategoryInput!): CreateCategoryPayload
+  createCategory(input: CreateCategoryInput!): CreateCategoryPayload
   """
   Update a `Category`
   """
-  updateCategory (id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+  updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
   """
   Delete a `Category`
   """
-  deleteCategory (id: ID!): DeleteCategoryPayload
+  deleteCategory(id: ID!): DeleteCategoryPayload
 }
 
 """
@@ -171,7 +181,7 @@ type Category implements Node {
   """
   List all `Task` of `categories`
   """
-  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
 }
 
 """
@@ -369,8 +379,8 @@ input WhereIDNullable {
 type PageInfo {
   endCursor: String!
   hasNextPage: Boolean!
-	hasPreviousPage: Boolean!
-	startCursor: String!
+  hasPreviousPage: Boolean!
+  startCursor: String!
 }
 
 """
