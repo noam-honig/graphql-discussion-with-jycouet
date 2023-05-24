@@ -35,6 +35,8 @@
 	"dependencies": {
 		"express": "^4.18.2",
 		"graphql-yoga": "^3.9.1",
+		"houdini": "^1.2.3",
+		"houdini-svelte": "^1.2.3",
 		"remult": "0.20.3-exp.0"
 	}
 }

@@ -8,7 +8,8 @@
 
 <nav>
 	<a href="/">Home</a>
-	<a href="/tasks">Tasks List</a>
+	<a href="/tasksList">Tasks List</a>
+	<a href="/tasksConnection">Tasks Connection</a>
 
 	<a style="float: right;" href="/api/graphql" target="_blank">Graph<i>i</i>GL</a>
 </nav>
