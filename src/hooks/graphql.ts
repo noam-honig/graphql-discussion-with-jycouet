@@ -1,9 +1,10 @@
 import type { Handle } from '@sveltejs/kit'
 import { remultGraphql } from '../remult_tmp/graphql'
 
-import { createSchema, createYoga } from 'graphql-yoga'
-import { remultApi } from './remult'
+import { mergeSchemas } from '@graphql-tools/schema'
+import { createSchema, createYoga, type YogaInitialContext } from 'graphql-yoga'
 import { fs } from 'houdini'
+import { remultApi } from './remult'
 
 const { typeDefs, resolvers } = remultGraphql(remultApi)
 
@@ -15,6 +16,50 @@ export const handleGraphql = (options?: { endpoint: string }): Handle => {
 	const { endpoint } = {
 		endpoint: '/api/graphql',
 		...options
+	}
+
+	const schema = mergeSchemas({
+		schemas: [
+			//  remult GraphQL
+			createSchema({ typeDefs, resolvers }),
+
+			// extended one
+			createSchema({
+				typeDefs: `
+			type Query {
+				me: CurrentUser
+			}
+			
+			type CurrentUser {
+				name: String
+			}
+			`,
+				resolvers: {
+					Query: {
+						me: async (root, arg, ctx: KitQLContext, info) => {
+							return { name: ctx.currentUser?.name }
+						}
+					}
+				}
+			})
+		]
+	})
+
+	type KitQLContext = Awaited<ReturnType<typeof context>>
+	const context = async (ctx: YogaInitialContext) => {
+		// console.log(`cookie`, ctx.request.headers.get('cookie'))
+		// get the the user from the cookie...
+		// and pass it to allllll resolvers
+		let currentUser: { name: string } | null = null
+		currentUser = { name: 'JYC' }
+
+		// TODO Noam. (Actually to look together)
+		// get remult api and passit to allllll resolvers?
+		// const api = await remultApi.getRemult(ctx.request)
+		return {
+			...ctx,
+			currentUser
+		}
 	}
 
 	const yoga = createYoga({
@@ -34,11 +79,9 @@ query My_First_Query {
 			`,
 			title: 'KitQL - Remult'
 		},
+		context,
 		graphqlEndpoint: endpoint,
-		schema: createSchema({
-			typeDefs,
-			resolvers
-		})
+		schema
 	})
 	return async ({ event, resolve }) => {
 		if (event.url && event.url.pathname === endpoint) {
