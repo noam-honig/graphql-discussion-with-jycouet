@@ -1,17 +1,25 @@
 import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 
-type Field = {
+type Enum = { Enum: true }
+
+type Arg = {
   key: string
-  args?: string
-  value: string
+  value: Enum | string
   comment?: string
+}
+
+type Field = Arg & {
+  args?: Arg[]
   order?: number
 }
 
+type Kind = 'type_impl_node' | 'type' | 'input' | 'enum' | 'interface'
+
 type GraphQLType = {
+  kind: Kind
   key: string
-  kind: 'type_impl_node' | 'type' | 'input'
+  comment?: string
   fields: Field[]
   query: {
     orderBy: string[]
@@ -56,7 +64,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
   const resolversMutation: Record<string, unknown> = {}
   const resolvers = { Query: resolversQuery, Mutation: resolversMutation }
 
-  function upsertTypes(key: string, kind: 'type_impl_node' | 'type' | 'input' = 'type', order = 0) {
+  function upsertTypes(key: string, kind: Kind = 'type', order = 0) {
     let t = types.find(t => t.key === key)
     if (!t) {
       types.push(
@@ -79,10 +87,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }),
       )
       if (kind === 'type_impl_node') {
-        t.fields.push({
-          key: 'nodeId',
-          value: 'ID!',
-        })
+        t.fields.push({ ...argNodeId, order: 11 })
       }
     }
     return t
@@ -133,6 +138,15 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     })
   }
 
+  const root_query = upsertTypes('Query', 'type', -10)
+  root_query.comment = `Represents all Remult entities.`
+  const argId: Arg = { key: `id`, value: `ID!` }
+  const argNodeId: Arg = {
+    key: 'nodeId',
+    value: `ID!`,
+    comment: `The globally unique \`ID\` _(_typename:id)_`,
+  }
+
   for (const meta of entities) {
     const orderByFields: string[] = []
 
@@ -141,14 +155,24 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
 
     if (key) {
-      const root_query = upsertTypes('Query', 'type', -10)
-
-      const queryArgsList = `limit: Int, page: Int, orderBy: ${key}OrderBy, where: ${key}Where`
-      const queryArgsConnection = `limit: Int, page: Int, orderBy: ${key}OrderBy, where: ${key}Where`
+      const queryArgsList: Arg[] = [
+        { key: 'limit', value: 'Int' },
+        { key: 'page', value: 'Int' },
+        { key: 'orderBy', value: `${key}OrderBy` },
+        { key: 'where', value: `${key}Where` },
+      ]
+      const queryArgsConnection: Arg[] = [
+        { key: 'first', value: 'Int' },
+        { key: 'after', value: 'String' },
+        { key: 'last', value: 'Int' },
+        { key: 'before', value: 'String' },
+        { key: 'orderBy', value: `${key}OrderBy` },
+        { key: 'where', value: `${key}Where` },
+      ]
 
       root_query.fields.push({
         key: toPascalCase(getMetaType(meta)),
-        args: `id: ID!`,
+        args: [argId],
         value: `${getMetaType(meta)}`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
       })
@@ -207,7 +231,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const createResolverKey = `create${getMetaType(meta)}`
       root_mutation.fields.push({
         key: createResolverKey,
-        args: `input: ${createInput}!`,
+        args: [{ key: 'input', value: `${createInput}!` }],
         value: `${createPayload}`,
         comment: `Create a new \`${getMetaType(meta)}\``,
       })
@@ -227,7 +251,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const updateResolverKey = `update${getMetaType(meta)}`
       root_mutation.fields.push({
         key: updateResolverKey,
-        args: `id: ID!, patch: ${updateInput}!`,
+        args: [argId, { key: 'patch', value: `${updateInput}!` }],
         value: `${updatePayload}`,
         comment: `Update a \`${getMetaType(meta)}\``,
       })
@@ -245,7 +269,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const deleteResolverKey = `delete${getMetaType(meta)}`
       root_mutation.fields.push({
         key: deleteResolverKey,
-        args: `id: ID!`,
+        args: [argId],
         value: `${deletePayload}`,
         comment: `Delete a \`${getMetaType(meta)}\``,
       })
@@ -369,6 +393,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       )
 
       whereTypeFields.push(`OR: [${key}Where!]`)
+      whereTypeFields.push(`AND: [${key}Where!]`)
       currentType.query.whereType.push(
         blockFormat({
           prefix: `input ${key}Where`,
@@ -481,12 +506,43 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     }
   }
 
+  // Add the node interface at the end
+  root_query.fields.push({
+    key: 'node',
+    args: [argNodeId],
+    value: `Node`,
+    comment: `Grab any Remult entity given it's globally unique \`ID\``,
+  })
+
+  const pageInfo = upsertTypes('PageInfo', 'type', 30)
+  pageInfo.fields.push({ key: 'endCursor', value: 'String!' })
+  pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
+  pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
+  pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+
+  const orderByDirection = upsertTypes('OrderByDirection', 'enum', 30)
+  orderByDirection.comment = `Determines the order of returned elements`
+  orderByDirection.fields.push({
+    key: 'ASC',
+    value: { Enum: true },
+    comment: 'Sort data in ascending order',
+  })
+  orderByDirection.fields.push({
+    key: 'DESC',
+    value: { Enum: true },
+    comment: 'Sort data in descending order',
+  })
+
+  const nodeInterface = upsertTypes('Node', 'interface', 31)
+  nodeInterface.comment = `Node interface of remult entities (eg: nodeId: \`Task:1\` so \`__typename:id\`)`
+  nodeInterface.fields.push(argNodeId)
+
   return {
     resolvers,
     rootValue: root,
     typeDefs: `${types
       .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
-      .map(({ key, kind, fields, query }) => {
+      .map(({ key, kind, fields, query, comment }) => {
         const { orderBy, whereType, whereTypeSubFields } = query
 
         let prefix = `${kind} ${key}`
@@ -499,12 +555,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           data: fields
             .sort((a, b) => (a.order ? a.order : 0) - (b.order ? b.order : 0))
             .map(field => fieldFormat(field)),
-          comment:
-            key === 'Query'
-              ? `Represents all Remult entities.`
-              : key === 'Mutation'
-              ? `Represents all Remult Mutations available on Remult.`
-              : `Represents \`${key}\` entity.`,
+          comment: comment ?? `The ${kind} for \`${key}\``,
         })
 
         const orderByStr = orderBy.length > 0 ? `\n\n${orderBy.join('\n\n')}` : ``
@@ -514,41 +565,9 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         return `${type}${orderByStr}${whereTypeStr}${whereTypeSubFieldsStr}`
       })
       .join(`\n\n`)}
-
-${schemaWithConnection}
-${schemaGlobal}
 `,
   }
 }
-
-const schemaWithConnection = `type PageInfo {
-  endCursor: String!
-  hasNextPage: Boolean!
-	hasPreviousPage: Boolean!
-	startCursor: String!
-}
-`
-
-const schemaGlobal = `"""
-Determines the order of items returned
-"""
-enum OrderByDirection {
-  """
-  Sort data in ascending order
-  """
-  ASC
-  """
-  Sort data in descending order
-  """
-  DESC
-}
-
-"""
-Node interface of remult entities (eg: nodeId: \`Task:1\` so \`Typename:id\`)
-"""
-interface Node {
-  nodeId: ID!
-}`
 
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
@@ -571,17 +590,47 @@ ${obj.comment}
   return `${commentsStr}${str}`
 }
 
-function fieldFormat(field: Field) {
-  const key_value = `${field.key}${field.args ? ` (${field.args})` : ``}: ${field.value}`
+function argsFormat(args?: Arg[]) {
+  if (args) {
+    return `(${args
+      .map(arg => {
+        let strComment = `
+    """
+    ${arg.comment}
+    """
+`
+        if (_removeComments || !arg.comment) {
+          strComment = ``
+        }
 
-  if (!_removeComments && field.comment) {
-    return `"""
+        if (strComment) {
+          return `${strComment}    ${arg.key}: ${arg.value}`
+        }
+
+        return `${arg.key}: ${arg.value}`
+      })
+      .join(', ')})`
+  }
+  return ``
+}
+
+function fieldFormat(field: Field) {
+  // First, the comment
+  let strComment = `"""
   ${field.comment}
   """
-  ${key_value}`
+`
+  if (_removeComments || !field.comment) {
+    strComment = ``
   }
 
-  return key_value
+  let key_value = `${field.key}${field.args ? `${argsFormat(field.args)}` : ``}: ${field.value}`
+  // It's an enum
+  if (typeof field.value === 'object') {
+    key_value = `${field.key}`
+  }
+
+  return `${strComment}  ${key_value}`
 }
 
 function getMetaType(entityMeta: EntityMetadata) {

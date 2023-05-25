@@ -28,250 +28,241 @@ describe('graphql-connection', () => {
     })
 
     expect(typeDefs).toMatchInlineSnapshot(`
-			"type Query {
-			  task (id: ID!): Task
-			  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-			  tasksConnection (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
-			  category (id: ID!): Category
-			  categories (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
-			  categoriesConnection (limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
-			}
+      "type Query {
+          task(id: ID!): Task
+          tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+          tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+          category(id: ID!): Category
+          categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+          categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+          node(nodeId: ID!): Node
+      }
 
-			type Mutation {
-			  createTask (input: CreateTaskInput!): CreateTaskPayload
-			  updateTask (id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
-			  deleteTask (id: ID!): DeleteTaskPayload
-			  createCategory (input: CreateCategoryInput!): CreateCategoryPayload
-			  updateCategory (id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
-			  deleteCategory (id: ID!): DeleteCategoryPayload
-			}
+      type Mutation {
+          createTask(input: CreateTaskInput!): CreateTaskPayload
+          updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+          deleteTask(id: ID!): DeleteTaskPayload
+          createCategory(input: CreateCategoryInput!): CreateCategoryPayload
+          updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+          deleteCategory(id: ID!): DeleteCategoryPayload
+      }
 
-			type Task implements Node {
-			  nodeId: ID!
-			  id: Int!
-			  title: String!
-			  completed: Boolean!
-			  category: Category
-			}
+      type Task implements Node {
+          id: Int!
+          title: String!
+          completed: Boolean!
+          category: Category
+          nodeId: ID!
+      }
 
-			input tasksOrderBy {
-			  id: OrderByDirection
-			  title: OrderByDirection
-			  completed: OrderByDirection
-			  category: OrderByDirection
-			}
+      input tasksOrderBy {
+        id: OrderByDirection
+        title: OrderByDirection
+        completed: OrderByDirection
+        category: OrderByDirection
+      }
 
-			input tasksWhere {
-			  id: WhereInt
-			  title: WhereString
-			  completed: WhereBoolean
-			  OR: [tasksWhere!]
-			}
+      input tasksWhere {
+        id: WhereInt
+        title: WhereString
+        completed: WhereBoolean
+        OR: [tasksWhere!]
+        AND: [tasksWhere!]
+      }
 
-			type TaskConnection {
-			  totalCount: Int!
-			  edges: [TaskEdge!]!
-			  pageInfo: PageInfo!
-			}
+      type TaskConnection {
+          totalCount: Int!
+          edges: [TaskEdge!]!
+          pageInfo: PageInfo!
+      }
 
-			type TaskEdge {
-			  node: Task!
-			  cursor: String!
-			}
+      type TaskEdge {
+          node: Task!
+          cursor: String!
+      }
 
-			input CreateTaskInput {
-			  title: String
-			  completed: Boolean
-			}
+      input CreateTaskInput {
+          title: String
+          completed: Boolean
+      }
 
-			type CreateTaskPayload {
-			  task: Task
-			}
+      type CreateTaskPayload {
+          task: Task
+      }
 
-			input UpdateTaskInput {
-			  title: String
-			  completed: Boolean
-			}
+      input UpdateTaskInput {
+          title: String
+          completed: Boolean
+      }
 
-			type UpdateTaskPayload {
-			  task: Task
-			}
+      type UpdateTaskPayload {
+          task: Task
+      }
 
-			type DeleteTaskPayload {
-			  deletedTaskId: ID
-			}
+      type DeleteTaskPayload {
+          deletedTaskId: ID
+      }
 
-			type Category implements Node {
-			  nodeId: ID!
-			  id: String!
-			  name: String!
-			  tasks (limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-			}
+      type Category implements Node {
+          id: String!
+          name: String!
+          tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+          nodeId: ID!
+      }
 
-			input categoriesOrderBy {
-			  id: OrderByDirection
-			  name: OrderByDirection
-			}
+      input categoriesOrderBy {
+        id: OrderByDirection
+        name: OrderByDirection
+      }
 
-			input categoriesWhere {
-			  id: WhereString
-			  name: WhereString
-			  OR: [categoriesWhere!]
-			}
+      input categoriesWhere {
+        id: WhereString
+        name: WhereString
+        OR: [categoriesWhere!]
+        AND: [categoriesWhere!]
+      }
 
-			type CategoryConnection {
-			  totalCount: Int!
-			  edges: [CategoryEdge!]!
-			  pageInfo: PageInfo!
-			}
+      type CategoryConnection {
+          totalCount: Int!
+          edges: [CategoryEdge!]!
+          pageInfo: PageInfo!
+      }
 
-			type CategoryEdge {
-			  node: Category!
-			  cursor: String!
-			}
+      type CategoryEdge {
+          node: Category!
+          cursor: String!
+      }
 
-			input CreateCategoryInput {
-			  id: String
-			  name: String
-			}
+      input CreateCategoryInput {
+          id: String
+          name: String
+      }
 
-			type CreateCategoryPayload {
-			  category: Category
-			}
+      type CreateCategoryPayload {
+          category: Category
+      }
 
-			input UpdateCategoryInput {
-			  id: String
-			  name: String
-			}
+      input UpdateCategoryInput {
+          id: String
+          name: String
+      }
 
-			type UpdateCategoryPayload {
-			  category: Category
-			}
+      type UpdateCategoryPayload {
+          category: Category
+      }
 
-			type DeleteCategoryPayload {
-			  deletedCategoryId: ID
-			}
+      type DeleteCategoryPayload {
+          deletedCategoryId: ID
+      }
 
-			input WhereString {
-			  eq: String
-			  ne: String
-			  in: [String!]
-			  gt: String
-			  gte: String
-			  lt: String
-			  lte: String
-			  st: String
-			}
+      input WhereString {
+          eq: String
+          ne: String
+          in: [String!]
+          gt: String
+          gte: String
+          lt: String
+          lte: String
+          st: String
+      }
 
-			input WhereStringNullable {
-			  eq: String
-			  ne: String
-			  in: [String!]
-			  gt: String
-			  gte: String
-			  lt: String
-			  lte: String
-			  st: String
-			  null: Boolean
-			}
+      input WhereStringNullable {
+          eq: String
+          ne: String
+          in: [String!]
+          gt: String
+          gte: String
+          lt: String
+          lte: String
+          st: String
+          null: Boolean
+      }
 
-			input WhereInt {
-			  eq: Int
-			  ne: Int
-			  in: [Int!]
-			  gt: Int
-			  gte: Int
-			  lt: Int
-			  lte: Int
-			}
+      input WhereInt {
+          eq: Int
+          ne: Int
+          in: [Int!]
+          gt: Int
+          gte: Int
+          lt: Int
+          lte: Int
+      }
 
-			input WhereIntNullable {
-			  eq: Int
-			  ne: Int
-			  in: [Int!]
-			  gt: Int
-			  gte: Int
-			  lt: Int
-			  lte: Int
-			  null: Boolean
-			}
+      input WhereIntNullable {
+          eq: Int
+          ne: Int
+          in: [Int!]
+          gt: Int
+          gte: Int
+          lt: Int
+          lte: Int
+          null: Boolean
+      }
 
-			input WhereFloat {
-			  eq: Float
-			  ne: Float
-			  in: [Float!]
-			  gt: Float
-			  gte: Float
-			  lt: Float
-			  lte: Float
-			}
+      input WhereFloat {
+          eq: Float
+          ne: Float
+          in: [Float!]
+          gt: Float
+          gte: Float
+          lt: Float
+          lte: Float
+      }
 
-			input WhereFloatNullable {
-			  eq: Float
-			  ne: Float
-			  in: [Float!]
-			  gt: Float
-			  gte: Float
-			  lt: Float
-			  lte: Float
-			  null: Boolean
-			}
+      input WhereFloatNullable {
+          eq: Float
+          ne: Float
+          in: [Float!]
+          gt: Float
+          gte: Float
+          lt: Float
+          lte: Float
+          null: Boolean
+      }
 
-			input WhereBoolean {
-			  eq: Boolean
-			  ne: Boolean
-			  in: [Boolean!]
-			}
+      input WhereBoolean {
+          eq: Boolean
+          ne: Boolean
+          in: [Boolean!]
+      }
 
-			input WhereBooleanNullable {
-			  eq: Boolean
-			  ne: Boolean
-			  in: [Boolean!]
-			  null: Boolean
-			}
+      input WhereBooleanNullable {
+          eq: Boolean
+          ne: Boolean
+          in: [Boolean!]
+          null: Boolean
+      }
 
-			input WhereID {
-			  eq: ID
-			  ne: ID
-			  in: [ID!]
-			}
+      input WhereID {
+          eq: ID
+          ne: ID
+          in: [ID!]
+      }
 
-			input WhereIDNullable {
-			  eq: ID
-			  ne: ID
-			  in: [ID!]
-			  null: Boolean
-			}
+      input WhereIDNullable {
+          eq: ID
+          ne: ID
+          in: [ID!]
+          null: Boolean
+      }
 
-			type PageInfo {
-			  endCursor: String!
-			  hasNextPage: Boolean!
-				hasPreviousPage: Boolean!
-				startCursor: String!
-			}
+      type PageInfo {
+          endCursor: String!
+          hasNextPage: Boolean!
+          hasPreviousPage: Boolean!
+          startCursor: String!
+      }
 
-			\\"\\"\\"
-			Determines the order of items returned
-			\\"\\"\\"
-			enum OrderByDirection {
-			  \\"\\"\\"
-			  Sort data in ascending order
-			  \\"\\"\\"
-			  ASC
-			  \\"\\"\\"
-			  Sort data in descending order
-			  \\"\\"\\"
-			  DESC
-			}
+      enum OrderByDirection {
+          ASC
+          DESC
+      }
 
-			\\"\\"\\"
-			Node interface of remult entities (eg: nodeId: \`Task:1\` so \`Typename:id\`)
-			\\"\\"\\"
-			interface Node {
-			  nodeId: ID!
-			}
-			"
-		`)
+      interface Node {
+          nodeId: ID!
+      }
+      "
+    `)
   })
 
   it('test get values', async () => {
