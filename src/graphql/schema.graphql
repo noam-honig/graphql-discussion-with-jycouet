@@ -13,7 +13,14 @@ type Query {
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+  tasksConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: tasksOrderBy
+    where: tasksWhere
+  ): TaskConnection
   """
   Get `Category` entity
   """
@@ -31,15 +38,26 @@ type Query {
   List all `Category` entity (with pagination, sorting and filtering)
   """
   categoriesConnection(
-    limit: Int
-    page: Int
+    first: Int
+    after: String
+    last: Int
+    before: String
     orderBy: categoriesOrderBy
     where: categoriesWhere
   ): CategoryConnection
+  """
+  Grab any Remult entity given it's globally unique `ID`
+  """
+  node(
+    """
+    The globally unique `ID` _(_typename:id)_
+    """
+    nodeId: ID!
+  ): Node
 }
 
 """
-Represents all Remult Mutations available on Remult.
+The type for `Mutation`
 """
 type Mutation {
   """
@@ -69,10 +87,9 @@ type Mutation {
 }
 
 """
-Represents `Task` entity.
+The type_impl_node for `Task`
 """
 type Task implements Node {
-  nodeId: ID!
   """
   Id
   """
@@ -89,6 +106,10 @@ type Task implements Node {
   Category
   """
   category: Category
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
 }
 
 """
@@ -109,10 +130,11 @@ input tasksWhere {
   title: WhereString
   completed: WhereBoolean
   OR: [tasksWhere!]
+  AND: [tasksWhere!]
 }
 
 """
-Represents `TaskConnection` entity.
+The type for `TaskConnection`
 """
 type TaskConnection {
   totalCount: Int!
@@ -121,7 +143,7 @@ type TaskConnection {
 }
 
 """
-Represents `TaskEdge` entity.
+The type for `TaskEdge`
 """
 type TaskEdge {
   node: Task!
@@ -129,7 +151,7 @@ type TaskEdge {
 }
 
 """
-Represents `CreateTaskInput` entity.
+The input for `CreateTaskInput`
 """
 input CreateTaskInput {
   title: String
@@ -137,14 +159,14 @@ input CreateTaskInput {
 }
 
 """
-Represents `CreateTaskPayload` entity.
+The type for `CreateTaskPayload`
 """
 type CreateTaskPayload {
   task: Task
 }
 
 """
-Represents `UpdateTaskInput` entity.
+The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
   title: String
@@ -152,24 +174,23 @@ input UpdateTaskInput {
 }
 
 """
-Represents `UpdateTaskPayload` entity.
+The type for `UpdateTaskPayload`
 """
 type UpdateTaskPayload {
   task: Task
 }
 
 """
-Represents `DeleteTaskPayload` entity.
+The type for `DeleteTaskPayload`
 """
 type DeleteTaskPayload {
   deletedTaskId: ID
 }
 
 """
-Represents `Category` entity.
+The type_impl_node for `Category`
 """
 type Category implements Node {
-  nodeId: ID!
   """
   Id
   """
@@ -182,6 +203,10 @@ type Category implements Node {
   List all `Task` of `categories`
   """
   tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
 }
 
 """
@@ -199,10 +224,11 @@ input categoriesWhere {
   id: WhereString
   name: WhereString
   OR: [categoriesWhere!]
+  AND: [categoriesWhere!]
 }
 
 """
-Represents `CategoryConnection` entity.
+The type for `CategoryConnection`
 """
 type CategoryConnection {
   totalCount: Int!
@@ -211,7 +237,7 @@ type CategoryConnection {
 }
 
 """
-Represents `CategoryEdge` entity.
+The type for `CategoryEdge`
 """
 type CategoryEdge {
   node: Category!
@@ -219,7 +245,7 @@ type CategoryEdge {
 }
 
 """
-Represents `CreateCategoryInput` entity.
+The input for `CreateCategoryInput`
 """
 input CreateCategoryInput {
   id: String
@@ -227,14 +253,14 @@ input CreateCategoryInput {
 }
 
 """
-Represents `CreateCategoryPayload` entity.
+The type for `CreateCategoryPayload`
 """
 type CreateCategoryPayload {
   category: Category
 }
 
 """
-Represents `UpdateCategoryInput` entity.
+The input for `UpdateCategoryInput`
 """
 input UpdateCategoryInput {
   id: String
@@ -242,21 +268,21 @@ input UpdateCategoryInput {
 }
 
 """
-Represents `UpdateCategoryPayload` entity.
+The type for `UpdateCategoryPayload`
 """
 type UpdateCategoryPayload {
   category: Category
 }
 
 """
-Represents `DeleteCategoryPayload` entity.
+The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
   deletedCategoryId: ID
 }
 
 """
-Represents `WhereString` entity.
+The input for `WhereString`
 """
 input WhereString {
   eq: String
@@ -270,7 +296,7 @@ input WhereString {
 }
 
 """
-Represents `WhereStringNullable` entity.
+The input for `WhereStringNullable`
 """
 input WhereStringNullable {
   eq: String
@@ -285,7 +311,7 @@ input WhereStringNullable {
 }
 
 """
-Represents `WhereInt` entity.
+The input for `WhereInt`
 """
 input WhereInt {
   eq: Int
@@ -298,7 +324,7 @@ input WhereInt {
 }
 
 """
-Represents `WhereIntNullable` entity.
+The input for `WhereIntNullable`
 """
 input WhereIntNullable {
   eq: Int
@@ -312,7 +338,7 @@ input WhereIntNullable {
 }
 
 """
-Represents `WhereFloat` entity.
+The input for `WhereFloat`
 """
 input WhereFloat {
   eq: Float
@@ -325,7 +351,7 @@ input WhereFloat {
 }
 
 """
-Represents `WhereFloatNullable` entity.
+The input for `WhereFloatNullable`
 """
 input WhereFloatNullable {
   eq: Float
@@ -339,7 +365,7 @@ input WhereFloatNullable {
 }
 
 """
-Represents `WhereBoolean` entity.
+The input for `WhereBoolean`
 """
 input WhereBoolean {
   eq: Boolean
@@ -348,7 +374,7 @@ input WhereBoolean {
 }
 
 """
-Represents `WhereBooleanNullable` entity.
+The input for `WhereBooleanNullable`
 """
 input WhereBooleanNullable {
   eq: Boolean
@@ -358,7 +384,7 @@ input WhereBooleanNullable {
 }
 
 """
-Represents `WhereID` entity.
+The input for `WhereID`
 """
 input WhereID {
   eq: ID
@@ -367,7 +393,7 @@ input WhereID {
 }
 
 """
-Represents `WhereIDNullable` entity.
+The input for `WhereIDNullable`
 """
 input WhereIDNullable {
   eq: ID
@@ -376,6 +402,9 @@ input WhereIDNullable {
   null: Boolean
 }
 
+"""
+The type for `PageInfo`
+"""
 type PageInfo {
   endCursor: String!
   hasNextPage: Boolean!
@@ -384,7 +413,7 @@ type PageInfo {
 }
 
 """
-Determines the order of items returned
+Determines the order of returned elements
 """
 enum OrderByDirection {
   """
@@ -398,8 +427,11 @@ enum OrderByDirection {
 }
 
 """
-Node interface of remult entities (eg: nodeId: `Task:1` so `Typename:id`)
+Node interface of remult entities (eg: nodeId: `Task:1` so `__typename:id`)
 """
 interface Node {
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
   nodeId: ID!
 }
