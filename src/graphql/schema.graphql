@@ -1,0 +1,437 @@
+"""
+Represents all Remult entities.
+"""
+type Query {
+  """
+  Get `Task` entity
+  """
+  task(id: ID!): Task
+  """
+  List all `Task` entity (with pagination, sorting and filtering)
+  """
+  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  """
+  List all `Task` entity (with pagination, sorting and filtering)
+  """
+  tasksConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: tasksOrderBy
+    where: tasksWhere
+  ): TaskConnection
+  """
+  Get `Category` entity
+  """
+  category(id: ID!): Category
+  """
+  List all `Category` entity (with pagination, sorting and filtering)
+  """
+  categories(
+    limit: Int
+    page: Int
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): [Category!]!
+  """
+  List all `Category` entity (with pagination, sorting and filtering)
+  """
+  categoriesConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): CategoryConnection
+  """
+  Grab any Remult entity given it's globally unique `ID`
+  """
+  node(
+    """
+    The globally unique `ID` _(_typename:id)_
+    """
+    nodeId: ID!
+  ): Node
+}
+
+"""
+The type for `Mutation`
+"""
+type Mutation {
+  """
+  Create a new `Task`
+  """
+  createTask(input: CreateTaskInput!): CreateTaskPayload
+  """
+  Update a `Task`
+  """
+  updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+  """
+  Delete a `Task`
+  """
+  deleteTask(id: ID!): DeleteTaskPayload
+  """
+  Create a new `Category`
+  """
+  createCategory(input: CreateCategoryInput!): CreateCategoryPayload
+  """
+  Update a `Category`
+  """
+  updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+  """
+  Delete a `Category`
+  """
+  deleteCategory(id: ID!): DeleteCategoryPayload
+}
+
+"""
+The type_impl_node for `Task`
+"""
+type Task implements Node {
+  """
+  Id
+  """
+  id: Int!
+  """
+  The Title
+  """
+  title: String!
+  """
+  Is it completed?
+  """
+  completed: Boolean!
+  """
+  Category
+  """
+  category: Category
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
+}
+
+"""
+OrderBy options for `tasks`
+"""
+input tasksOrderBy {
+  id: OrderByDirection
+  title: OrderByDirection
+  completed: OrderByDirection
+  category: OrderByDirection
+}
+
+"""
+Where options for `tasks`
+"""
+input tasksWhere {
+  id: WhereInt
+  title: WhereString
+  completed: WhereBoolean
+  OR: [tasksWhere!]
+  AND: [tasksWhere!]
+}
+
+"""
+The type for `TaskConnection`
+"""
+type TaskConnection {
+  totalCount: Int!
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+}
+
+"""
+The type for `TaskEdge`
+"""
+type TaskEdge {
+  node: Task!
+  cursor: String!
+}
+
+"""
+The input for `CreateTaskInput`
+"""
+input CreateTaskInput {
+  title: String
+  completed: Boolean
+}
+
+"""
+The type for `CreateTaskPayload`
+"""
+type CreateTaskPayload {
+  task: Task
+}
+
+"""
+The input for `UpdateTaskInput`
+"""
+input UpdateTaskInput {
+  title: String
+  completed: Boolean
+}
+
+"""
+The type for `UpdateTaskPayload`
+"""
+type UpdateTaskPayload {
+  task: Task
+}
+
+"""
+The type for `DeleteTaskPayload`
+"""
+type DeleteTaskPayload {
+  deletedTaskId: ID
+}
+
+"""
+The type_impl_node for `Category`
+"""
+type Category implements Node {
+  """
+  Id
+  """
+  id: String!
+  """
+  Name
+  """
+  name: String!
+  """
+  List all `Task` of `categories`
+  """
+  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
+}
+
+"""
+OrderBy options for `categories`
+"""
+input categoriesOrderBy {
+  id: OrderByDirection
+  name: OrderByDirection
+}
+
+"""
+Where options for `categories`
+"""
+input categoriesWhere {
+  id: WhereString
+  name: WhereString
+  OR: [categoriesWhere!]
+  AND: [categoriesWhere!]
+}
+
+"""
+The type for `CategoryConnection`
+"""
+type CategoryConnection {
+  totalCount: Int!
+  edges: [CategoryEdge!]!
+  pageInfo: PageInfo!
+}
+
+"""
+The type for `CategoryEdge`
+"""
+type CategoryEdge {
+  node: Category!
+  cursor: String!
+}
+
+"""
+The input for `CreateCategoryInput`
+"""
+input CreateCategoryInput {
+  id: String
+  name: String
+}
+
+"""
+The type for `CreateCategoryPayload`
+"""
+type CreateCategoryPayload {
+  category: Category
+}
+
+"""
+The input for `UpdateCategoryInput`
+"""
+input UpdateCategoryInput {
+  id: String
+  name: String
+}
+
+"""
+The type for `UpdateCategoryPayload`
+"""
+type UpdateCategoryPayload {
+  category: Category
+}
+
+"""
+The type for `DeleteCategoryPayload`
+"""
+type DeleteCategoryPayload {
+  deletedCategoryId: ID
+}
+
+"""
+The input for `WhereString`
+"""
+input WhereString {
+  eq: String
+  ne: String
+  in: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  st: String
+}
+
+"""
+The input for `WhereStringNullable`
+"""
+input WhereStringNullable {
+  eq: String
+  ne: String
+  in: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  st: String
+  null: Boolean
+}
+
+"""
+The input for `WhereInt`
+"""
+input WhereInt {
+  eq: Int
+  ne: Int
+  in: [Int!]
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
+}
+
+"""
+The input for `WhereIntNullable`
+"""
+input WhereIntNullable {
+  eq: Int
+  ne: Int
+  in: [Int!]
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
+  null: Boolean
+}
+
+"""
+The input for `WhereFloat`
+"""
+input WhereFloat {
+  eq: Float
+  ne: Float
+  in: [Float!]
+  gt: Float
+  gte: Float
+  lt: Float
+  lte: Float
+}
+
+"""
+The input for `WhereFloatNullable`
+"""
+input WhereFloatNullable {
+  eq: Float
+  ne: Float
+  in: [Float!]
+  gt: Float
+  gte: Float
+  lt: Float
+  lte: Float
+  null: Boolean
+}
+
+"""
+The input for `WhereBoolean`
+"""
+input WhereBoolean {
+  eq: Boolean
+  ne: Boolean
+  in: [Boolean!]
+}
+
+"""
+The input for `WhereBooleanNullable`
+"""
+input WhereBooleanNullable {
+  eq: Boolean
+  ne: Boolean
+  in: [Boolean!]
+  null: Boolean
+}
+
+"""
+The input for `WhereID`
+"""
+input WhereID {
+  eq: ID
+  ne: ID
+  in: [ID!]
+}
+
+"""
+The input for `WhereIDNullable`
+"""
+input WhereIDNullable {
+  eq: ID
+  ne: ID
+  in: [ID!]
+  null: Boolean
+}
+
+"""
+The type for `PageInfo`
+"""
+type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+}
+
+"""
+Determines the order of returned elements
+"""
+enum OrderByDirection {
+  """
+  Sort data in ascending order
+  """
+  ASC
+  """
+  Sort data in descending order
+  """
+  DESC
+}
+
+"""
+Node interface of remult entities (eg: nodeId: `Task:1` so `__typename:id`)
+"""
+interface Node {
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
+}

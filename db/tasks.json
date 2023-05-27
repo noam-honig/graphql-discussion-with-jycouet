@@ -2,7 +2,8 @@
   {
     "id": 1,
     "title": "task z",
-    "completed": false
+    "completed": false,
+    "category": "cli1up0bn000008lac9rpff93"
   },
   {
     "id": 2,

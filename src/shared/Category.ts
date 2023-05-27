@@ -1,11 +1,9 @@
-import { Entity, Fields } from "remult";
+import { Entity, Fields } from 'remult'
 
-@Entity("categories", {
-  allowApiCrud: true,
-})
+@Entity('categories', { allowApiCrud: true })
 export class Category {
   @Fields.cuid()
-  id = "";
+  id = ''
   @Fields.string()
-  name = "";
+  name = ''
 }

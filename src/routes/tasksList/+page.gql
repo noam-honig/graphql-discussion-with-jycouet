@@ -1,0 +1,6 @@
+query Tasks {
+  tasks(orderBy: { title: ASC }) {
+    id
+    title
+  }
+}
