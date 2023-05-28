@@ -9,6 +9,7 @@ pnpm dev
 
 ## TODOs
 
+- [ ] where not in (nin?) TODO JYC
 - [ ] Where OR
   - [x] typedefs
   - [x] resolver TODO Noam
@@ -51,3 +52,13 @@ d. return the object
 ## Notes
 
 - All what is needed on top of sveltekit skeleton is in dependencies
+
+## Noam Question
+
+- [ ] why create/update return an object with task member - why not return the task directly
+
+## Noam thinks todo required
+
+- [ ] on create and update operation
+  - [ ] ,get id of related entities
+  - [ ] reflect in the schema the apiUpdateAllowed and includeInApi

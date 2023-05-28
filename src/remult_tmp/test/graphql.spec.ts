@@ -9,9 +9,12 @@ import { remultGraphql } from '../graphql'
 
 // import { remultSveltekit, type RemultSveltekitServer } from 'remult/remult-sveltekit';
 
-// let api: RemultSveltekitServer;
-let api: RemultExpressServer
 describe('graphql-connection', () => {
+  let api: RemultExpressServer
+  async function withRemult<T>(what: () => Promise<T>): Promise<T> {
+    return await api['get internal server']().run({} as any, what)
+  }
+  let gql: (gql: string) => Promise<any>
   beforeEach(async () => {
     // api = remultSveltekit({
     api = remultExpress({
@@ -19,8 +22,92 @@ describe('graphql-connection', () => {
       dataProvider: new InMemoryDataProvider(),
       entities: [Task, Category],
     })
-  })
+    const { typeDefs, resolvers } = remultGraphql(api)
 
+    const yoga = createYoga({
+      schema: createSchema({
+        typeDefs,
+        resolvers,
+      }),
+    })
+    gql = async (query: string) => {
+      return await yoga.getResultForParams({
+        request: {} as any,
+        params: {
+          query,
+        },
+      })
+    }
+  })
+  it('test mutation create', async () => {
+    const result = await gql(`
+mutation {
+  createTask(input: {title: "testing"}) {
+    task {
+      id
+      title
+    }
+  }
+}`)
+    expect(await withRemult(() => remult.repo(Task).count())).toBe(1)
+  })
+  it('test mutation update', async () => {
+    await withRemult(() => remult.repo(Task).insert({ title: 'aaa' }))
+    console.log("HAHAHA")
+    const result = await gql(`
+mutation {
+  updateTask(id:1, patch: {title: "bbb"}) {
+    task {
+      id
+      title
+    }
+  }
+}`)
+ //   expect(result).toBe('')
+ //   expect((await withRemult(() => remult.repo(Task).findFirst())).title).toBe('b')
+  })
+  it('test graphql', async () => {
+    await withRemult(async () => {
+      await remult.repo(Task).insert([{ title: 'task c' }])
+      await remult.repo(Task).insert([{ title: 'task b' }])
+      await remult.repo(Task).insert([{ title: 'task a' }])
+      expect(await remult.repo(Task).count()).toBe(3)
+    })
+
+    const result = await gql(/* GraphQL */ `
+      query Tasks {
+        tasks(orderBy: { title: ASC }) {
+          id
+          title
+          completed
+        }
+      }
+    `)
+
+    expect(result).toMatchInlineSnapshot(`
+			{
+			  "data": {
+			    "tasks": [
+			      {
+			        "completed": false,
+			        "id": 3,
+			        "title": "task a",
+			      },
+			      {
+			        "completed": false,
+			        "id": 2,
+			        "title": "task b",
+			      },
+			      {
+			        "completed": false,
+			        "id": 1,
+			        "title": "task c",
+			      },
+			    ],
+			  },
+			}
+		`)
+  })
   it('test basics', async () => {
     // rmv removeComments is very handy for testing!
     const { typeDefs } = remultGraphql(api, {
@@ -266,68 +353,11 @@ describe('graphql-connection', () => {
   })
 
   it('test get values', async () => {
-    api['get internal server']().run({} as any, async () => {
+    withRemult(async () => {
       await remult.repo(Task).insert([{ title: 'task a' }])
       expect(await remult.repo(Task).count()).toBe(1)
     })
     const { resolvers } = remultGraphql(api)
     expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1)
-  })
-
-  it('test graphql', async () => {
-    const { typeDefs, resolvers } = remultGraphql(api)
-
-    const yoga = createYoga({
-      schema: createSchema({
-        typeDefs,
-        resolvers,
-      }),
-    })
-
-    await api['get internal server']().run({} as any, async () => {
-      await remult.repo(Task).insert([{ title: 'task c' }])
-      await remult.repo(Task).insert([{ title: 'task b' }])
-      await remult.repo(Task).insert([{ title: 'task a' }])
-      expect(await remult.repo(Task).count()).toBe(3)
-    })
-
-    const result = await yoga.getResultForParams({
-      request: new Request('http://...'),
-      params: {
-        query: /* GraphQL */ `
-          query Tasks {
-            tasks(orderBy: { title: ASC }) {
-              id
-              title
-              completed
-            }
-          }
-        `,
-      },
-    })
-
-    expect(result).toMatchInlineSnapshot(`
-			{
-			  "data": {
-			    "tasks": [
-			      {
-			        "completed": false,
-			        "id": 3,
-			        "title": "task a",
-			      },
-			      {
-			        "completed": false,
-			        "id": 2,
-			        "title": "task b",
-			      },
-			      {
-			        "completed": false,
-			        "id": 1,
-			        "title": "task c",
-			      },
-			    ],
-			  },
-			}
-		`)
   })
 })

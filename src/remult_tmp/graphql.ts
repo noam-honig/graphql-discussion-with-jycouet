@@ -1,5 +1,6 @@
 import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
+import type { DataApi, DataApiResponse } from 'remult/src/data-api'
 
 type Enum = { Enum: true }
 
@@ -263,6 +264,8 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         key: `${toPascalCase(getMetaType(meta))}`,
         value: `${getMetaType(meta)}`,
       })
+      resolversMutation[updateResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[updateResolverKey](args, req, gqlInfo)
 
       // delete
       const deletePayload = `Delete${getMetaType(meta)}Payload`
@@ -402,102 +405,148 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }),
       )
 
-      root[key] = async (arg1: any, req: any) => {
-        const { limit, page, orderBy, where } = arg1
-
-        return new Promise((res, error) => {
-          server.run(req, async () => {
-            const dApi = await server.getDataApi(req, meta)
-            let result: any
-            let err: any
-            await dApi.getArray(
-              {
+      const buildIt = (
+        work: (
+          dataApi: DataApi,
+          result: DataApiResponse,
+          setResult: (result: any) => void,
+          arg1: any,
+          req: any,
+        ) => Promise<void>,
+      ) => {
+        return async (arg1: any, req: any) => {
+          return new Promise((res, error) => {
+            server.run(req, async () => {
+              const dApi = await server.getDataApi(req, meta)
+              let result: any
+              let err: any
+              const response = {
                 success: (x: any) => {
-                  return (result = x.map((y: any) => {
-                    currentType.query.resultProcessors.forEach(z => z(y))
-                    return y
-                  }))
+                  err = 'success not handled'
                 },
-                created: () => {},
-                deleted: () => {},
+                created: () => {
+                  err = 'created not handled'
+                },
+                deleted: () => {
+                  err = 'deleted not handled'
+                },
                 error: (x: any) => (err = x),
                 forbidden: () => (err = 'forbidden'),
                 notFound: () => (err = 'not found'),
                 progress: () => {},
-              },
-              {
-                get: (key: string) => {
-                  if (limit && key === '_limit') {
-                    return limit
-                  }
-                  if (page && key === '_page') {
-                    return page
-                  }
-                  if (orderBy) {
-                    if (key === '_sort') {
-                      const sort_keys: string[] = []
-                      Object.keys(orderBy).forEach(sort_key => {
-                        sort_keys.push(sort_key)
-                      })
-                      if (sort_keys.length > 0) {
-                        return sort_keys.join(',')
-                      }
-                    } else if (key === '_order') {
-                      const sort_directions: string[] = []
-                      Object.keys(orderBy).forEach(sort_key => {
-                        const direction = orderBy[sort_key].toLowerCase()
-                        sort_directions.push(direction)
-                      })
-                      if (sort_directions.length > 0) {
-                        return sort_directions.join(',')
-                      }
-                    }
-                  }
-                  if (where) {
-                    // TODO Noam: OR management?
-                    // TODO Noam: AND management?
-
-                    const whereAND: string[] = []
-                    Object.keys(where).forEach(w => {
-                      const subWhere = where[w]
-                      Object.keys(subWhere).forEach(sw => {
-                        let map = `${w}.${sw}`
-
-                        if (map.endsWith('.eq')) {
-                          map = `${w}`
-                        }
-
-                        if (map === key) {
-                          whereAND.push(subWhere[sw])
-                          return subWhere[sw]
-                        }
-                      })
-                    })
-                    if (whereAND.length > 0) {
-                      return whereAND.join(',')
-                    }
-                  }
-                },
-              },
-            )
-            if (err) {
-              error(err)
-              return
-            }
-            res(result)
+              }
+              await work(dApi, response, x => (result = x), arg1, req)
+              if (err) {
+                error(err)
+                return
+              }
+              res(result)
+            })
           })
-        })
+        }
       }
 
-      root[createResolverKey] = async (arg1: any, req: any) => {
-        // TODO Noam
-        console.log(`createResolverKey`, arg1)
-      }
+      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        const { limit, page, orderBy, where } = arg1
+        await dApi.getArray(
+          {
+            ...response,
+            success: (x: any) => {
+              setResult(
+                x.map((y: any) => {
+                  currentType.query.resultProcessors.forEach(z => z(y))
+                  return y
+                }),
+              )
+            },
+          },
+          {
+            get: (key: string) => {
+              if (limit && key === '_limit') {
+                return limit
+              }
+              if (page && key === '_page') {
+                return page
+              }
+              if (orderBy) {
+                if (key === '_sort') {
+                  const sort_keys: string[] = []
+                  Object.keys(orderBy).forEach(sort_key => {
+                    sort_keys.push(sort_key)
+                  })
+                  if (sort_keys.length > 0) {
+                    return sort_keys.join(',')
+                  }
+                } else if (key === '_order') {
+                  const sort_directions: string[] = []
+                  Object.keys(orderBy).forEach(sort_key => {
+                    const direction = orderBy[sort_key].toLowerCase()
+                    sort_directions.push(direction)
+                  })
+                  if (sort_directions.length > 0) {
+                    return sort_directions.join(',')
+                  }
+                }
+              }
+              if (where) {
+                // TODO Noam: OR management?
+                // TODO Noam: AND management?
 
-      root[updateResolverKey] = async (arg1: any, req: any) => {
-        // TODO Noam
-        console.log(`updateResolverKey`, arg1)
-      }
+                const whereAND: string[] = []
+                Object.keys(where).forEach(w => {
+                  const subWhere = where[w]
+                  Object.keys(subWhere).forEach(sw => {
+                    let map = `${w}.${sw}`
+
+                    if (map.endsWith('.eq')) {
+                      map = `${w}`
+                    }
+
+                    if (map === key) {
+                      whereAND.push(subWhere[sw])
+                      return subWhere[sw]
+                    }
+                  })
+                })
+                if (whereAND.length > 0) {
+                  return whereAND.join(',')
+                }
+              }
+            },
+          },
+        )
+      })
+
+      root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.post(
+          {
+            ...response,
+            created: y => {
+              currentType.query.resultProcessors.forEach(z => z(y))
+              setResult({
+                [toPascalCase(getMetaType(meta))]: y,
+              })
+            },
+          },
+          arg1.input,
+        )
+      })
+
+      root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.put(
+          {
+            ...response,
+            success: y => {
+              currentType.query.resultProcessors.forEach(z => z(y))
+              setResult({
+                [toPascalCase(getMetaType(meta))]: y,
+              })
+            },
+          },
+          arg1.id,
+          arg1.patch,
+        )
+      })
 
       root[deleteResolverKey] = async (arg1: any, req: any) => {
         // TODO Noam
