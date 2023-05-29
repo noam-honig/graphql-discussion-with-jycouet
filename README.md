@@ -60,5 +60,8 @@ d. return the object
 ## Noam thinks todo required
 
 - [ ] on create and update operation
-  - [ ] ,get id of related entities
+  - [ ] ,id of related entities
   - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
+  - [x] update
+  - [x] create
+  - [x] delete
