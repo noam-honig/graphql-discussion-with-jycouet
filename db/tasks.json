@@ -1,15 +1,9 @@
 [
   {
     "id": 1,
-    "title": "testing",
+    "title": "task 1",
     "completed": false,
     "category": "cli1up0bn000008lac9rpff93"
-  },
-  {
-    "id": 2,
-    "title": "task b",
-    "completed": false,
-    "category": null
   },
   {
     "id": 3,

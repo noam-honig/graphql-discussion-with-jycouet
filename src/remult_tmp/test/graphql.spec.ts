@@ -39,32 +39,91 @@ describe('graphql-connection', () => {
       })
     }
   })
+  it('test mutation delete', async () => {
+    await withRemult(() => remult.repo(Task).insert([{ title: 'task a' }, { title: 'task b' }]))
+    expect(
+      await gql(`mutation delete{
+      deleteTask(id:2){
+        deletedTaskId
+      }
+    }`),
+    ).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "deleteTask": {
+            "deletedTaskId": "2",
+          },
+        },
+      }
+    `)
+    expect(await withRemult(() => remult.repo(Task).find())).toMatchInlineSnapshot(`
+      [
+        Task {
+          "category": null,
+          "completed": false,
+          "id": 1,
+          "title": "task a",
+        },
+      ]
+    `)
+  })
   it('test mutation create', async () => {
     const result = await gql(`
-mutation {
-  createTask(input: {title: "testing"}) {
-    task {
-      id
-      title
-    }
-  }
-}`)
-    expect(await withRemult(() => remult.repo(Task).count())).toBe(1)
+    mutation {
+      createTask(input: {title: "testing"}) {
+        task {
+          id
+          title
+        }
+      }
+    }`)
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "createTask": {
+            "task": {
+              "id": 1,
+              "title": "testing",
+            },
+          },
+        },
+      }
+    `)
+    expect(await withRemult(() => remult.repo(Task).find())).toMatchInlineSnapshot(`
+      [
+        Task {
+          "category": null,
+          "completed": false,
+          "id": 1,
+          "title": "testing",
+        },
+      ]
+    `)
   })
   it('test mutation update', async () => {
     await withRemult(() => remult.repo(Task).insert({ title: 'aaa' }))
-    console.log("HAHAHA")
+    console.log('HAHAHA')
     const result = await gql(`
-mutation {
-  updateTask(id:1, patch: {title: "bbb"}) {
-    task {
-      id
-      title
-    }
-  }
-}`)
- //   expect(result).toBe('')
- //   expect((await withRemult(() => remult.repo(Task).findFirst())).title).toBe('b')
+       mutation {
+         updateTask(id:1, patch: {title: "bbb"}) {
+           task {
+             id
+             title
+           }
+         }
+      }`)
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "updateTask": {
+            "task": {
+              "id": 1,
+              "title": "bbb",
+            },
+          },
+        },
+      }
+    `)
   })
   it('test graphql', async () => {
     await withRemult(async () => {

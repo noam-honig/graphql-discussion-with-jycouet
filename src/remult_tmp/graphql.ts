@@ -278,10 +278,13 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       })
 
       currentType.mutation.delete.payload = upsertTypes(deletePayload)
+      const deletedResultKey = `deleted${getMetaType(meta)}Id`
       currentType.mutation.delete.payload.fields.push({
-        key: `deleted${getMetaType(meta)}Id`,
+        key: deletedResultKey,
         value: 'ID',
       })
+      resolversMutation[deleteResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[deleteResolverKey](args, req, gqlInfo)
 
       const whereTypeFields: string[] = []
       for (const f of meta.fields) {
@@ -548,10 +551,17 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         )
       })
 
-      root[deleteResolverKey] = async (arg1: any, req: any) => {
-        // TODO Noam
-        console.log(`deleteResolverKey`, arg1)
-      }
+      root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.delete(
+          {
+            ...response,
+            deleted: () => {
+              setResult({ [deletedResultKey]: arg1.id })
+            },
+          },
+          arg1.id,
+        )
+      })
     }
   }
 
