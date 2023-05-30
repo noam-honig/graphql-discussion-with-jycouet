@@ -228,8 +228,8 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           meta,
         )}\` entity (with pagination, sorting and filtering)`,
       })
+
       root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        const { limit, page, orderBy, where } = arg1
         await dApi.getArray(
           {
             ...response,
@@ -243,58 +243,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
             },
           },
           {
-            get: (key: string) => {
-              if (limit && key === '_limit') {
-                return limit
-              }
-              if (page && key === '_page') {
-                return page
-              }
-              if (orderBy) {
-                if (key === '_sort') {
-                  const sort_keys: string[] = []
-                  Object.keys(orderBy).forEach(sort_key => {
-                    sort_keys.push(sort_key)
-                  })
-                  if (sort_keys.length > 0) {
-                    return sort_keys.join(',')
-                  }
-                } else if (key === '_order') {
-                  const sort_directions: string[] = []
-                  Object.keys(orderBy).forEach(sort_key => {
-                    const direction = orderBy[sort_key].toLowerCase()
-                    sort_directions.push(direction)
-                  })
-                  if (sort_directions.length > 0) {
-                    return sort_directions.join(',')
-                  }
-                }
-              }
-              if (where) {
-                // TODO Noam: OR management?
-                // TODO Noam: AND management?
-
-                const whereAND: string[] = []
-                Object.keys(where).forEach(w => {
-                  const subWhere = where[w]
-                  Object.keys(subWhere).forEach(sw => {
-                    let map = `${w}.${sw}`
-
-                    if (map.endsWith('.eq')) {
-                      map = `${w}`
-                    }
-
-                    if (map === key) {
-                      whereAND.push(subWhere[sw])
-                      return subWhere[sw]
-                    }
-                  })
-                })
-                if (whereAND.length > 0) {
-                  return whereAND.join(',')
-                }
-              }
-            },
+            get: bridgeQueryOptionsToDataApiGet(arg1),
           },
         )
       })
@@ -302,8 +251,8 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[key](args, req, gqlInfo)
 
-      const connectionKey = `${key}Connection`
       // Connection
+      const connectionKey = `${key}Connection`
       root_query.fields.push({
         key: connectionKey,
         args: queryArgsConnection,
@@ -336,6 +285,16 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         key: 'cursor',
         value: `String!`,
       })
+
+      root[connectionKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        
+        
+      })
+
+      resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[key](args, req, gqlInfo)
+
+      // Mutation
 
       const root_mutation = upsertTypes('Mutation', 'type', -9)
 
@@ -700,4 +659,60 @@ function toPascalCase(str: string) {
     .split('')
     .map((c, i) => (i === 0 ? c.toLowerCase() : c))
     .join('')
+}
+
+function bridgeQueryOptionsToDataApiGet(arg1: any) {
+  const { limit, page, orderBy, where } = arg1
+  return (key: string) => {
+    if (limit && key === '_limit') {
+      return limit
+    }
+    if (page && key === '_page') {
+      return page
+    }
+    if (orderBy) {
+      if (key === '_sort') {
+        const sort_keys: string[] = []
+        Object.keys(orderBy).forEach(sort_key => {
+          sort_keys.push(sort_key)
+        })
+        if (sort_keys.length > 0) {
+          return sort_keys.join(',')
+        }
+      } else if (key === '_order') {
+        const sort_directions: string[] = []
+        Object.keys(orderBy).forEach(sort_key => {
+          const direction = orderBy[sort_key].toLowerCase()
+          sort_directions.push(direction)
+        })
+        if (sort_directions.length > 0) {
+          return sort_directions.join(',')
+        }
+      }
+    }
+    if (where) {
+      // TODO Noam: OR management?
+      // TODO Noam: AND management?
+
+      const whereAND: string[] = []
+      Object.keys(where).forEach(w => {
+        const subWhere = where[w]
+        Object.keys(subWhere).forEach(sw => {
+          let map = `${w}.${sw}`
+
+          if (map.endsWith('.eq')) {
+            map = `${w}`
+          }
+
+          if (map === key) {
+            whereAND.push(subWhere[sw])
+            return subWhere[sw]
+          }
+        })
+      })
+      if (whereAND.length > 0) {
+        return whereAND.join(',')
+      }
+    }
+  }
 }
