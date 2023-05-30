@@ -156,6 +156,48 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
 
     if (key) {
+      const buildIt = (
+        work: (
+          dataApi: DataApi,
+          result: DataApiResponse,
+          setResult: (result: any) => void,
+          arg1: any,
+          req: any,
+        ) => Promise<void>,
+      ) => {
+        return async (arg1: any, req: any) => {
+          if (req.req) req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
+          return new Promise((res, error) => {
+            server.run(req, async () => {
+              const dApi = await server.getDataApi(req, meta)
+              let result: any
+              let err: any
+              const response = {
+                success: (x: any) => {
+                  err = 'success not handled'
+                },
+                created: () => {
+                  err = 'created not handled'
+                },
+                deleted: () => {
+                  err = 'deleted not handled'
+                },
+                error: (x: any) => (err = x),
+                forbidden: () => (err = 'forbidden'),
+                notFound: () => (err = 'not found'),
+                progress: () => {},
+              }
+              await work(dApi, response, x => (result = x), arg1, req)
+              if (err) {
+                error(err)
+                return
+              }
+              res(result)
+            })
+          })
+        }
+      }
+
       const queryArgsList: Arg[] = [
         { key: 'limit', value: 'Int' },
         { key: 'page', value: 'Int' },
@@ -186,10 +228,84 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           meta,
         )}\` entity (with pagination, sorting and filtering)`,
       })
+      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        const { limit, page, orderBy, where } = arg1
+        await dApi.getArray(
+          {
+            ...response,
+            success: (x: any) => {
+              setResult(
+                x.map((y: any) => {
+                  currentType.query.resultProcessors.forEach(z => z(y))
+                  return y
+                }),
+              )
+            },
+          },
+          {
+            get: (key: string) => {
+              if (limit && key === '_limit') {
+                return limit
+              }
+              if (page && key === '_page') {
+                return page
+              }
+              if (orderBy) {
+                if (key === '_sort') {
+                  const sort_keys: string[] = []
+                  Object.keys(orderBy).forEach(sort_key => {
+                    sort_keys.push(sort_key)
+                  })
+                  if (sort_keys.length > 0) {
+                    return sort_keys.join(',')
+                  }
+                } else if (key === '_order') {
+                  const sort_directions: string[] = []
+                  Object.keys(orderBy).forEach(sort_key => {
+                    const direction = orderBy[sort_key].toLowerCase()
+                    sort_directions.push(direction)
+                  })
+                  if (sort_directions.length > 0) {
+                    return sort_directions.join(',')
+                  }
+                }
+              }
+              if (where) {
+                // TODO Noam: OR management?
+                // TODO Noam: AND management?
 
+                const whereAND: string[] = []
+                Object.keys(where).forEach(w => {
+                  const subWhere = where[w]
+                  Object.keys(subWhere).forEach(sw => {
+                    let map = `${w}.${sw}`
+
+                    if (map.endsWith('.eq')) {
+                      map = `${w}`
+                    }
+
+                    if (map === key) {
+                      whereAND.push(subWhere[sw])
+                      return subWhere[sw]
+                    }
+                  })
+                })
+                if (whereAND.length > 0) {
+                  return whereAND.join(',')
+                }
+              }
+            },
+          },
+        )
+      })
+
+      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[key](args, req, gqlInfo)
+
+      const connectionKey = `${key}Connection`
       // Connection
       root_query.fields.push({
-        key: `${key}Connection`,
+        key: connectionKey,
         args: queryArgsConnection,
         value: `${getMetaType(meta)}Connection`,
         comment: `List all \`${getMetaType(
@@ -221,9 +337,6 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         value: `String!`,
       })
 
-      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-        root[key](args, req, gqlInfo)
-
       const root_mutation = upsertTypes('Mutation', 'type', -9)
 
       // create
@@ -236,8 +349,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         value: `${createPayload}`,
         comment: `Create a new \`${getMetaType(meta)}\``,
       })
-      resolversMutation[createResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-        root[createResolverKey](args, req, gqlInfo)
+
       currentType.mutation.create.input = upsertTypes(createInput, 'input')
 
       currentType.mutation.create.payload = upsertTypes(createPayload)
@@ -245,6 +357,22 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         key: `${toPascalCase(getMetaType(meta))}`,
         value: `${getMetaType(meta)}`,
       })
+      root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.post(
+          {
+            ...response,
+            created: y => {
+              currentType.query.resultProcessors.forEach(z => z(y))
+              setResult({
+                [toPascalCase(getMetaType(meta))]: y,
+              })
+            },
+          },
+          arg1.input,
+        )
+      })
+      resolversMutation[createResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[createResolverKey](args, req, gqlInfo)
 
       // update
       const updateInput = `Update${getMetaType(meta)}Input`
@@ -264,6 +392,21 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         key: `${toPascalCase(getMetaType(meta))}`,
         value: `${getMetaType(meta)}`,
       })
+      root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.put(
+          {
+            ...response,
+            success: y => {
+              currentType.query.resultProcessors.forEach(z => z(y))
+              setResult({
+                [toPascalCase(getMetaType(meta))]: y,
+              })
+            },
+          },
+          arg1.id,
+          arg1.patch,
+        )
+      })
       resolversMutation[updateResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[updateResolverKey](args, req, gqlInfo)
 
@@ -282,6 +425,17 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       currentType.mutation.delete.payload.fields.push({
         key: deletedResultKey,
         value: 'ID',
+      })
+      root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        await dApi.delete(
+          {
+            ...response,
+            deleted: () => {
+              setResult({ [deletedResultKey]: arg1.id })
+            },
+          },
+          arg1.id,
+        )
       })
       resolversMutation[deleteResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[deleteResolverKey](args, req, gqlInfo)
@@ -407,162 +561,6 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           comment: `Where options for \`${key}\``,
         }),
       )
-
-      const buildIt = (
-        work: (
-          dataApi: DataApi,
-          result: DataApiResponse,
-          setResult: (result: any) => void,
-          arg1: any,
-          req: any,
-        ) => Promise<void>,
-      ) => {
-        return async (arg1: any, req: any) => {
-          if (req.req) req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
-          return new Promise((res, error) => {
-            server.run(req, async () => {
-              const dApi = await server.getDataApi(req, meta)
-              let result: any
-              let err: any
-              const response = {
-                success: (x: any) => {
-                  err = 'success not handled'
-                },
-                created: () => {
-                  err = 'created not handled'
-                },
-                deleted: () => {
-                  err = 'deleted not handled'
-                },
-                error: (x: any) => (err = x),
-                forbidden: () => (err = 'forbidden'),
-                notFound: () => (err = 'not found'),
-                progress: () => {},
-              }
-              await work(dApi, response, x => (result = x), arg1, req)
-              if (err) {
-                error(err)
-                return
-              }
-              res(result)
-            })
-          })
-        }
-      }
-
-      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        const { limit, page, orderBy, where } = arg1
-        await dApi.getArray(
-          {
-            ...response,
-            success: (x: any) => {
-              setResult(
-                x.map((y: any) => {
-                  currentType.query.resultProcessors.forEach(z => z(y))
-                  return y
-                }),
-              )
-            },
-          },
-          {
-            get: (key: string) => {
-              if (limit && key === '_limit') {
-                return limit
-              }
-              if (page && key === '_page') {
-                return page
-              }
-              if (orderBy) {
-                if (key === '_sort') {
-                  const sort_keys: string[] = []
-                  Object.keys(orderBy).forEach(sort_key => {
-                    sort_keys.push(sort_key)
-                  })
-                  if (sort_keys.length > 0) {
-                    return sort_keys.join(',')
-                  }
-                } else if (key === '_order') {
-                  const sort_directions: string[] = []
-                  Object.keys(orderBy).forEach(sort_key => {
-                    const direction = orderBy[sort_key].toLowerCase()
-                    sort_directions.push(direction)
-                  })
-                  if (sort_directions.length > 0) {
-                    return sort_directions.join(',')
-                  }
-                }
-              }
-              if (where) {
-                // TODO Noam: OR management?
-                // TODO Noam: AND management?
-
-                const whereAND: string[] = []
-                Object.keys(where).forEach(w => {
-                  const subWhere = where[w]
-                  Object.keys(subWhere).forEach(sw => {
-                    let map = `${w}.${sw}`
-
-                    if (map.endsWith('.eq')) {
-                      map = `${w}`
-                    }
-
-                    if (map === key) {
-                      whereAND.push(subWhere[sw])
-                      return subWhere[sw]
-                    }
-                  })
-                })
-                if (whereAND.length > 0) {
-                  return whereAND.join(',')
-                }
-              }
-            },
-          },
-        )
-      })
-
-      root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.post(
-          {
-            ...response,
-            created: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
-            },
-          },
-          arg1.input,
-        )
-      })
-
-      root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.put(
-          {
-            ...response,
-            success: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
-            },
-          },
-          arg1.id,
-          arg1.patch,
-        )
-      })
-
-      root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.delete(
-          {
-            ...response,
-            deleted: () => {
-              setResult({ [deletedResultKey]: arg1.id })
-            },
-          },
-          arg1.id,
-        )
-      })
     }
   }
 
