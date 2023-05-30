@@ -100,10 +100,12 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const currentWhereNullable = upsertTypes(`Where${whereType}Nullable`, 'input', 20)
 
     // For everyone
-    for (const operator of ['eq', 'ne', 'in']) {
+    const operatorType = ['eq', 'ne']
+    const operatorTypeArray = ['in', 'nin']
+    for (const operator of [...operatorType, ...operatorTypeArray]) {
       const field = {
         key: operator,
-        value: operator === 'in' ? `[${whereType}!]` : whereType,
+        value: operatorTypeArray.includes(operator) ? `[${whereType}!]` : whereType,
       }
       currentWhere.fields.push(field)
       currentWhereNullable.fields.push(field)
@@ -286,10 +288,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         value: `String!`,
       })
 
-      root[connectionKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        
-        
-      })
+      root[connectionKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {})
 
       resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[key](args, req, gqlInfo)
