@@ -13,7 +13,14 @@ type Query {
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+  tasksConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: tasksOrderBy
+    where: tasksWhere
+  ): TaskConnection
   """
   Get `Category` entity
   """
@@ -21,11 +28,23 @@ type Query {
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+  categories(
+    limit: Int
+    page: Int
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): [Category!]!
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+  categoriesConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: categoriesOrderBy
+    where: categoriesWhere
+  ): CategoryConnection
   """
   Get `Tag` entity
   """
@@ -37,7 +56,14 @@ type Query {
   """
   List all `Tag` entity (with pagination, sorting and filtering)
   """
-  tagsConnection(first: Int, after: String, last: Int, before: String, orderBy: tagsOrderBy, where: tagsWhere): TagConnection
+  tagsConnection(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    orderBy: tagsOrderBy
+    where: tagsWhere
+  ): TagConnection
   """
   Grab any Remult entity given it's globally unique `ID`
   """
@@ -148,56 +174,56 @@ input tasksWhere {
 The type for `TaskConnection`
 """
 type TaskConnection {
-    totalCount: Int!
-    edges: [TaskEdge!]!
-    pageInfo: PageInfo!
+  totalCount: Int!
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
 }
 
 """
 The type for `TaskEdge`
 """
 type TaskEdge {
-    node: Task!
-    cursor: String!
+  node: Task!
+  cursor: String!
 }
 
 """
 The input for `CreateTaskInput`
 """
 input CreateTaskInput {
-    title: String
-    completed: Boolean
-    thePriority: String
+  title: String
+  completed: Boolean
+  thePriority: String
 }
 
 """
 The type for `CreateTaskPayload`
 """
 type CreateTaskPayload {
-    task: Task
+  task: Task
 }
 
 """
 The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
-    title: String
-    completed: Boolean
-    thePriority: String
+  title: String
+  completed: Boolean
+  thePriority: String
 }
 
 """
 The type for `UpdateTaskPayload`
 """
 type UpdateTaskPayload {
-    task: Task
+  task: Task
 }
 
 """
 The type for `DeleteTaskPayload`
 """
 type DeleteTaskPayload {
-    deletedTaskId: ID
+  deletedTaskId: ID
 }
 
 """
@@ -244,54 +270,54 @@ input categoriesWhere {
 The type for `CategoryConnection`
 """
 type CategoryConnection {
-    totalCount: Int!
-    edges: [CategoryEdge!]!
-    pageInfo: PageInfo!
+  totalCount: Int!
+  edges: [CategoryEdge!]!
+  pageInfo: PageInfo!
 }
 
 """
 The type for `CategoryEdge`
 """
 type CategoryEdge {
-    node: Category!
-    cursor: String!
+  node: Category!
+  cursor: String!
 }
 
 """
 The input for `CreateCategoryInput`
 """
 input CreateCategoryInput {
-    id: String
-    name: String
+  id: String
+  name: String
 }
 
 """
 The type for `CreateCategoryPayload`
 """
 type CreateCategoryPayload {
-    category: Category
+  category: Category
 }
 
 """
 The input for `UpdateCategoryInput`
 """
 input UpdateCategoryInput {
-    id: String
-    name: String
+  id: String
+  name: String
 }
 
 """
 The type for `UpdateCategoryPayload`
 """
 type UpdateCategoryPayload {
-    category: Category
+  category: Category
 }
 
 """
 The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
-    deletedCategoryId: ID
+  deletedCategoryId: ID
 }
 
 """
@@ -334,185 +360,185 @@ input tagsWhere {
 The type for `TagConnection`
 """
 type TagConnection {
-    totalCount: Int!
-    edges: [TagEdge!]!
-    pageInfo: PageInfo!
+  totalCount: Int!
+  edges: [TagEdge!]!
+  pageInfo: PageInfo!
 }
 
 """
 The type for `TagEdge`
 """
 type TagEdge {
-    node: Tag!
-    cursor: String!
+  node: Tag!
+  cursor: String!
 }
 
 """
 The input for `CreateTagInput`
 """
 input CreateTagInput {
-    id: String
-    value: String
+  id: String
+  value: String
 }
 
 """
 The type for `CreateTagPayload`
 """
 type CreateTagPayload {
-    tag: Tag
+  tag: Tag
 }
 
 """
 The input for `UpdateTagInput`
 """
 input UpdateTagInput {
-    id: String
-    value: String
+  id: String
+  value: String
 }
 
 """
 The type for `UpdateTagPayload`
 """
 type UpdateTagPayload {
-    tag: Tag
+  tag: Tag
 }
 
 """
 The type for `DeleteTagPayload`
 """
 type DeleteTagPayload {
-    deletedTagId: ID
+  deletedTagId: ID
 }
 
 """
 The input for `WhereString`
 """
 input WhereString {
-    eq: String
-    ne: String
-    in: [String!]
-    gt: String
-    gte: String
-    lt: String
-    lte: String
-    st: String
+  eq: String
+  ne: String
+  in: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  st: String
 }
 
 """
 The input for `WhereStringNullable`
 """
 input WhereStringNullable {
-    eq: String
-    ne: String
-    in: [String!]
-    gt: String
-    gte: String
-    lt: String
-    lte: String
-    st: String
-    null: Boolean
+  eq: String
+  ne: String
+  in: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  st: String
+  null: Boolean
 }
 
 """
 The input for `WhereInt`
 """
 input WhereInt {
-    eq: Int
-    ne: Int
-    in: [Int!]
-    gt: Int
-    gte: Int
-    lt: Int
-    lte: Int
+  eq: Int
+  ne: Int
+  in: [Int!]
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
 }
 
 """
 The input for `WhereIntNullable`
 """
 input WhereIntNullable {
-    eq: Int
-    ne: Int
-    in: [Int!]
-    gt: Int
-    gte: Int
-    lt: Int
-    lte: Int
-    null: Boolean
+  eq: Int
+  ne: Int
+  in: [Int!]
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
+  null: Boolean
 }
 
 """
 The input for `WhereFloat`
 """
 input WhereFloat {
-    eq: Float
-    ne: Float
-    in: [Float!]
-    gt: Float
-    gte: Float
-    lt: Float
-    lte: Float
+  eq: Float
+  ne: Float
+  in: [Float!]
+  gt: Float
+  gte: Float
+  lt: Float
+  lte: Float
 }
 
 """
 The input for `WhereFloatNullable`
 """
 input WhereFloatNullable {
-    eq: Float
-    ne: Float
-    in: [Float!]
-    gt: Float
-    gte: Float
-    lt: Float
-    lte: Float
-    null: Boolean
+  eq: Float
+  ne: Float
+  in: [Float!]
+  gt: Float
+  gte: Float
+  lt: Float
+  lte: Float
+  null: Boolean
 }
 
 """
 The input for `WhereBoolean`
 """
 input WhereBoolean {
-    eq: Boolean
-    ne: Boolean
-    in: [Boolean!]
+  eq: Boolean
+  ne: Boolean
+  in: [Boolean!]
 }
 
 """
 The input for `WhereBooleanNullable`
 """
 input WhereBooleanNullable {
-    eq: Boolean
-    ne: Boolean
-    in: [Boolean!]
-    null: Boolean
+  eq: Boolean
+  ne: Boolean
+  in: [Boolean!]
+  null: Boolean
 }
 
 """
 The input for `WhereID`
 """
 input WhereID {
-    eq: ID
-    ne: ID
-    in: [ID!]
+  eq: ID
+  ne: ID
+  in: [ID!]
 }
 
 """
 The input for `WhereIDNullable`
 """
 input WhereIDNullable {
-    eq: ID
-    ne: ID
-    in: [ID!]
-    null: Boolean
+  eq: ID
+  ne: ID
+  in: [ID!]
+  null: Boolean
 }
 
 """
 The type for `PageInfo`
 """
 type PageInfo {
-    endCursor: String!
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String!
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
 }
 
 """

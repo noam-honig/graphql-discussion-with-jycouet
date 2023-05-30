@@ -1,4 +1,4 @@
-import { DATABASE_URL } from '$env/static/private'
+// import { DATABASE_URL } from '$env/static/private'
 import { SqlDatabase } from 'remult'
 import { createPostgresConnection } from 'remult/postgres'
 import { remultSveltekit } from 'remult/remult-sveltekit'

@@ -61,7 +61,8 @@ d. return the object
 ## Noam Question
 
 - [ ] why create/update return an object with task member - why not return the task directly
-- [ ] Do we need to implement the __type as specified at: https://relay.dev/graphql/connections.htm#sec-Reserved-Types
+- [ ] Do we need to implement the \_\_type as specified at:
+      https://relay.dev/graphql/connections.htm#sec-Reserved-Types
 - [ ] Should category connection return a task connection at it's tasks?
 
 ## Noam thinks todo required
@@ -72,4 +73,4 @@ d. return the object
   - [x] update
   - [x] create
   - [x] delete
-- [ ] 
+- [ ]

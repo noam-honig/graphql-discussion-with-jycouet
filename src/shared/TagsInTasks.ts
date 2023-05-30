@@ -5,9 +5,9 @@ export
   allowApiCrud: true,
 })
 class TagsInTasks extends IdEntity {
-  @Fields.string()
-  taskId: number = 0
+  @Fields.integer()
+  taskId = 0
 
   @Fields.string()
-  tagsId: String = ''
+  tagsId = ''
 }
