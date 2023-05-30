@@ -316,7 +316,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
             return rows.map((row: any) => ({
               //[ ] - It should initially be the row id, and we should waste some resources, later we can optimize it
               //[ ] - we should have a mechanism that extracts the row id - also for compound column ids. to place it in the nodeId
-
+r
               [cursorKey]: 'x',
               [nodeKey]: row,
             }))
