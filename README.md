@@ -46,7 +46,12 @@ d. return the object
 ## Open questions
 
 - How to add SQL logs?
+  - [x] `SqlDatabase.LogToConsole = true`
+  - [ ] Share my clean SQL function?
+  - [ ] Tune formats? (provide a function?)
 - In the todo list, where to we set a v1? v2?
+- Adding a nice throw on db doesn't exist?
+- Field enum? to have db Enums?
 
 ## Notes
 

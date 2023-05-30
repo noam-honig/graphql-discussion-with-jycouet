@@ -604,7 +604,8 @@ function argsFormat(args?: Arg[]) {
         }
 
         if (strComment) {
-          return `${strComment}    ${arg.key}: ${arg.value}`
+          return `${strComment}    ${arg.key}: ${arg.value}
+  `
         }
 
         return `${arg.key}: ${arg.value}`

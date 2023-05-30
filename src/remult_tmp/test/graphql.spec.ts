@@ -51,6 +51,7 @@ describe('graphql-connection', () => {
           id: Int!
           title: String!
           completed: Boolean!
+          thePriority: String!
           category: Category
           nodeId: ID!
       }
@@ -59,6 +60,7 @@ describe('graphql-connection', () => {
         id: OrderByDirection
         title: OrderByDirection
         completed: OrderByDirection
+        thePriority: OrderByDirection
         category: OrderByDirection
       }
 
@@ -66,6 +68,7 @@ describe('graphql-connection', () => {
         id: WhereInt
         title: WhereString
         completed: WhereBoolean
+        thePriority: WhereString
         OR: [tasksWhere!]
         AND: [tasksWhere!]
       }
@@ -84,6 +87,7 @@ describe('graphql-connection', () => {
       input CreateTaskInput {
           title: String
           completed: Boolean
+          thePriority: String
       }
 
       type CreateTaskPayload {
@@ -93,6 +97,7 @@ describe('graphql-connection', () => {
       input UpdateTaskInput {
           title: String
           completed: Boolean
+          thePriority: String
       }
 
       type UpdateTaskPayload {

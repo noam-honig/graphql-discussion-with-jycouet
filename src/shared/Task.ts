@@ -17,6 +17,14 @@ class Task {
   title = ''
   @Fields.boolean({ caption: 'Is it completed?' })
   completed = false
+  @Fields.object({ dbName: 'the_priority' })
+  thePriority = Priority.Low
   @Field(() => Category, { allowNull: true })
   category?: Category
+}
+
+export enum Priority {
+  Low,
+  High,
+  Critical,
 }

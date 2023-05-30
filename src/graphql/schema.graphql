@@ -27,13 +27,26 @@ type Query {
   """
   categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
   """
+  Get `Tag` entity
+  """
+  tag(id: ID!): Tag
+  """
+  List all `Tag` entity (with pagination, sorting and filtering)
+  """
+  tags(limit: Int, page: Int, orderBy: tagsOrderBy, where: tagsWhere): [Tag!]!
+  """
+  List all `Tag` entity (with pagination, sorting and filtering)
+  """
+  tagsConnection(first: Int, after: String, last: Int, before: String, orderBy: tagsOrderBy, where: tagsWhere): TagConnection
+  """
   Grab any Remult entity given it's globally unique `ID`
   """
   node(
     """
     The globally unique `ID` _(_typename:id)_
     """
-    nodeId: ID!): Node
+    nodeId: ID!
+  ): Node
 }
 
 """
@@ -64,6 +77,18 @@ type Mutation {
   Delete a `Category`
   """
   deleteCategory(id: ID!): DeleteCategoryPayload
+  """
+  Create a new `Tag`
+  """
+  createTag(input: CreateTagInput!): CreateTagPayload
+  """
+  Update a `Tag`
+  """
+  updateTag(id: ID!, patch: UpdateTagInput!): UpdateTagPayload
+  """
+  Delete a `Tag`
+  """
+  deleteTag(id: ID!): DeleteTagPayload
 }
 
 """
@@ -83,6 +108,10 @@ type Task implements Node {
   """
   completed: Boolean!
   """
+  The Priority
+  """
+  thePriority: String!
+  """
   Category
   """
   category: Category
@@ -99,6 +128,7 @@ input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
   completed: OrderByDirection
+  thePriority: OrderByDirection
   category: OrderByDirection
 }
 
@@ -109,6 +139,7 @@ input tasksWhere {
   id: WhereInt
   title: WhereString
   completed: WhereBoolean
+  thePriority: WhereString
   OR: [tasksWhere!]
   AND: [tasksWhere!]
 }
@@ -136,6 +167,7 @@ The input for `CreateTaskInput`
 input CreateTaskInput {
     title: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -151,6 +183,7 @@ The input for `UpdateTaskInput`
 input UpdateTaskInput {
     title: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -259,6 +292,96 @@ The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
     deletedCategoryId: ID
+}
+
+"""
+The type_impl_node for `Tag`
+"""
+type Tag implements Node {
+  """
+  Id
+  """
+  id: String!
+  """
+  Value
+  """
+  value: String!
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
+}
+
+"""
+OrderBy options for `tags`
+"""
+input tagsOrderBy {
+  id: OrderByDirection
+  value: OrderByDirection
+}
+
+"""
+Where options for `tags`
+"""
+input tagsWhere {
+  id: WhereString
+  value: WhereString
+  OR: [tagsWhere!]
+  AND: [tagsWhere!]
+}
+
+"""
+The type for `TagConnection`
+"""
+type TagConnection {
+    totalCount: Int!
+    edges: [TagEdge!]!
+    pageInfo: PageInfo!
+}
+
+"""
+The type for `TagEdge`
+"""
+type TagEdge {
+    node: Tag!
+    cursor: String!
+}
+
+"""
+The input for `CreateTagInput`
+"""
+input CreateTagInput {
+    id: String
+    value: String
+}
+
+"""
+The type for `CreateTagPayload`
+"""
+type CreateTagPayload {
+    tag: Tag
+}
+
+"""
+The input for `UpdateTagInput`
+"""
+input UpdateTagInput {
+    id: String
+    value: String
+}
+
+"""
+The type for `UpdateTagPayload`
+"""
+type UpdateTagPayload {
+    tag: Tag
+}
+
+"""
+The type for `DeleteTagPayload`
+"""
+type DeleteTagPayload {
+    deletedTagId: ID
 }
 
 """
