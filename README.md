@@ -9,6 +9,7 @@ pnpm dev
 
 ## TODOs
 
+- [ ] where not in (nin?) TODO JYC
 - [ ] Where OR
   - [x] typedefs
   - [x] resolver TODO Noam
@@ -56,3 +57,19 @@ d. return the object
 ## Notes
 
 - All what is needed on top of sveltekit skeleton is in dependencies
+
+## Noam Question
+
+- [ ] why create/update return an object with task member - why not return the task directly
+- [ ] Do we need to implement the __type as specified at: https://relay.dev/graphql/connections.htm#sec-Reserved-Types
+- [ ] Should category connection return a task connection at it's tasks?
+
+## Noam thinks todo required
+
+- [ ] on create and update operation
+  - [ ] ,id of related entities
+  - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
+  - [x] update
+  - [x] create
+  - [x] delete
+- [ ] 
