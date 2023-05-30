@@ -2,8 +2,9 @@ import { Entity, Field, Fields } from 'remult'
 
 import { Category } from './Category'
 
+export
 @Entity('tasks', { allowApiCrud: true })
-export class Task {
+class Task {
   // @Fields.cuid()
   @Fields.autoIncrement()
   id = 0
