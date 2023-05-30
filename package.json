@@ -11,9 +11,8 @@
     "format": "prettier --plugin-search-dir . --write .",
     "lint": "prettier --plugin-search-dir . --check . && eslint --ignore-path .prettierignore --quiet .",
     "preview": "vite preview",
-    "test": "vitest --watch",
-    "test:e2e": "playwright test",
-    "testi": "vitest --watch --inspect"
+    "test": "vitest --watch --inspect --no-threads",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",

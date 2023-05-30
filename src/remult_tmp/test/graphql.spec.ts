@@ -297,6 +297,7 @@ describe('graphql-connection', () => {
           eq: String
           ne: String
           in: [String!]
+          nin: [String!]
           gt: String
           gte: String
           lt: String
