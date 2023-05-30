@@ -39,6 +39,54 @@ describe('graphql-connection', () => {
       })
     }
   })
+  it('test count', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
+    )
+    expect(
+      await gql(`
+    query{
+      tasksConnection{
+        totalCount
+      }
+    }`),
+    ).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "tasksConnection": {
+            "totalCount": 3,
+          },
+        },
+      }
+    `)
+  })
+  it('test count 2', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
+    )
+    expect(
+      await gql(`
+    query{
+      tasksConnection(
+        where:{
+          title:{
+            lte:"bbb"
+          }
+        }
+      ){
+        totalCount
+      }
+    }`),
+    ).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "tasksConnection": {
+            "totalCount": 2,
+          },
+        },
+      }
+    `)
+  })
   it('test mutation delete', async () => {
     await withRemult(() => remult.repo(Task).insert([{ title: 'task a' }, { title: 'task b' }]))
     expect(
