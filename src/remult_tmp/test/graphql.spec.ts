@@ -56,25 +56,8 @@ describe('graphql-connection', () => {
         deletedTaskId
       }
     }`),
-    ).toMatchInlineSnapshot(`
-      {
-        "data": {
-          "deleteTask": {
-            "deletedTaskId": "2",
-          },
-        },
-      }
-    `)
-    expect(await withRemult(async () => await remult.repo(Task).find())).toMatchInlineSnapshot(`
-      [
-        Task {
-          "category": null,
-          "completed": false,
-          "id": 1,
-          "title": "task a",
-        },
-      ]
-    `)
+    ).toMatchSnapshot()
+    expect(await withRemult(async () => await remult.repo(Task).find())).toMatchSnapshot()
   })
 
   it('test mutation create', async () => {
@@ -87,36 +70,8 @@ describe('graphql-connection', () => {
         }
       }
     }`)
-    expect(result).toMatchInlineSnapshot(`
-            [
-              Task {
-                "category": null,
-                "completed": false,
-                "id": 1,
-                "thePriority": 0,
-                "title": "task a",
-              },
-              Task {
-                "category": null,
-                "completed": false,
-                "id": 3,
-                "thePriority": 0,
-                "title": "task c",
-              },
-            ]
-          `)
-    expect(await withRemult(async () => await remult.repo(Task).find())).toMatchInlineSnapshot(`
-                  {
-                    "data": {
-                      "createTask": {
-                        "task": {
-                          "id": 1,
-                          "title": "testing",
-                        },
-                      },
-                    },
-                  }
-                `)
+    expect(result).toMatchSnapshot()
+    expect(await withRemult(async () => await remult.repo(Task).find())).toMatchSnapshot()
   })
 
   it('test mutation update', async () => {
@@ -131,17 +86,7 @@ describe('graphql-connection', () => {
            }
          }
       }`)
-    expect(result).toMatchInlineSnapshot(`
-                            [
-                              Task {
-                                "category": null,
-                                "completed": false,
-                                "id": 1,
-                                "thePriority": 0,
-                                "title": "testing",
-                              },
-                            ]
-                          `)
+    expect(result).toMatchSnapshot()
   })
 
   it('test graphql', async () => {
@@ -162,18 +107,7 @@ describe('graphql-connection', () => {
       }
     `)
 
-    expect(result).toMatchInlineSnapshot(`
-                                {
-                                  "data": {
-                                    "updateTask": {
-                                      "task": {
-                                        "id": 1,
-                                        "title": "bbb",
-                                      },
-                                    },
-                                  },
-                                }
-                              `)
+    expect(result).toMatchSnapshot()
   })
 
   it('test basics', async () => {
@@ -182,7 +116,7 @@ describe('graphql-connection', () => {
       removeComments: true,
     })
 
-    expect(typeDefs).toMatchInlineSnapshot()
+    expect(typeDefs).toMatchSnapshot()
   })
 
   it('test get values', async () => {
