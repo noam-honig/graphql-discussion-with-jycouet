@@ -1,0 +1,14 @@
+query Tasks {
+  tasksConnection(limit: 5, orderBy: { title: ASC }) {
+    totalCount
+    edges {
+      node {
+        id
+        title
+        category {
+          name
+        }
+      }
+    }
+  }
+}

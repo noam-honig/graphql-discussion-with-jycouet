@@ -1,9 +1,0 @@
-query Tasks {
-  tasks(limit: 5, orderBy: { title: ASC }) {
-    id
-    title
-    category {
-      name
-    }
-  }
-}
