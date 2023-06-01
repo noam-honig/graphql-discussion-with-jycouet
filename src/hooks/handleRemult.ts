@@ -1,6 +1,5 @@
 // import { DATABASE_URL } from '$env/static/private'
 import { SqlDatabase } from 'remult'
-import { createPostgresConnection } from 'remult/postgres'
 import { remultSveltekit } from 'remult/remult-sveltekit'
 
 import { Category } from '../shared/Category'
@@ -9,9 +8,13 @@ import { Task } from '../shared/Task'
 
 SqlDatabase.LogToConsole = true
 
-export const remultApi = remultSveltekit({
+export const handleRemult = remultSveltekit({
   logApiEndPoints: false,
   entities: [Task, Category, Tag],
+  getUser: async event => {
+    const session = await event?.locals?.getSession()
+    return session?.user
+  },
   // dataProvider: await createPostgresConnection({
   //   connectionString: DATABASE_URL,
   // }),

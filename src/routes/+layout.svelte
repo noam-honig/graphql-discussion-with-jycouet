@@ -1,3 +1,15 @@
+<script lang="ts">
+  import { signOut } from '@auth/sveltekit/client'
+  import { remult } from 'remult'
+
+  import type { LayoutData } from './$types'
+
+  export let data: LayoutData
+
+  // set this globaly
+  remult.user = data.user
+</script>
+
 <svelte:head>
   <title>Remult & Houdini</title>
 </svelte:head>
@@ -8,10 +20,16 @@
 
 <nav>
   <a href="/">Home</a>
+  |
   <a href="/tasksList">Tasks List</a>
+  |
   <a href="/tasksConnection">Tasks Connection</a>
 
-  <a style="float: right;" href="/api/graphql" target="_blank">Graph<i>i</i>GL</a>
+  <div style="float: right;">
+    <a href="/api/graphql" target="_blank">Graph<i>i</i>GL</a>
+    | Hello {remult.user?.name}
+    | <a href="/" on:click={signOut}>Logout</a>
+  </div>
 </nav>
 
 <hr />

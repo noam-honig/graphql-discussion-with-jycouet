@@ -1,5 +1,5 @@
 query Tasks {
-  tasks(orderBy: { title: ASC }) {
+  tasks(limit: 5, orderBy: { title: ASC }) {
     id
     title
     category {
