@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { Category } from '../../shared/Category'
 import { Task } from '../../shared/Task'
+import { TasksController } from '../../shared/tasksController'
 import { remultGraphql } from '../graphql'
 
 // import { remultSveltekit, type RemultSveltekitServer } from 'remult/remult-sveltekit';
@@ -22,6 +23,7 @@ describe('graphql-connection', () => {
       logApiEndPoints: false, // We don't need this in tests
       dataProvider: new InMemoryDataProvider(),
       entities: [Task, Category],
+      controllers: [TasksController],
     })
 
     const { typeDefs, resolvers } = remultGraphql(api)

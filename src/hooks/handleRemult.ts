@@ -5,12 +5,14 @@ import { remultSveltekit } from 'remult/remult-sveltekit'
 import { Category } from '../shared/Category'
 import { Tag } from '../shared/Tag'
 import { Task } from '../shared/Task'
+import { TasksController } from '../shared/tasksController'
 
 SqlDatabase.LogToConsole = true
 
 export const handleRemult = remultSveltekit({
   logApiEndPoints: false,
   entities: [Task, Category, Tag],
+  controllers: [TasksController],
   getUser: async event => {
     const session = await event?.locals?.getSession()
     return session?.user
