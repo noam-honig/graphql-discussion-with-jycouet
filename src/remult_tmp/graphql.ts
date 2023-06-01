@@ -1,3 +1,7 @@
+import { GraphQLError } from 'graphql'
+import { type FieldNode, type GraphQLResolveInfo, Kind as KindGQL } from 'graphql'
+import type { InlineFragmentNode } from 'graphql'
+import type { FragmentDefinitionNode } from 'graphql'
 import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 import type { DataApi, DataApiResponse } from 'remult/src/data-api'
@@ -166,9 +170,10 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           setResult: (result: any) => void,
           arg1: any,
           req: any,
+          gqlInfo: any,
         ) => Promise<void>,
       ) => {
-        return async (arg1: any, req: any) => {
+        return async (arg1: any, req: any, gqlInfo: any) => {
           if (req.req) req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
           return new Promise((res, error) => {
             server.run(req, async () => {
@@ -190,7 +195,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
                 notFound: () => (err = 'not found'),
                 progress: () => {},
               }
-              await work(dApi, response, x => (result = x), arg1, req)
+              await work(dApi, response, x => (result = x), arg1, req, gqlInfo)
               if (err) {
                 error(err)
                 return
@@ -328,10 +333,48 @@ For **backward cursor** pagination
         value: `String!`,
       })
 
-      root[connectionKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {})
+      root[connectionKey] = buildIt(
+        async (dApi, response, setResult, arg1: any, req: any, gqlInfo: any) => {
+          const what_is_asked = rootFields(gqlInfo)
 
-      resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-        root[key](args, req, gqlInfo)
+          if (what_is_asked.includes('totalCount')) {
+            // ...
+          }
+          if (what_is_asked.includes('edges')) {
+            // ...
+          }
+          if (what_is_asked.includes('pageInfo')) {
+            // ...
+          }
+
+          await dApi.getArray(
+            {
+              ...response,
+              success: (x: any) => {
+                const connectionObj = {
+                  edges: x.map((node: any) => {
+                    return {
+                      node,
+                      cursor: 'TODO Noam',
+                    }
+                  }),
+                  totalCount: 77,
+                }
+
+                setResult(connectionObj)
+              },
+            },
+            {
+              get: bridgeQueryOptionsToDataApiGet(arg1),
+            },
+          )
+        },
+      )
+
+      resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) => {
+        checkPaginationArgs(args)
+        return root[connectionKey](args, req, gqlInfo)
+      }
 
       // Mutation
 
@@ -643,6 +686,22 @@ For **backward cursor** pagination
   }
 }
 
+function checkPaginationArgs(args: any) {
+  let paginationPage = !!args.limit ? 1 : 0
+  paginationPage += !!args.page ? 1 : 0
+
+  let paginationCursor = !!args.first ? 1 : 0
+  paginationCursor += !!args.after ? 1 : 0
+  paginationCursor += !!args.last ? 1 : 0
+  paginationCursor += !!args.before ? 1 : 0
+
+  if (paginationPage > 0 && paginationCursor > 0) {
+    throw new GraphQLError(
+      `You can't use \`limit,page\` and \`first,after,last,before\` at the same time. Choose your pagination style.`,
+    )
+  }
+}
+
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
     return ``
@@ -773,4 +832,40 @@ function bridgeQueryOptionsToDataApiGet(arg1: any) {
       }
     }
   }
+}
+
+// From https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts
+function extractSelectionSet(
+  node: FieldNode | InlineFragmentNode | FragmentDefinitionNode,
+  info: GraphQLResolveInfo,
+) {
+  const a: any[] = []
+
+  node.selectionSet?.selections.map(c => {
+    if (c.kind === KindGQL.FIELD) {
+      a.push(c.name.value)
+    } else if (c.kind === KindGQL.INLINE_FRAGMENT) {
+      extractSelectionSet(c, info).forEach(d => {
+        a.push(d)
+      })
+    } else if (c.kind === KindGQL.FRAGMENT_SPREAD) {
+      extractSelectionSet(info.fragments[c.name.value], info).forEach(d => {
+        a.push(d)
+      })
+    } else {
+      console.error(`extractSelectionSet, unknown kind: "${JSON.stringify(c)}"`)
+      throw new Error('Unknown kind')
+    }
+  })
+
+  // make it unique!
+  return [...new Set(a)]
+}
+
+export const rootFields = (info: GraphQLResolveInfo) => {
+  const fields = info.fieldNodes.flatMap(c => {
+    return extractSelectionSet(c, info)
+  })
+
+  return fields
 }
