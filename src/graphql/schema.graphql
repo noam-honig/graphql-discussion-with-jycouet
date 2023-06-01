@@ -263,13 +263,17 @@ type Task implements Node {
   """
   title: String!
   """
-  Is it completed?
+  The Due Date
   """
-  completed: Boolean!
+  dueDate: String!
   """
   The Priority
   """
   thePriority: String!
+  """
+  Is it completed?
+  """
+  completed: Boolean!
   """
   Category
   """
@@ -286,8 +290,9 @@ OrderBy options for `tasks`
 input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
-  completed: OrderByDirection
+  dueDate: OrderByDirection
   thePriority: OrderByDirection
+  completed: OrderByDirection
   category: OrderByDirection
 }
 
@@ -297,8 +302,9 @@ Where options for `tasks`
 input tasksWhere {
   id: WhereInt
   title: WhereString
-  completed: WhereBoolean
+  dueDate: WhereString
   thePriority: WhereString
+  completed: WhereBoolean
   OR: [tasksWhere!]
   AND: [tasksWhere!]
 }
@@ -325,8 +331,9 @@ The input for `CreateTaskInput`
 """
 input CreateTaskInput {
     title: String
-    completed: Boolean
+    dueDate: String
     thePriority: String
+    completed: Boolean
 }
 
 """
@@ -342,8 +349,9 @@ The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
     title: String
-    completed: Boolean
+    dueDate: String
     thePriority: String
+    completed: Boolean
 }
 
 """

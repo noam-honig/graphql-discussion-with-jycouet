@@ -7,6 +7,8 @@
 </script>
 
 <h2>Tasks List ({$Tasks?.data?.tasksConnection?.totalCount})</h2>
-{#each $Tasks?.data?.tasksConnection?.edges ?? [] as task}
-  <pre>{JSON.stringify(task, null, 2)}</pre>
+{#each $Tasks?.data?.tasks ?? [] as task}
+  <a href={`/tasks/${task.id}`}>
+    <pre>{JSON.stringify(task, null, 2)}</pre>
+  </a>
 {/each}

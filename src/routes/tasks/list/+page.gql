@@ -1,14 +1,30 @@
-query Tasks {
-  tasksConnection(limit: 5, orderBy: { title: ASC }) {
+# query Tasks {
+#   tasksConnection(limit: 5, orderBy: { id: DESC }) {
+#     totalCount
+#     edges {
+#       node {
+#         id
+#         title
+#         category {
+#           name
+#         }
+#       }
+#     }
+#   }
+# }
+query Tasks @cache(policy: CacheAndNetwork) {
+  tasksConnection(limit: 5, orderBy: { id: DESC }) {
     totalCount
-    edges {
-      node {
-        id
-        title
-        category {
-          name
-        }
-      }
-    }
+  }
+  tasks(limit: 5, orderBy: { id: DESC }) {
+    # totalCount
+    id
+    title
+    dueDate
+    completed
+    thePriority
+    # category {
+    #   name
+    # }
   }
 }

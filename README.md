@@ -22,6 +22,7 @@ npm run dev
 - [ ] Connection
   - [x] typedefs
   - [ ] resolver
+- [ ] scalars (TODO JYC)
 
 a. need to check the field selection. (you can copy this:
 https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts)
@@ -55,6 +56,7 @@ d. return the object
 - Adding a nice log on db doesn't exist?
 - Field enum? to have db Enums?
 - Where to throw new GraphQLError(`Forbidden`)? (and all others?)
+- speak about ! or not... (db migration?!)
 
 ## Notes
 

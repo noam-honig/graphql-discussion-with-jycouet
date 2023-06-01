@@ -1,9 +1,15 @@
 <script lang="ts">
-  import type { PageData } from '../../taskCreate/$types'
-
-  export let data: PageData
+  import { goto } from '$app/navigation'
+  import Form from '$lib/Form.svelte'
+  import { Task } from '$shared/Task'
 </script>
 
 <h2>Create Task</h2>
 
-🚧 Under contstruction 🚧
+<Form
+  entity={Task}
+  mode="create"
+  on:create={() => {
+    goto('/tasks/list')
+  }}
+/>

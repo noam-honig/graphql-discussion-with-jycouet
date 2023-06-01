@@ -21,9 +21,9 @@
 <nav>
   <a href="/">Home</a>
   |
-  <a href="/tasks/create">Create</a>
-  |
   <a href="/tasks/list">List</a>
+  |
+  <a href="/tasks/create">Create</a>
 
   <div style="float: right;">
     <a href="/api/graphql" target="_blank">Graph<i>i</i>GL</a>
