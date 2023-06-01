@@ -67,8 +67,8 @@ d. return the object
 - [ ] Do we need to implement the \_\_type as specified at:
       https://relay.dev/graphql/connections.htm#sec-Reserved-Types
   - [ ] We already have "Connection & PageInfo". I think it's already good.
-- [ ] Should category connection return a task connection at it's tasks?
-  - [ ] Yes, good idea. (JYC todo)
+- [x] Should category connection return a task connection at it's tasks?
+  - [x] Yes, good idea. (JYC todo)
 
 ## Noam thinks todo required
 
