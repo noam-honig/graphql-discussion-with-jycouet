@@ -18,9 +18,9 @@
       $data = data
     })
 
-  $: mode === 'create' && ($data = { ...dataCreate }) && console.log(`dataCreate`, dataCreate)
-  $: mode === 'update' && ($data = { ...dataUpdate }) && console.log(`dataUpdate`, dataUpdate)
-  $: mode === 'readonly' && ($data = { ...dataUpdate }) && console.log(`dataUpdate`, dataUpdate)
+  $: mode === 'create' && ($data = { ...dataCreate })
+  $: mode === 'update' && ($data = { ...dataUpdate })
+  $: mode === 'readonly' && ($data = { ...dataUpdate })
 
   const dispatch = createEventDispatcher()
 
@@ -33,7 +33,7 @@
   }
 
   onDestroy(() => {
-    id = null
+    console.log("We  should do sometthing here... if we save and left, it's not updating")
   })
 
   const currentRepo = remult.repo(entity)
