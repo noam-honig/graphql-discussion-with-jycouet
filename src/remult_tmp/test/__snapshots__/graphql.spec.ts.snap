@@ -4,10 +4,10 @@ exports[`graphql-connection > test basics 1`] = `
 "type Query {
     task(id: ID!): Task
     tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-    tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+    tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere, first: Int, after: String, last: Int, before: String): TaskConnection
     category(id: ID!): Category
     categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
-    categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+    categoriesConnection(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere, first: Int, after: String, last: Int, before: String): CategoryConnection
     node(nodeId: ID!): Node
 }
 
@@ -88,7 +88,7 @@ type Category implements Node {
     id: String!
     name: String!
     tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-    tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+    tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere, first: Int, after: String, last: Int, before: String): TaskConnection
     nodeId: ID!
 }
 

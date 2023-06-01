@@ -38,6 +38,7 @@ d. return the object
 - [x] me query
   - [x] merge schema
   - [x] To test with Auth (TODO JYC)
+- [ ] How to use defaultGetLimit in the graphql schema (at least in description)
 - [ ] api in context to not re create it at each resolver?
 - [ ] dataloader (optimisation)
 - [ ] @Field Virtual (resolving a primitive or an Entity or an Entity Virtual)

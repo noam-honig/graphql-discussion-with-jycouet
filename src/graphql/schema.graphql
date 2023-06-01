@@ -13,7 +13,60 @@ type Query {
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+  tasksConnection(
+    """
+    
+For *page by page* pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For *page by page* pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tasksOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tasksWhere
+  , 
+    """
+    
+For *forward cursor* pagination
+Takes the `first`: `n` elements from the list.
+    """
+    first: Int
+  , 
+    """
+    
+For *forward cursor* pagination
+`after` this `cursor`.
+    """
+    after: String
+  , 
+    """
+    
+For *backward cursor* pagination
+Takes the `last`: `n` elements from the list.
+    """
+    last: Int
+  , 
+    """
+    
+For *backward cursor* pagination
+`before` this `cursor`.
+    """
+    before: String
+  ): TaskConnection
   """
   Get `Category` entity
   """
@@ -25,7 +78,60 @@ type Query {
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+  categoriesConnection(
+    """
+    
+For *page by page* pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For *page by page* pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: categoriesOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: categoriesWhere
+  , 
+    """
+    
+For *forward cursor* pagination
+Takes the `first`: `n` elements from the list.
+    """
+    first: Int
+  , 
+    """
+    
+For *forward cursor* pagination
+`after` this `cursor`.
+    """
+    after: String
+  , 
+    """
+    
+For *backward cursor* pagination
+Takes the `last`: `n` elements from the list.
+    """
+    last: Int
+  , 
+    """
+    
+For *backward cursor* pagination
+`before` this `cursor`.
+    """
+    before: String
+  ): CategoryConnection
   """
   Get `Tag` entity
   """
@@ -37,7 +143,60 @@ type Query {
   """
   List all `Tag` entity (with pagination, sorting and filtering)
   """
-  tagsConnection(first: Int, after: String, last: Int, before: String, orderBy: tagsOrderBy, where: tagsWhere): TagConnection
+  tagsConnection(
+    """
+    
+For *page by page* pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For *page by page* pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tagsOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tagsWhere
+  , 
+    """
+    
+For *forward cursor* pagination
+Takes the `first`: `n` elements from the list.
+    """
+    first: Int
+  , 
+    """
+    
+For *forward cursor* pagination
+`after` this `cursor`.
+    """
+    after: String
+  , 
+    """
+    
+For *backward cursor* pagination
+Takes the `last`: `n` elements from the list.
+    """
+    last: Int
+  , 
+    """
+    
+For *backward cursor* pagination
+`before` this `cursor`.
+    """
+    before: String
+  ): TagConnection
   """
   Grab any Remult entity given it's globally unique `ID`
   """
@@ -56,39 +215,39 @@ type Mutation {
   """
   Create a new `Task`
   """
-  createTask(input: CreateTaskInput!): CreateTaskPayload
+  createTask(input: CreateTaskInput!, clientMutationId: String): CreateTaskPayload
   """
   Update a `Task`
   """
-  updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+  updateTask(id: ID!, patch: UpdateTaskInput!, clientMutationId: String): UpdateTaskPayload
   """
   Delete a `Task`
   """
-  deleteTask(id: ID!): DeleteTaskPayload
+  deleteTask(id: ID!, clientMutationId: String): DeleteTaskPayload
   """
   Create a new `Category`
   """
-  createCategory(input: CreateCategoryInput!): CreateCategoryPayload
+  createCategory(input: CreateCategoryInput!, clientMutationId: String): CreateCategoryPayload
   """
   Update a `Category`
   """
-  updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+  updateCategory(id: ID!, patch: UpdateCategoryInput!, clientMutationId: String): UpdateCategoryPayload
   """
   Delete a `Category`
   """
-  deleteCategory(id: ID!): DeleteCategoryPayload
+  deleteCategory(id: ID!, clientMutationId: String): DeleteCategoryPayload
   """
   Create a new `Tag`
   """
-  createTag(input: CreateTagInput!): CreateTagPayload
+  createTag(input: CreateTagInput!, clientMutationId: String): CreateTagPayload
   """
   Update a `Tag`
   """
-  updateTag(id: ID!, patch: UpdateTagInput!): UpdateTagPayload
+  updateTag(id: ID!, patch: UpdateTagInput!, clientMutationId: String): UpdateTagPayload
   """
   Delete a `Tag`
   """
-  deleteTag(id: ID!): DeleteTagPayload
+  deleteTag(id: ID!, clientMutationId: String): DeleteTagPayload
 }
 
 """
@@ -175,6 +334,7 @@ The type for `CreateTaskPayload`
 """
 type CreateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 """
@@ -191,13 +351,15 @@ The type for `UpdateTaskPayload`
 """
 type UpdateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 """
 The type for `DeleteTaskPayload`
 """
 type DeleteTaskPayload {
-    deletedTaskId: ID
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -216,6 +378,60 @@ type Category implements Node {
   List all `Task` of `categories`
   """
   tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+    tasksConnection(
+    """
+    
+For *page by page* pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For *page by page* pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tasksOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tasksWhere
+  , 
+    """
+    
+For *forward cursor* pagination
+Takes the `first`: `n` elements from the list.
+    """
+    first: Int
+  , 
+    """
+    
+For *forward cursor* pagination
+`after` this `cursor`.
+    """
+    after: String
+  , 
+    """
+    
+For *backward cursor* pagination
+Takes the `last`: `n` elements from the list.
+    """
+    last: Int
+  , 
+    """
+    
+For *backward cursor* pagination
+`before` this `cursor`.
+    """
+    before: String
+  ): TaskConnection
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -270,6 +486,7 @@ The type for `CreateCategoryPayload`
 """
 type CreateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 """
@@ -285,13 +502,15 @@ The type for `UpdateCategoryPayload`
 """
 type UpdateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 """
 The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
-    deletedCategoryId: ID
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -360,6 +579,7 @@ The type for `CreateTagPayload`
 """
 type CreateTagPayload {
     tag: Tag
+    clientMutationId: String
 }
 
 """
@@ -375,13 +595,15 @@ The type for `UpdateTagPayload`
 """
 type UpdateTagPayload {
     tag: Tag
+    clientMutationId: String
 }
 
 """
 The type for `DeleteTagPayload`
 """
 type DeleteTagPayload {
-    deletedTagId: ID
+    id: ID
+    clientMutationId: String
 }
 
 """

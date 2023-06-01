@@ -208,12 +208,51 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         { key: 'where', value: `${key}Where` },
       ]
       const queryArgsConnection: Arg[] = [
-        { key: 'first', value: 'Int' },
-        { key: 'after', value: 'String' },
-        { key: 'last', value: 'Int' },
-        { key: 'before', value: 'String' },
-        { key: 'orderBy', value: `${key}OrderBy` },
-        { key: 'where', value: `${key}Where` },
+        {
+          key: 'limit',
+          value: 'Int',
+          comment: `
+For *page by page* pagination.
+Limit the number of result. 
+_Side note: \`Math.ceil(totalCount / limit)\` to determine how many pages there are._`,
+        },
+        {
+          key: 'page',
+          value: 'Int',
+          comment: `
+For *page by page* pagination.
+Select a dedicated page.`,
+        },
+        { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
+        { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
+        {
+          key: 'first',
+          value: 'Int',
+          comment: `
+For *forward cursor* pagination
+Takes the \`first\`: \`n\` elements from the list.`,
+        },
+        {
+          key: 'after',
+          value: 'String',
+          comment: `
+For *forward cursor* pagination
+\`after\` this \`cursor\`.`,
+        },
+        {
+          key: 'last',
+          value: 'Int',
+          comment: `
+For *backward cursor* pagination
+Takes the \`last\`: \`n\` elements from the list.`,
+        },
+        {
+          key: 'before',
+          value: 'String',
+          comment: `
+For *backward cursor* pagination
+\`before\` this \`cursor\`.`,
+        },
       ]
 
       root_query.fields.push({

@@ -15,6 +15,7 @@ export const handleRemult = remultSveltekit({
     const session = await event?.locals?.getSession()
     return session?.user
   },
+  // defaultGetLimit: 11,
   // dataProvider: await createPostgresConnection({
   //   connectionString: DATABASE_URL,
   // }),
