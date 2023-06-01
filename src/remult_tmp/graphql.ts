@@ -386,7 +386,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       })
 
       currentType.mutation.delete.payload = upsertTypes(deletePayload)
-      const deletedResultKey = `deleted${getMetaType(meta)}Id`
+      const deletedResultKey = `id`
       currentType.mutation.delete.payload.fields.push(
         {
           key: deletedResultKey,

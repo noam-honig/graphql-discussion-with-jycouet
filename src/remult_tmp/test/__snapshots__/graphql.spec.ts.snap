@@ -80,7 +80,7 @@ type UpdateTaskPayload {
 }
 
 type DeleteTaskPayload {
-    deletedTaskId: ID
+    id: ID
     clientMutationId: String
 }
 
@@ -135,7 +135,7 @@ type UpdateCategoryPayload {
 }
 
 type DeleteCategoryPayload {
-    deletedCategoryId: ID
+    id: ID
     clientMutationId: String
 }
 
@@ -311,7 +311,7 @@ exports[`graphql-connection > test mutation delete 1`] = `
 {
   "data": {
     "deleteTask": {
-      "deletedTaskId": "2",
+      "id": "2",
     },
   },
 }

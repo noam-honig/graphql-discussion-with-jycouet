@@ -51,11 +51,12 @@ describe('graphql-connection', () => {
           .insert([{ title: 'task a' }, { title: 'task b' }, { title: 'task c' }]),
     )
     expect(
-      await gql(`mutation delete{
-      deleteTask(id:2){
-        deletedTaskId
-      }
-    }`),
+      await gql(`
+      mutation delete{
+        deleteTask(id:2) {
+          id
+        }
+      }`),
     ).toMatchSnapshot()
     expect(await withRemult(async () => await remult.repo(Task).find())).toMatchSnapshot()
   })
@@ -78,14 +79,14 @@ describe('graphql-connection', () => {
     await withRemult(async () => await remult.repo(Task).insert({ title: 'aaa' }))
 
     const result = await gql(`
-       mutation {
-         updateTask(id:1, patch: {title: "bbb"}) {
-           task {
-             id
-             title
-           }
-         }
-      }`)
+    mutation {
+      updateTask(id:1, patch: {title: "bbb"}) {
+        task {
+          id
+          title
+        }
+      }
+    }`)
     expect(result).toMatchSnapshot()
   })
 
@@ -97,15 +98,14 @@ describe('graphql-connection', () => {
       expect(await remult.repo(Task).count()).toBe(3)
     })
 
-    const result = await gql(/* GraphQL */ `
-      query Tasks {
-        tasks(orderBy: { title: ASC }) {
-          id
-          title
-          completed
-        }
+    const result = await gql(`
+    query Tasks {
+      tasks(orderBy: { title: ASC }) {
+        id
+        title
+        completed
       }
-    `)
+    }`)
 
     expect(result).toMatchSnapshot()
   })
