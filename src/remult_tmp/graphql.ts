@@ -174,7 +174,10 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         ) => Promise<void>,
       ) => {
         return async (arg1: any, req: any, gqlInfo: any) => {
-          if (req.req) req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
+          if (req.req) {
+            req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
+            // req should be "ctx" for context. inside, you have by default "YogaInitialContext", now I added session for example.
+          }
           return new Promise((res, error) => {
             server.run(req, async () => {
               const dApi = await server.getDataApi(req, meta)

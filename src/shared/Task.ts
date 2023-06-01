@@ -3,7 +3,11 @@ import { Entity, Field, Fields } from 'remult'
 import { Category } from './Category'
 
 export
-@Entity('tasks', { allowApiCrud: true })
+@Entity('tasks', {
+  allowApiCrud: true,
+  // We will set this later to see the behavior in GraphQL
+  // allowApiInsert: 'admin',
+})
 class Task {
   // @Fields.cuid()
   @Fields.autoIncrement()

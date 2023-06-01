@@ -54,6 +54,7 @@ d. return the object
 - In the todo list, where to we set a v1? v2?
 - Adding a nice log on db doesn't exist?
 - Field enum? to have db Enums?
+- Where to throw new GraphQLError(`Forbidden`)? (and all others?)
 
 ## Notes
 

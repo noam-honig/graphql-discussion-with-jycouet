@@ -9,7 +9,7 @@ export type KitQLContext = Awaited<ReturnType<typeof context>>
 const context = async (ctx: YogaInitialContext) => {
   return {
     ...ctx,
-    session: authSession(ctx),
+    session: await authSession(ctx),
   }
 }
 
