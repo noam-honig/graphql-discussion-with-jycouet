@@ -88,7 +88,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }),
       )
       if (kind === 'type_impl_node') {
-        t.fields.push({ ...argNodeId, order: 11 })
+        t.fields.push({ ...argNodeId, order: 111 })
       }
     }
     return t
@@ -462,6 +462,15 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           })
+
+          const connectionKey = `${key}Connection`
+          refT.fields.push({
+            key: connectionKey,
+            args: queryArgsConnection,
+            value: `${getMetaType(meta)}Connection`,
+            order: 11,
+          })
+
           refT.query.resultProcessors.push(r => {
             const val = r.id
             r[key] = async (args: any, req: any, gqlInfo: any) => {

@@ -88,6 +88,7 @@ type Category implements Node {
     id: String!
     name: String!
     tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+    tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
     nodeId: ID!
 }
 

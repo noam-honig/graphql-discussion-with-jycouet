@@ -61,7 +61,7 @@ d. return the object
 ## Noam Question
 
 - [ ] why create/update return an object with task member - why not return the task directly
-  - [ ] Because, we should add a `clientMutationId` that is both in input and output (just pass it
+  - [x] Because, we should add a `clientMutationId` that is both in input and output (just pass it
         through). Some GraphQL Client use this feature. (JYC todo)
 - [ ] Do we need to implement the \_\_type as specified at:
       https://relay.dev/graphql/connections.htm#sec-Reserved-Types
