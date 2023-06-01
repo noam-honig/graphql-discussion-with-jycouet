@@ -149,6 +149,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     value: `ID!`,
     comment: `The globally unique \`ID\` _(_typename:id)_`,
   }
+  const argClientMutationId = { key: 'clientMutationId', value: `String` }
 
   for (const meta of entities) {
     const orderByFields: string[] = []
@@ -303,7 +304,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const createResolverKey = `create${getMetaType(meta)}`
       root_mutation.fields.push({
         key: createResolverKey,
-        args: [{ key: 'input', value: `${createInput}!` }],
+        args: [{ key: 'input', value: `${createInput}!` }, argClientMutationId],
         value: `${createPayload}`,
         comment: `Create a new \`${getMetaType(meta)}\``,
       })
@@ -311,10 +312,13 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       currentType.mutation.create.input = upsertTypes(createInput, 'input')
 
       currentType.mutation.create.payload = upsertTypes(createPayload)
-      currentType.mutation.create.payload.fields.push({
-        key: `${toPascalCase(getMetaType(meta))}`,
-        value: `${getMetaType(meta)}`,
-      })
+      currentType.mutation.create.payload.fields.push(
+        {
+          key: `${toPascalCase(getMetaType(meta))}`,
+          value: `${getMetaType(meta)}`,
+        },
+        argClientMutationId,
+      )
       root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.post(
           {
@@ -338,7 +342,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const updateResolverKey = `update${getMetaType(meta)}`
       root_mutation.fields.push({
         key: updateResolverKey,
-        args: [argId, { key: 'patch', value: `${updateInput}!` }],
+        args: [argId, { key: 'patch', value: `${updateInput}!` }, argClientMutationId],
         value: `${updatePayload}`,
         comment: `Update a \`${getMetaType(meta)}\``,
       })
@@ -346,10 +350,13 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       currentType.mutation.update.input = upsertTypes(updateInput, 'input')
 
       currentType.mutation.update.payload = upsertTypes(updatePayload)
-      currentType.mutation.update.payload.fields.push({
-        key: `${toPascalCase(getMetaType(meta))}`,
-        value: `${getMetaType(meta)}`,
-      })
+      currentType.mutation.update.payload.fields.push(
+        {
+          key: `${toPascalCase(getMetaType(meta))}`,
+          value: `${getMetaType(meta)}`,
+        },
+        argClientMutationId,
+      )
       root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.put(
           {
@@ -373,17 +380,20 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       const deleteResolverKey = `delete${getMetaType(meta)}`
       root_mutation.fields.push({
         key: deleteResolverKey,
-        args: [argId],
+        args: [argId, argClientMutationId],
         value: `${deletePayload}`,
         comment: `Delete a \`${getMetaType(meta)}\``,
       })
 
       currentType.mutation.delete.payload = upsertTypes(deletePayload)
       const deletedResultKey = `deleted${getMetaType(meta)}Id`
-      currentType.mutation.delete.payload.fields.push({
-        key: deletedResultKey,
-        value: 'ID',
-      })
+      currentType.mutation.delete.payload.fields.push(
+        {
+          key: deletedResultKey,
+          value: 'ID',
+        },
+        argClientMutationId,
+      )
       root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.delete(
           {

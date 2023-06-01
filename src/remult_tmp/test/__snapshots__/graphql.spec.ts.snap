@@ -12,12 +12,12 @@ exports[`graphql-connection > test basics 1`] = `
 }
 
 type Mutation {
-    createTask(input: CreateTaskInput!): CreateTaskPayload
-    updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
-    deleteTask(id: ID!): DeleteTaskPayload
-    createCategory(input: CreateCategoryInput!): CreateCategoryPayload
-    updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
-    deleteCategory(id: ID!): DeleteCategoryPayload
+    createTask(input: CreateTaskInput!, clientMutationId: String): CreateTaskPayload
+    updateTask(id: ID!, patch: UpdateTaskInput!, clientMutationId: String): UpdateTaskPayload
+    deleteTask(id: ID!, clientMutationId: String): DeleteTaskPayload
+    createCategory(input: CreateCategoryInput!, clientMutationId: String): CreateCategoryPayload
+    updateCategory(id: ID!, patch: UpdateCategoryInput!, clientMutationId: String): UpdateCategoryPayload
+    deleteCategory(id: ID!, clientMutationId: String): DeleteCategoryPayload
 }
 
 type Task implements Node {
@@ -65,6 +65,7 @@ input CreateTaskInput {
 
 type CreateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 input UpdateTaskInput {
@@ -75,10 +76,12 @@ input UpdateTaskInput {
 
 type UpdateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 type DeleteTaskPayload {
     deletedTaskId: ID
+    clientMutationId: String
 }
 
 type Category implements Node {
@@ -118,6 +121,7 @@ input CreateCategoryInput {
 
 type CreateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 input UpdateCategoryInput {
@@ -127,10 +131,12 @@ input UpdateCategoryInput {
 
 type UpdateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 type DeleteCategoryPayload {
     deletedCategoryId: ID
+    clientMutationId: String
 }
 
 input WhereString {
