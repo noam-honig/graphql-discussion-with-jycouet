@@ -212,7 +212,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
           key: 'limit',
           value: 'Int',
           comment: `
-For *page by page* pagination.
+For **page by page** pagination.
 Limit the number of result. 
 _Side note: \`Math.ceil(totalCount / limit)\` to determine how many pages there are._`,
         },
@@ -220,7 +220,7 @@ _Side note: \`Math.ceil(totalCount / limit)\` to determine how many pages there 
           key: 'page',
           value: 'Int',
           comment: `
-For *page by page* pagination.
+For **page by page** pagination.
 Select a dedicated page.`,
         },
         { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
@@ -229,28 +229,28 @@ Select a dedicated page.`,
           key: 'first',
           value: 'Int',
           comment: `
-For *forward cursor* pagination
+For **forward cursor** pagination
 Takes the \`first\`: \`n\` elements from the list.`,
         },
         {
           key: 'after',
           value: 'String',
           comment: `
-For *forward cursor* pagination
+For **forward cursor** pagination
 \`after\` this \`cursor\`.`,
         },
         {
           key: 'last',
           value: 'Int',
           comment: `
-For *backward cursor* pagination
+For **backward cursor** pagination
 Takes the \`last\`: \`n\` elements from the list.`,
         },
         {
           key: 'before',
           value: 'String',
           comment: `
-For *backward cursor* pagination
+For **backward cursor** pagination
 \`before\` this \`cursor\`.`,
         },
       ]

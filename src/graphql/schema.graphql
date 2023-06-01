@@ -16,7 +16,7 @@ type Query {
   tasksConnection(
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Limit the number of result. 
 _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
@@ -24,7 +24,7 @@ _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there ar
   , 
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Select a dedicated page.
     """
     page: Int
@@ -41,28 +41,28 @@ Select a dedicated page.
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 Takes the `first`: `n` elements from the list.
     """
     first: Int
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 `after` this `cursor`.
     """
     after: String
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 Takes the `last`: `n` elements from the list.
     """
     last: Int
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 `before` this `cursor`.
     """
     before: String
@@ -81,7 +81,7 @@ For *backward cursor* pagination
   categoriesConnection(
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Limit the number of result. 
 _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
@@ -89,7 +89,7 @@ _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there ar
   , 
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Select a dedicated page.
     """
     page: Int
@@ -106,28 +106,28 @@ Select a dedicated page.
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 Takes the `first`: `n` elements from the list.
     """
     first: Int
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 `after` this `cursor`.
     """
     after: String
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 Takes the `last`: `n` elements from the list.
     """
     last: Int
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 `before` this `cursor`.
     """
     before: String
@@ -146,7 +146,7 @@ For *backward cursor* pagination
   tagsConnection(
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Limit the number of result. 
 _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
@@ -154,7 +154,7 @@ _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there ar
   , 
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Select a dedicated page.
     """
     page: Int
@@ -171,28 +171,28 @@ Select a dedicated page.
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 Takes the `first`: `n` elements from the list.
     """
     first: Int
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 `after` this `cursor`.
     """
     after: String
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 Takes the `last`: `n` elements from the list.
     """
     last: Int
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 `before` this `cursor`.
     """
     before: String
@@ -381,7 +381,7 @@ type Category implements Node {
     tasksConnection(
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Limit the number of result. 
 _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
@@ -389,7 +389,7 @@ _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there ar
   , 
     """
     
-For *page by page* pagination.
+For **page by page** pagination.
 Select a dedicated page.
     """
     page: Int
@@ -406,28 +406,28 @@ Select a dedicated page.
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 Takes the `first`: `n` elements from the list.
     """
     first: Int
   , 
     """
     
-For *forward cursor* pagination
+For **forward cursor** pagination
 `after` this `cursor`.
     """
     after: String
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 Takes the `last`: `n` elements from the list.
     """
     last: Int
   , 
     """
     
-For *backward cursor* pagination
+For **backward cursor** pagination
 `before` this `cursor`.
     """
     before: String
