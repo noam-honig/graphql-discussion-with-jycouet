@@ -9,11 +9,32 @@ type Query {
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-  """
-  List all `Task` entity (with pagination, sorting and filtering)
-  """
-  tasksConnection(first: Int, after: String, last: Int, before: String, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+  tasks(
+    """
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For **page by page** pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tasksOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tasksWhere
+  ): TaskConnection
   """
   Get `Category` entity
   """
@@ -21,11 +42,65 @@ type Query {
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
+  categories(
+    """
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For **page by page** pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: categoriesOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: categoriesWhere
+  ): CategoryConnection
   """
-  List all `Category` entity (with pagination, sorting and filtering)
+  Get `Tag` entity
   """
-  categoriesConnection(first: Int, after: String, last: Int, before: String, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+  tag(id: ID!): Tag
+  """
+  List all `Tag` entity (with pagination, sorting and filtering)
+  """
+  tags(
+    """
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For **page by page** pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tagsOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tagsWhere
+  ): TagConnection
   """
   Grab any Remult entity given it's globally unique `ID`
   """
@@ -33,7 +108,8 @@ type Query {
     """
     The globally unique `ID` _(_typename:id)_
     """
-    nodeId: ID!): Node
+    nodeId: ID!
+  ): Node
 }
 
 """
@@ -43,27 +119,39 @@ type Mutation {
   """
   Create a new `Task`
   """
-  createTask(input: CreateTaskInput!): CreateTaskPayload
+  createTask(input: CreateTaskInput!, clientMutationId: String): CreateTaskPayload
   """
   Update a `Task`
   """
-  updateTask(id: ID!, patch: UpdateTaskInput!): UpdateTaskPayload
+  updateTask(id: ID!, patch: UpdateTaskInput!, clientMutationId: String): UpdateTaskPayload
   """
   Delete a `Task`
   """
-  deleteTask(id: ID!): DeleteTaskPayload
+  deleteTask(id: ID!, clientMutationId: String): DeleteTaskPayload
   """
   Create a new `Category`
   """
-  createCategory(input: CreateCategoryInput!): CreateCategoryPayload
+  createCategory(input: CreateCategoryInput!, clientMutationId: String): CreateCategoryPayload
   """
   Update a `Category`
   """
-  updateCategory(id: ID!, patch: UpdateCategoryInput!): UpdateCategoryPayload
+  updateCategory(id: ID!, patch: UpdateCategoryInput!, clientMutationId: String): UpdateCategoryPayload
   """
   Delete a `Category`
   """
-  deleteCategory(id: ID!): DeleteCategoryPayload
+  deleteCategory(id: ID!, clientMutationId: String): DeleteCategoryPayload
+  """
+  Create a new `Tag`
+  """
+  createTag(input: CreateTagInput!, clientMutationId: String): CreateTagPayload
+  """
+  Update a `Tag`
+  """
+  updateTag(id: ID!, patch: UpdateTagInput!, clientMutationId: String): UpdateTagPayload
+  """
+  Delete a `Tag`
+  """
+  deleteTag(id: ID!, clientMutationId: String): DeleteTagPayload
 }
 
 """
@@ -83,6 +171,10 @@ type Task implements Node {
   """
   completed: Boolean!
   """
+  The Priority
+  """
+  thePriority: String!
+  """
   Category
   """
   category: Category
@@ -99,6 +191,7 @@ input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
   completed: OrderByDirection
+  thePriority: OrderByDirection
   category: OrderByDirection
 }
 
@@ -109,6 +202,7 @@ input tasksWhere {
   id: WhereInt
   title: WhereString
   completed: WhereBoolean
+  thePriority: WhereString
   OR: [tasksWhere!]
   AND: [tasksWhere!]
 }
@@ -118,16 +212,8 @@ The type for `TaskConnection`
 """
 type TaskConnection {
     totalCount: Int!
-    edges: [TaskEdge!]!
+    items: [Task!]!
     pageInfo: PageInfo!
-}
-
-"""
-The type for `TaskEdge`
-"""
-type TaskEdge {
-    node: Task!
-    cursor: String!
 }
 
 """
@@ -136,6 +222,7 @@ The input for `CreateTaskInput`
 input CreateTaskInput {
     title: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -143,6 +230,7 @@ The type for `CreateTaskPayload`
 """
 type CreateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 """
@@ -151,6 +239,7 @@ The input for `UpdateTaskInput`
 input UpdateTaskInput {
     title: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -158,13 +247,15 @@ The type for `UpdateTaskPayload`
 """
 type UpdateTaskPayload {
     task: Task
+    clientMutationId: String
 }
 
 """
 The type for `DeleteTaskPayload`
 """
 type DeleteTaskPayload {
-    deletedTaskId: ID
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -182,7 +273,32 @@ type Category implements Node {
   """
   List all `Task` of `categories`
   """
-  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+  tasks(
+    """
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    """
+    limit: Int
+  , 
+    """
+    
+For **page by page** pagination.
+Select a dedicated page.
+    """
+    page: Int
+  , 
+    """
+    Remult sorting options
+    """
+    orderBy: tasksOrderBy
+  , 
+    """
+    Remult filtering options
+    """
+    where: tasksWhere
+  ): [Task!]!
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -212,16 +328,8 @@ The type for `CategoryConnection`
 """
 type CategoryConnection {
     totalCount: Int!
-    edges: [CategoryEdge!]!
+    items: [Category!]!
     pageInfo: PageInfo!
-}
-
-"""
-The type for `CategoryEdge`
-"""
-type CategoryEdge {
-    node: Category!
-    cursor: String!
 }
 
 """
@@ -237,6 +345,7 @@ The type for `CreateCategoryPayload`
 """
 type CreateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 """
@@ -252,13 +361,100 @@ The type for `UpdateCategoryPayload`
 """
 type UpdateCategoryPayload {
     category: Category
+    clientMutationId: String
 }
 
 """
 The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
-    deletedCategoryId: ID
+    id: ID
+    clientMutationId: String
+}
+
+"""
+The type_impl_node for `Tag`
+"""
+type Tag implements Node {
+  """
+  Id
+  """
+  id: String!
+  """
+  Value
+  """
+  value: String!
+  """
+  The globally unique `ID` _(_typename:id)_
+  """
+  nodeId: ID!
+}
+
+"""
+OrderBy options for `tags`
+"""
+input tagsOrderBy {
+  id: OrderByDirection
+  value: OrderByDirection
+}
+
+"""
+Where options for `tags`
+"""
+input tagsWhere {
+  id: WhereString
+  value: WhereString
+  OR: [tagsWhere!]
+  AND: [tagsWhere!]
+}
+
+"""
+The type for `TagConnection`
+"""
+type TagConnection {
+    totalCount: Int!
+    items: [Tag!]!
+    pageInfo: PageInfo!
+}
+
+"""
+The input for `CreateTagInput`
+"""
+input CreateTagInput {
+    id: String
+    value: String
+}
+
+"""
+The type for `CreateTagPayload`
+"""
+type CreateTagPayload {
+    tag: Tag
+    clientMutationId: String
+}
+
+"""
+The input for `UpdateTagInput`
+"""
+input UpdateTagInput {
+    id: String
+    value: String
+}
+
+"""
+The type for `UpdateTagPayload`
+"""
+type UpdateTagPayload {
+    tag: Tag
+    clientMutationId: String
+}
+
+"""
+The type for `DeleteTagPayload`
+"""
+type DeleteTagPayload {
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -268,6 +464,7 @@ input WhereString {
     eq: String
     ne: String
     in: [String!]
+    nin: [String!]
     gt: String
     gte: String
     lt: String
@@ -282,6 +479,7 @@ input WhereStringNullable {
     eq: String
     ne: String
     in: [String!]
+    nin: [String!]
     gt: String
     gte: String
     lt: String
@@ -297,6 +495,7 @@ input WhereInt {
     eq: Int
     ne: Int
     in: [Int!]
+    nin: [Int!]
     gt: Int
     gte: Int
     lt: Int
@@ -310,6 +509,7 @@ input WhereIntNullable {
     eq: Int
     ne: Int
     in: [Int!]
+    nin: [Int!]
     gt: Int
     gte: Int
     lt: Int
@@ -324,6 +524,7 @@ input WhereFloat {
     eq: Float
     ne: Float
     in: [Float!]
+    nin: [Float!]
     gt: Float
     gte: Float
     lt: Float
@@ -337,6 +538,7 @@ input WhereFloatNullable {
     eq: Float
     ne: Float
     in: [Float!]
+    nin: [Float!]
     gt: Float
     gte: Float
     lt: Float
@@ -351,6 +553,7 @@ input WhereBoolean {
     eq: Boolean
     ne: Boolean
     in: [Boolean!]
+    nin: [Boolean!]
 }
 
 """
@@ -360,6 +563,7 @@ input WhereBooleanNullable {
     eq: Boolean
     ne: Boolean
     in: [Boolean!]
+    nin: [Boolean!]
     null: Boolean
 }
 
@@ -370,6 +574,7 @@ input WhereID {
     eq: ID
     ne: ID
     in: [ID!]
+    nin: [ID!]
 }
 
 """
@@ -379,6 +584,7 @@ input WhereIDNullable {
     eq: ID
     ne: ID
     in: [ID!]
+    nin: [ID!]
     null: Boolean
 }
 

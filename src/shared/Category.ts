@@ -1,7 +1,8 @@
 import { Entity, Fields } from 'remult'
 
+export
 @Entity('categories', { allowApiCrud: true })
-export class Category {
+class Category {
   @Fields.cuid()
   id = ''
   @Fields.string()

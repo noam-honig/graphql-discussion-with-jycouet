@@ -88,7 +88,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }),
       )
       if (kind === 'type_impl_node') {
-        t.fields.push({ ...argNodeId, order: 11 })
+        t.fields.push({ ...argNodeId, order: 111 })
       }
     }
     return t
@@ -100,10 +100,12 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const currentWhereNullable = upsertTypes(`Where${whereType}Nullable`, 'input', 20)
 
     // For everyone
-    for (const operator of ['eq', 'ne', 'in']) {
+    const operatorType = ['eq', 'ne']
+    const operatorTypeArray = ['in', 'nin']
+    for (const operator of [...operatorType, ...operatorTypeArray]) {
       const field = {
         key: operator,
-        value: operator === 'in' ? `[${whereType}!]` : whereType,
+        value: operatorTypeArray.includes(operator) ? `[${whereType}!]` : whereType,
       }
       currentWhere.fields.push(field)
       currentWhereNullable.fields.push(field)
@@ -147,6 +149,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     value: `ID!`,
     comment: `The globally unique \`ID\` _(_typename:id)_`,
   }
+  const argClientMutationId = { key: 'clientMutationId', value: `String` }
 
   for (const meta of entities) {
     const orderByFields: string[] = []
@@ -203,7 +206,10 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         ) => Promise<void>,
       ) => {
         return createResultPromise(async (response, setResult, arg1, req) => {
-          if (req.req) req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
+          if (req.req) {
+            req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
+            // req should be "ctx" for context. inside, you have by default "YogaInitialContext", now I added session for example.
+          }
 
           await server.run(req, async () => {
             const dApi = await server.getDataApi(req, meta)
@@ -212,19 +218,53 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         })
       }
 
-      const queryArgsList: Arg[] = [
-        { key: 'limit', value: 'Int' },
-        { key: 'page', value: 'Int' },
-        { key: 'orderBy', value: `${key}OrderBy` },
-        { key: 'where', value: `${key}Where` },
-      ]
       const queryArgsConnection: Arg[] = [
-        { key: 'first', value: 'Int' },
-        { key: 'after', value: 'String' },
-        { key: 'last', value: 'Int' },
-        { key: 'before', value: 'String' },
-        { key: 'orderBy', value: `${key}OrderBy` },
-        { key: 'where', value: `${key}Where` },
+        {
+          key: 'limit',
+          value: 'Int',
+          comment: `
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: \`Math.ceil(totalCount / limit)\` to determine how many pages there are._`,
+        },
+        {
+          key: 'page',
+          value: 'Int',
+          comment: `
+For **page by page** pagination.
+Select a dedicated page.`,
+        },
+        { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
+        { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
+        // for cursor pagination (v2)
+        //         {
+        //           key: 'first',
+        //           value: 'Int',
+        //           comment: `
+        // For **forward cursor** pagination
+        // Takes the \`first\`: \`n\` elements from the list.`,
+        //         },
+        //         {
+        //           key: 'after',
+        //           value: 'String',
+        //           comment: `
+        // For **forward cursor** pagination
+        // \`after\` this \`cursor\`.`,
+        //         },
+        //         {
+        //           key: 'last',
+        //           value: 'Int',
+        //           comment: `
+        // For **backward cursor** pagination
+        // Takes the \`last\`: \`n\` elements from the list.`,
+        //         },
+        //         {
+        //           key: 'before',
+        //           value: 'String',
+        //           comment: `
+        // For **backward cursor** pagination
+        // \`before\` this \`cursor\`.`,
+        //         },
       ]
 
       root_query.fields.push({
@@ -232,15 +272,6 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         args: [argId],
         value: `${getMetaType(meta)}`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
-      })
-      // list
-      root_query.fields.push({
-        key,
-        args: queryArgsList,
-        value: `[${getMetaType(meta)}!]!`,
-        comment: `List all \`${getMetaType(
-          meta,
-        )}\` entity (with pagination, sorting and filtering)`,
       })
 
       root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
@@ -265,10 +296,9 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[key](args, req, gqlInfo)
 
-      // Connection
-      const connectionKey = `${key}Connection`
+      // Connection (v1 items, v2 edges)
       root_query.fields.push({
-        key: connectionKey,
+        key,
         args: queryArgsConnection,
         value: `${getMetaType(meta)}Connection`,
         comment: `List all \`${getMetaType(
@@ -282,28 +312,33 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         key: totalCountKey,
         value: 'Int!',
       })
-      const edgesKey = 'edges'
+      // for cursor pagination (v2)
+      // connection.fields.push({
+      //   key: 'edges',
+      //   value: `[${getMetaType(meta)}Edge!]!`,
+      // })
       connection.fields.push({
-        key: edgesKey,
-        value: `[${getMetaType(meta)}Edge!]!`,
+        key: 'items',
+        value: `[${getMetaType(meta)}!]!`,
       })
       connection.fields.push({
         key: 'pageInfo',
         value: `PageInfo!`,
       })
 
-      const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
-      edge.fields.push({
-        key: 'node',
-        value: `${getMetaType(meta)}!`,
-      })
-      const cursorKey = 'cursor'
-      edge.fields.push({
-        key: cursorKey,
-        value: `String!`,
-      })
+      // for cursor pagination (v2)
+      // const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
+      // edge.fields.push({
+      //   key: 'node',
+      //   value: `${getMetaType(meta)}!`,
+      // })
+      // const cursorKey = 'cursor'
+      // edge.fields.push({
+      //   key: cursorKey,
+      //   value: `String!`,
+      // })
 
-      root[connectionKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         let rowsPromise = () => {
           const r = root[key](arg1, req, {})
           rowsPromise = () => r
@@ -311,16 +346,17 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }
 
         setResult({
-          [edgesKey]: async () => {
-            const rows = await rowsPromise()
-            return rows.map((row: any) => ({
-              //[ ] - It should initially be the row id, and we should waste some resources, later we can optimize it
-              //[ ] - we should have a mechanism that extracts the row id - also for compound column ids. to place it in the nodeId
-r
-              [cursorKey]: 'x',
-              [nodeKey]: row,
-            }))
-          },
+          // TODO Noam, thx :)
+          //           [edgesKey]: async () => {
+          //             const rows = await rowsPromise()
+          //             return rows.map((row: any) => ({
+          //               //[ ] - It should initially be the row id, and we should waste some resources, later we can optimize it
+          //               //[ ] - we should have a mechanism that extracts the row id - also for compound column ids. to place it in the nodeId
+          //
+          //               [cursorKey]: 'x',
+          //               [nodeKey]: row,
+          //             }))
+          //           },
           [totalCountKey]: createResultPromise(async (response, setResult) => {
             // [ ] count should ignore limit, page etc....
             await dApi.count(
@@ -336,8 +372,8 @@ r
         })
       })
 
-      resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) => {
-        return root[connectionKey](args, req, gqlInfo)
+      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) => {
+        return root[key](args, req, gqlInfo)
       }
 
       // Mutation
@@ -350,7 +386,7 @@ r
       const createResolverKey = `create${getMetaType(meta)}`
       root_mutation.fields.push({
         key: createResolverKey,
-        args: [{ key: 'input', value: `${createInput}!` }],
+        args: [{ key: 'input', value: `${createInput}!` }, argClientMutationId],
         value: `${createPayload}`,
         comment: `Create a new \`${getMetaType(meta)}\``,
       })
@@ -358,10 +394,13 @@ r
       currentType.mutation.create.input = upsertTypes(createInput, 'input')
 
       currentType.mutation.create.payload = upsertTypes(createPayload)
-      currentType.mutation.create.payload.fields.push({
-        key: `${toPascalCase(getMetaType(meta))}`,
-        value: `${getMetaType(meta)}`,
-      })
+      currentType.mutation.create.payload.fields.push(
+        {
+          key: `${toPascalCase(getMetaType(meta))}`,
+          value: `${getMetaType(meta)}`,
+        },
+        argClientMutationId,
+      )
       root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.post(
           {
@@ -385,7 +424,7 @@ r
       const updateResolverKey = `update${getMetaType(meta)}`
       root_mutation.fields.push({
         key: updateResolverKey,
-        args: [argId, { key: 'patch', value: `${updateInput}!` }],
+        args: [argId, { key: 'patch', value: `${updateInput}!` }, argClientMutationId],
         value: `${updatePayload}`,
         comment: `Update a \`${getMetaType(meta)}\``,
       })
@@ -393,10 +432,13 @@ r
       currentType.mutation.update.input = upsertTypes(updateInput, 'input')
 
       currentType.mutation.update.payload = upsertTypes(updatePayload)
-      currentType.mutation.update.payload.fields.push({
-        key: `${toPascalCase(getMetaType(meta))}`,
-        value: `${getMetaType(meta)}`,
-      })
+      currentType.mutation.update.payload.fields.push(
+        {
+          key: `${toPascalCase(getMetaType(meta))}`,
+          value: `${getMetaType(meta)}`,
+        },
+        argClientMutationId,
+      )
       root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.put(
           {
@@ -420,17 +462,20 @@ r
       const deleteResolverKey = `delete${getMetaType(meta)}`
       root_mutation.fields.push({
         key: deleteResolverKey,
-        args: [argId],
+        args: [argId, argClientMutationId],
         value: `${deletePayload}`,
         comment: `Delete a \`${getMetaType(meta)}\``,
       })
 
       currentType.mutation.delete.payload = upsertTypes(deletePayload)
-      const deletedResultKey = `deleted${getMetaType(meta)}Id`
-      currentType.mutation.delete.payload.fields.push({
-        key: deletedResultKey,
-        value: 'ID',
-      })
+      const deletedResultKey = `id`
+      currentType.mutation.delete.payload.fields.push(
+        {
+          key: deletedResultKey,
+          value: 'ID',
+        },
+        argClientMutationId,
+      )
       root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         await dApi.delete(
           {
@@ -494,11 +539,12 @@ r
           const refT = upsertTypes(getMetaType(ref), 'type_impl_node')
           refT.fields.push({
             key,
-            args: queryArgsList,
+            args: queryArgsConnection,
             value: `[${getMetaType(meta)}!]!`,
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           })
+
           refT.query.resultProcessors.push(r => {
             const val = r.id
             r[key] = async (args: any, req: any, gqlInfo: any) => {
@@ -633,6 +679,23 @@ r
   }
 }
 
+// For cursor pagination (v2)
+// function checkPaginationArgs(args: any) {
+//   let paginationPage = !!args.limit ? 1 : 0
+//   paginationPage += !!args.page ? 1 : 0
+
+//   let paginationCursor = !!args.first ? 1 : 0
+//   paginationCursor += !!args.after ? 1 : 0
+//   paginationCursor += !!args.last ? 1 : 0
+//   paginationCursor += !!args.before ? 1 : 0
+
+//   if (paginationPage > 0 && paginationCursor > 0) {
+//     throw new GraphQLError(
+//       `You can't use \`limit,page\` and \`first,after,last,before\` at the same time. Choose your pagination style.`,
+//     )
+//   }
+// }
+
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
     return ``
@@ -668,7 +731,8 @@ function argsFormat(args?: Arg[]) {
         }
 
         if (strComment) {
-          return `${strComment}    ${arg.key}: ${arg.value}`
+          return `${strComment}    ${arg.key}: ${arg.value}
+  `
         }
 
         return `${arg.key}: ${arg.value}`

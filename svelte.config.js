@@ -14,6 +14,7 @@ const config = {
     adapter: adapter(),
     alias: {
       $houdini: './$houdini',
+      $shared: './src/shared',
     },
   },
 }

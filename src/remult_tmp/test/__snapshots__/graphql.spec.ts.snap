@@ -1,0 +1,338 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`graphql-connection > test basics 1`] = `
+"type Query {
+    task(id: ID!): Task
+    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
+    category(id: ID!): Category
+    categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
+    node(nodeId: ID!): Node
+}
+
+type Mutation {
+    createTask(input: CreateTaskInput!, clientMutationId: String): CreateTaskPayload
+    updateTask(id: ID!, patch: UpdateTaskInput!, clientMutationId: String): UpdateTaskPayload
+    deleteTask(id: ID!, clientMutationId: String): DeleteTaskPayload
+    createCategory(input: CreateCategoryInput!, clientMutationId: String): CreateCategoryPayload
+    updateCategory(id: ID!, patch: UpdateCategoryInput!, clientMutationId: String): UpdateCategoryPayload
+    deleteCategory(id: ID!, clientMutationId: String): DeleteCategoryPayload
+}
+
+type Task implements Node {
+    id: Int!
+    title: String!
+    completed: Boolean!
+    thePriority: String!
+    category: Category
+    nodeId: ID!
+}
+
+input tasksOrderBy {
+  id: OrderByDirection
+  title: OrderByDirection
+  completed: OrderByDirection
+  thePriority: OrderByDirection
+  category: OrderByDirection
+}
+
+input tasksWhere {
+  id: WhereInt
+  title: WhereString
+  completed: WhereBoolean
+  thePriority: WhereString
+  OR: [tasksWhere!]
+  AND: [tasksWhere!]
+}
+
+type TaskConnection {
+    totalCount: Int!
+    items: [Task!]!
+    pageInfo: PageInfo!
+}
+
+input CreateTaskInput {
+    title: String
+    completed: Boolean
+    thePriority: String
+}
+
+type CreateTaskPayload {
+    task: Task
+    clientMutationId: String
+}
+
+input UpdateTaskInput {
+    title: String
+    completed: Boolean
+    thePriority: String
+}
+
+type UpdateTaskPayload {
+    task: Task
+    clientMutationId: String
+}
+
+type DeleteTaskPayload {
+    id: ID
+    clientMutationId: String
+}
+
+type Category implements Node {
+    id: String!
+    name: String!
+    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+    nodeId: ID!
+}
+
+input categoriesOrderBy {
+  id: OrderByDirection
+  name: OrderByDirection
+}
+
+input categoriesWhere {
+  id: WhereString
+  name: WhereString
+  OR: [categoriesWhere!]
+  AND: [categoriesWhere!]
+}
+
+type CategoryConnection {
+    totalCount: Int!
+    items: [Category!]!
+    pageInfo: PageInfo!
+}
+
+input CreateCategoryInput {
+    id: String
+    name: String
+}
+
+type CreateCategoryPayload {
+    category: Category
+    clientMutationId: String
+}
+
+input UpdateCategoryInput {
+    id: String
+    name: String
+}
+
+type UpdateCategoryPayload {
+    category: Category
+    clientMutationId: String
+}
+
+type DeleteCategoryPayload {
+    id: ID
+    clientMutationId: String
+}
+
+input WhereString {
+    eq: String
+    ne: String
+    in: [String!]
+    nin: [String!]
+    gt: String
+    gte: String
+    lt: String
+    lte: String
+    st: String
+}
+
+input WhereStringNullable {
+    eq: String
+    ne: String
+    in: [String!]
+    nin: [String!]
+    gt: String
+    gte: String
+    lt: String
+    lte: String
+    st: String
+    null: Boolean
+}
+
+input WhereInt {
+    eq: Int
+    ne: Int
+    in: [Int!]
+    nin: [Int!]
+    gt: Int
+    gte: Int
+    lt: Int
+    lte: Int
+}
+
+input WhereIntNullable {
+    eq: Int
+    ne: Int
+    in: [Int!]
+    nin: [Int!]
+    gt: Int
+    gte: Int
+    lt: Int
+    lte: Int
+    null: Boolean
+}
+
+input WhereFloat {
+    eq: Float
+    ne: Float
+    in: [Float!]
+    nin: [Float!]
+    gt: Float
+    gte: Float
+    lt: Float
+    lte: Float
+}
+
+input WhereFloatNullable {
+    eq: Float
+    ne: Float
+    in: [Float!]
+    nin: [Float!]
+    gt: Float
+    gte: Float
+    lt: Float
+    lte: Float
+    null: Boolean
+}
+
+input WhereBoolean {
+    eq: Boolean
+    ne: Boolean
+    in: [Boolean!]
+    nin: [Boolean!]
+}
+
+input WhereBooleanNullable {
+    eq: Boolean
+    ne: Boolean
+    in: [Boolean!]
+    nin: [Boolean!]
+    null: Boolean
+}
+
+input WhereID {
+    eq: ID
+    ne: ID
+    in: [ID!]
+    nin: [ID!]
+}
+
+input WhereIDNullable {
+    eq: ID
+    ne: ID
+    in: [ID!]
+    nin: [ID!]
+    null: Boolean
+}
+
+type PageInfo {
+    endCursor: String!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String!
+}
+
+enum OrderByDirection {
+    ASC
+    DESC
+}
+
+interface Node {
+    nodeId: ID!
+}
+"
+`;
+
+exports[`graphql-connection > test graphql 1`] = `
+{
+  "data": {
+    "tasks": [
+      {
+        "completed": false,
+        "id": 3,
+        "title": "task a",
+      },
+      {
+        "completed": false,
+        "id": 2,
+        "title": "task b",
+      },
+      {
+        "completed": false,
+        "id": 1,
+        "title": "task c",
+      },
+  ],
+  },
+}
+`;
+
+exports[`graphql-connection > test mutation create 1`] = `
+{
+  "data": {
+    "createTask": {
+      "task": {
+        "id": 1,
+        "title": "testing",
+      },
+    },
+  },
+}
+`;
+
+exports[`graphql-connection > test mutation create 2`] = `
+[
+  Task {
+    "category": null,
+    "completed": false,
+    "id": 1,
+    "thePriority": 1,
+    "title": "testing",
+  },
+]
+`;
+
+exports[`graphql-connection > test mutation delete 1`] = `
+{
+  "data": {
+    "deleteTask": {
+      "id": "2",
+    },
+  },
+}
+`;
+
+exports[`graphql-connection > test mutation delete 2`] = `
+[
+  Task {
+    "category": null,
+    "completed": false,
+    "id": 1,
+    "thePriority": 1,
+    "title": "task a",
+  },
+  Task {
+    "category": null,
+    "completed": false,
+    "id": 3,
+    "thePriority": 1,
+    "title": "task c",
+  },
+]
+`;
+
+exports[`graphql-connection > test mutation update 1`] = `
+{
+  "data": {
+    "updateTask": {
+      "task": {
+        "id": 1,
+        "title": "bbb",
+      },
+    },
+  },
+}
+`;
