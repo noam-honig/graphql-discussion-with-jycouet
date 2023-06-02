@@ -5,47 +5,7 @@
     "completed": false,
     "dueDate": "2023-06-02",
     "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 2,
-    "title": "uuuu",
-    "completed": true,
-    "dueDate": "2023-06-09",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 3,
-    "title": "uuuiiisdsd",
-    "completed": false,
-    "dueDate": "2023-06-09",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 4,
-    "title": "coucouss",
-    "completed": false,
-    "dueDate": "2023-06-09",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 5,
-    "title": "hihihi",
-    "completed": false,
-    "dueDate": "2023-06-09",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 6,
-    "title": "Ca va?",
-    "completed": false,
-    "dueDate": "2023-06-09",
-    "thePriority": "CRITICAL",
-    "category": null
+    "category": "cliel404a0000ktbyb0oibhwq"
   },
   {
     "id": 7,
@@ -53,34 +13,6 @@
     "completed": false,
     "dueDate": "2023-06-09",
     "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 2,
-    "title": "test",
-    "completed": false,
-    "thePriority": 1,
-    "category": null
-  },
-  {
-    "id": 3,
-    "title": "test",
-    "completed": false,
-    "thePriority": 1,
-    "category": null
-  },
-  {
-    "id": 4,
-    "title": "test",
-    "completed": false,
-    "thePriority": 1,
-    "category": null
-  },
-  {
-    "id": 5,
-    "title": "test",
-    "completed": false,
-    "thePriority": 1,
-    "category": null
+    "category": "cliel404a0000ktbyb0oibhwq"
   }
 ]

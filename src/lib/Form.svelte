@@ -96,11 +96,13 @@
       }
     }
     const allowNull = with_allowNull ? true : !c.allowNull
-    const readOnly = with_readonly ? true : !c.dbReadOnly
+    const readOnly = with_readonly ? true : !c.dbReadOnly && c.options.allowApiUpdate === undefined
     const hideInCreate = with_hideInCreate ? !c.options?.hideInCreate : true
 
     return allowNull && readOnly && hideInCreate
   }) as field}
+    <!-- {@const inputType = field.inputType ?? field.valueType.name === 'String' ? 'text' : undefined} -->
+    {@const inputType = field.inputType}
     <div class="field">
       <label for={field.key}>
         <p class="caption">
@@ -111,15 +113,15 @@
             <p style="padding-top: 0.6rem; padding-left: 0.6rem;">
               {field.displayValue($data)}
             </p>
-          {:else if field.inputType === 'text'}
+          {:else if inputType === 'text'}
             <input use:common={field} type="text" bind:value={$data[field.key]} />
-          {:else if field.inputType === 'number'}
+          {:else if inputType === 'number'}
             <input use:common={field} type="number" bind:value={$data[field.key]} />
-          {:else if field.inputType === 'checkbox'}
+          {:else if inputType === 'checkbox'}
             <div style="padding-top: 12px;">
               <input use:common={field} type="checkbox" bind:checked={$data[field.key]} />
             </div>
-          {:else if field.inputType === 'date'}
+          {:else if inputType === 'date'}
             <input
               use:common={field}
               type="date"
@@ -129,7 +131,7 @@
                 $data[field.key] = field.fromInput(e.target.value)
               }}
             />
-          {:else if field.inputType === 'select'}
+          {:else if inputType === 'select'}
             <select
               use:common={field}
               value={field.toInput($data[field.key])}
@@ -143,9 +145,10 @@
               {/each}
             </select>
           {:else}
-            {console.log(`field`, field)}
+            <pre>{field.key} type: {inputType} not managed!</pre>
 
-            <pre>{field.inputType} not managed!</pre>
+            {console.log(field)}
+            <!-- <input use:common={field} type="text" bind:value={$data[field.key]} /> -->
           {/if}
         </div>
       </label>
@@ -173,6 +176,6 @@
     justify-content: space-between;
   }
   .input {
-    height: 2rem;
+    min-height: 2rem;
   }
 </style>

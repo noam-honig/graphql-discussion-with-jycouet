@@ -32,10 +32,12 @@ export const handleGraphql = (options?: { endpoint: string }): Handle => {
 # You can also discover the API using the built-in documentation explorer.
 			
 query My_First_Query {
-	tasks(orderBy: { title: ASC }) {
-		id
-		title
-	}
+  tasks(orderBy: {id: DESC}) {
+    totalCount
+    items {
+      title
+    }
+  }
 }
 			`,
       title: 'KitQL - Remult',

@@ -1,18 +1,12 @@
 query Tasks @cache(policy: CacheAndNetwork) {
-  tasks(limit: 5, orderBy: { id: DESC }) {
+  tasks(orderBy: { id: DESC }) {
     totalCount
     items {
       id
       title
-      completed
+      category {
+        name
+      }
     }
-    # id
-    # title
-    # dueDate
-    # completed
-    # thePriority
-    # category {
-    #   name
-    # }
   }
 }

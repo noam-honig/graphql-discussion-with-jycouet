@@ -27,6 +27,7 @@
   {/each}
 
   <div style="float: right;">
+    <a href="/tasks-graphql">tasks-graphql</a> |
     <a href="/api/graphql" target="_blank">Graph<i>i</i>GL</a>
     | Hello {remult.user?.name}
     | <a href="/" on:click={signOut}>Logout</a>
