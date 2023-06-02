@@ -17,6 +17,7 @@ class Task {
     inputType: 'text', // how to remove? (should be default)
     caption: 'The Title',
     validate: task => {
+      if (task.title?.length <= 0) throw Error('Required!')
       if (task.title?.length < 3) throw Error('Too short')
     },
     placeholder: 'Be creative...',
@@ -31,7 +32,7 @@ class Task {
   completed = false
 
   @Fields.dateOnly({
-    caption: 'The Due Date',
+    caption: 'Due Date',
     allowNull: false,
   })
   dueDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 7)

@@ -22,6 +22,7 @@ type Task implements Node {
     id: Int!
     title: String!
     completed: Boolean!
+    dueDate: String!
     thePriority: String!
     category: Category
     nodeId: ID!
@@ -31,6 +32,7 @@ input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
   completed: OrderByDirection
+  dueDate: OrderByDirection
   thePriority: OrderByDirection
   category: OrderByDirection
 }
@@ -39,6 +41,7 @@ input tasksWhere {
   id: WhereInt
   title: WhereString
   completed: WhereBoolean
+  dueDate: WhereString
   thePriority: WhereString
   OR: [tasksWhere!]
   AND: [tasksWhere!]
@@ -53,6 +56,7 @@ type TaskConnection {
 input CreateTaskInput {
     title: String
     completed: Boolean
+    dueDate: String
     thePriority: String
 }
 
@@ -64,6 +68,7 @@ type CreateTaskPayload {
 input UpdateTaskInput {
     title: String
     completed: Boolean
+    dueDate: String
     thePriority: String
 }
 
@@ -290,8 +295,12 @@ exports[`graphql-connection > test mutation create 2`] = `
   Task {
     "category": null,
     "completed": false,
+    "dueDate": 2023-06-08T22:00:00.000Z,
     "id": 1,
-    "thePriority": 1,
+    "thePriority": TaskPriority {
+      "caption": "High ‼️",
+      "id": "HIGH",
+    },
     "title": "testing",
   },
 ]
@@ -312,15 +321,23 @@ exports[`graphql-connection > test mutation delete 2`] = `
   Task {
     "category": null,
     "completed": false,
+    "dueDate": 2023-06-08T22:00:00.000Z,
     "id": 1,
-    "thePriority": 1,
+    "thePriority": TaskPriority {
+      "caption": "High ‼️",
+      "id": "HIGH",
+    },
     "title": "task a",
   },
   Task {
     "category": null,
     "completed": false,
+    "dueDate": 2023-06-08T22:00:00.000Z,
     "id": 3,
-    "thePriority": 1,
+    "thePriority": TaskPriority {
+      "caption": "High ‼️",
+      "id": "HIGH",
+    },
     "title": "task c",
   },
 ]

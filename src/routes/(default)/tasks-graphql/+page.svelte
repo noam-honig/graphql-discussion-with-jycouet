@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PageData } from '../task-list/$houdini'
+  import type { PageData } from '../../task-list/$houdini'
 
   export let data: PageData
 
