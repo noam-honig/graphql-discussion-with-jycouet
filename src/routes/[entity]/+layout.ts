@@ -8,7 +8,7 @@ export const load = (async ({ params }) => {
     // to check if it exists
     const repo = getRepo(params.entity)
     const listPOJO = await repo.find()
-    const list = [...structuredClone(listPOJO)]
+    const list = JSON.parse(JSON.stringify(listPOJO))
 
     return {
       list,

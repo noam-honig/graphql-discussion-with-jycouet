@@ -8,9 +8,9 @@
 
   export let data: PageData
 
-  const repo = getRepo(data.entity)
+  $: repo = getRepo(data.entity)
 
-  const list = remultStore(repo, data.list)
+  $: list = remultStore(repo, data.list)
   $: browser && list.listen()
 </script>
 
@@ -24,20 +24,20 @@
 
 <table>
   <tr>
-    {#each repo.fields.toArray() as cell}
-      <th>{cell.caption}</th>
+    {#each repo.fields.toArray() as field}
+      <th>{field.caption}</th>
     {/each}
   </tr>
   {#each $list as row}
     <tr>
-      {#each repo.fields.toArray() as cell}
+      {#each repo.fields.toArray() as field}
         <td>
-          {#if cell.key === 'id'}
-            <a href={`/${data.entity}/${row[cell.key]}`}>
-              {cell.displayValue(row)}
+          {#if field.key === 'id'}
+            <a href={`/${data.entity}/${row[field.key]}`}>
+              {field.displayValue(row)}
             </a>
           {:else}
-            {cell.displayValue(row)}
+            {field.displayValue(row)}
           {/if}
         </td>
       {/each}
