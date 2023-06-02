@@ -5,7 +5,6 @@ query Tasks @cache(policy: CacheAndNetwork) {
       id
       title
       completed
-      thePriority
     }
     # id
     # title
