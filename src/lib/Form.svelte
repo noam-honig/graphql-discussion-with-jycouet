@@ -113,8 +113,6 @@
             <p style="padding-top: 0.6rem; padding-left: 0.6rem;">
               {field.displayValue($data)}
             </p>
-          {:else if inputType === 'text'}
-            <input use:common={field} type="text" bind:value={$data[field.key]} />
           {:else if inputType === 'number'}
             <input use:common={field} type="number" bind:value={$data[field.key]} />
           {:else if inputType === 'checkbox'}
@@ -145,10 +143,8 @@
               {/each}
             </select>
           {:else}
-            <pre>{field.key} type: {inputType} not managed!</pre>
-
-            {console.log(field)}
-            <!-- <input use:common={field} type="text" bind:value={$data[field.key]} /> -->
+            <!-- default to text -->
+            <input use:common={field} type="text" bind:value={$data[field.key]} />
           {/if}
         </div>
       </label>
