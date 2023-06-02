@@ -1,4 +1,4 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Vitest Snapshot v1
 
 exports[`graphql-connection > test basics 1`] = `
 "type Query {
@@ -249,23 +249,25 @@ interface Node {
 exports[`graphql-connection > test graphql 1`] = `
 {
   "data": {
-    "tasks": [
-      {
-        "completed": false,
-        "id": 3,
-        "title": "task a",
-      },
-      {
-        "completed": false,
-        "id": 2,
-        "title": "task b",
-      },
-      {
-        "completed": false,
-        "id": 1,
-        "title": "task c",
-      },
-  ],
+    "tasks": {
+      "items": [
+        {
+          "completed": false,
+          "id": 3,
+          "title": "task a",
+        },
+        {
+          "completed": false,
+          "id": 2,
+          "title": "task b",
+        },
+        {
+          "completed": false,
+          "id": 1,
+          "title": "task c",
+        },
+      ],
+    },
   },
 }
 `;

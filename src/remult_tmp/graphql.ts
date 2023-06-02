@@ -274,25 +274,6 @@ Select a dedicated page.`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
       })
 
-      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.getArray(
-          {
-            ...response,
-            success: (x: any) => {
-              setResult(
-                x.map((y: any) => {
-                  currentType.query.resultProcessors.forEach(z => z(y))
-                  return y
-                }),
-              )
-            },
-          },
-          {
-            get: bridgeQueryOptionsToDataApiGet(arg1),
-          },
-        )
-      })
-
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[key](args, req, gqlInfo)
 
@@ -317,8 +298,9 @@ Select a dedicated page.`,
       //   key: 'edges',
       //   value: `[${getMetaType(meta)}Edge!]!`,
       // })
+      const itemsKey = 'items'
       connection.fields.push({
-        key: 'items',
+        key: itemsKey,
         value: `[${getMetaType(meta)}!]!`,
       })
       connection.fields.push({
@@ -340,23 +322,33 @@ Select a dedicated page.`,
 
       root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         let rowsPromise = () => {
-          const r = root[key](arg1, req, {})
-          rowsPromise = () => r
-          return r
+          const p = new Promise<any[]>(setResult => {
+            dApi.getArray(
+              {
+                ...response,
+                success: (x: any) => {
+                  setResult(
+                    x.map((y: any) => {
+                      currentType.query.resultProcessors.forEach(z => z(y))
+                      return y
+                    }),
+                  )
+                },
+              },
+              {
+                get: bridgeQueryOptionsToDataApiGet(arg1),
+              },
+            )
+          })
+          rowsPromise = () => p
+
+          return p
         }
 
         setResult({
-          // TODO Noam, thx :)
-          //           [edgesKey]: async () => {
-          //             const rows = await rowsPromise()
-          //             return rows.map((row: any) => ({
-          //               //[ ] - It should initially be the row id, and we should waste some resources, later we can optimize it
-          //               //[ ] - we should have a mechanism that extracts the row id - also for compound column ids. to place it in the nodeId
-          //
-          //               [cursorKey]: 'x',
-          //               [nodeKey]: row,
-          //             }))
-          //           },
+          [itemsKey]: createResultPromise(async (response, setResult) => {
+            setResult(await rowsPromise())
+          }),
           [totalCountKey]: createResultPromise(async (response, setResult) => {
             // [ ] count should ignore limit, page etc....
             await dApi.count(
