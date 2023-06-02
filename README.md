@@ -9,7 +9,13 @@ npm run dev
 
 ## TODOs
 
-- [x] where not in (nin?) TODO JYC
+- [x] # where not in (nin?) TODO JYC
+- [ ] where not in (nin?)
+  - [ ] typedefs
+  - [ ] implementation
+- [ ] where in
+  - [x] typedefs
+  - [ ] resolver TODO Noam
 - [ ] Where OR
   - [x] typedefs
   - [x] resolver (TODO Noam)
@@ -70,15 +76,15 @@ d. return the object
 
 ## Noam Question
 
-- [ ] why create/update return an object with task member - why not return the task directly
+- [x] why create/update return an object with task member - why not return the task directly
   - [x] Because, we should add a `clientMutationId` that is both in input and output (just pass it
         through). Some GraphQL Client use this feature. (JYC todo)
-- [ ] Do we need to implement the \_\_type as specified at:
+- [x] Do we need to implement the \_\_type as specified at:
       https://relay.dev/graphql/connections.htm#sec-Reserved-Types
-  - [ ] We already have "Connection & PageInfo". I think it's already good.
+  - [x] Already handled by yoga (introspection)
 - [x] Should category connection return a task connection at it's tasks?
   - [x] Yes, good idea. (JYC todo)
-  - [ ] items (JYC todo)
+  - [x] items (JYC todo)
 
 ## Noam thinks todo required
 

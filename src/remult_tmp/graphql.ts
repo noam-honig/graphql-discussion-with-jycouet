@@ -163,50 +163,63 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
 
     if (key) {
-      const buildIt = (
+      const createResultPromise = (
         work: (
-          dataApi: DataApi,
-          result: DataApiResponse,
+          response: DataApiResponse,
           setResult: (result: any) => void,
           arg1: any,
           req: any,
-          gqlInfo: any,
         ) => Promise<void>,
       ) => {
-        return async (arg1: any, req: any, gqlInfo: any) => {
+        return async (arg1: any, req: any) => {
+          return new Promise(async (res, error) => {
+            let result: any
+            let err: any
+            const response = {
+              success: (x: any) => {
+                err = 'success not handled'
+              },
+              created: () => {
+                err = 'created not handled'
+              },
+              deleted: () => {
+                err = 'deleted not handled'
+              },
+              error: (x: any) => (err = x),
+              forbidden: () => (err = 'forbidden'),
+              notFound: () => (err = 'not found'),
+              progress: () => {},
+            }
+            await work(response, x => (result = x), arg1, req)
+            if (err) {
+              error(err)
+              return
+            }
+            res(result)
+          })
+        }
+      }
+
+      const buildIt = (
+        work: (
+          dataApi: DataApi,
+          response: DataApiResponse,
+          setResult: (result: any) => void,
+          arg1: any,
+          req: any,
+        ) => Promise<void>,
+      ) => {
+        return createResultPromise(async (response, setResult, arg1, req) => {
           if (req.req) {
             req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
             // req should be "ctx" for context. inside, you have by default "YogaInitialContext", now I added session for example.
           }
-          return new Promise((res, error) => {
-            server.run(req, async () => {
-              const dApi = await server.getDataApi(req, meta)
-              let result: any
-              let err: any
-              const response = {
-                success: (x: any) => {
-                  err = 'success not handled'
-                },
-                created: () => {
-                  err = 'created not handled'
-                },
-                deleted: () => {
-                  err = 'deleted not handled'
-                },
-                error: (x: any) => (err = x),
-                forbidden: () => (err = 'forbidden'),
-                notFound: () => (err = 'not found'),
-                progress: () => {},
-              }
-              await work(dApi, response, x => (result = x), arg1, req, gqlInfo)
-              if (err) {
-                error(err)
-                return
-              }
-              res(result)
-            })
+
+          await server.run(req, async () => {
+            const dApi = await server.getDataApi(req, meta)
+            await work(dApi, response, setResult, arg1, req)
           })
-        }
+        })
       }
 
       const queryArgsConnection: Arg[] = [
@@ -297,8 +310,9 @@ Select a dedicated page.`,
       })
 
       const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
+      const totalCountKey = 'totalCount'
       connection.fields.push({
-        key: 'totalCount',
+        key: totalCountKey,
         value: 'Int!',
       })
       // connection.fields.push({
@@ -319,15 +333,46 @@ Select a dedicated page.`,
       //   key: 'node',
       //   value: `${getMetaType(meta)}!`,
       // })
+      // const cursorKey = 'cursor'
       // edge.fields.push({
-      //   key: 'cursor',
+      //   key: cursorKey,
       //   value: `String!`,
       // })
 
-      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {})
+      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
+        let rowsPromise = () => {
+          const r = root[key](arg1, req, {})
+          rowsPromise = () => r
+          return r
+        }
+
+        setResult({
+          //           [edgesKey]: async () => {
+          //             const rows = await rowsPromise()
+          //             return rows.map((row: any) => ({
+          //               //[ ] - It should initially be the row id, and we should waste some resources, later we can optimize it
+          //               //[ ] - we should have a mechanism that extracts the row id - also for compound column ids. to place it in the nodeId
+          //
+          //               [cursorKey]: 'x',
+          //               [nodeKey]: row,
+          //             }))
+          //           },
+          [totalCountKey]: createResultPromise(async (response, setResult) => {
+            // [ ] count should ignore limit, page etc....
+            await dApi.count(
+              {
+                ...response,
+                success: x => setResult(x.count),
+              },
+              {
+                get: bridgeQueryOptionsToDataApiGet(arg1),
+              },
+            )
+          }),
+        })
+      })
 
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) => {
-        // checkPaginationArgs(args)
         return root[key](args, req, gqlInfo)
       }
 
@@ -571,8 +616,9 @@ Select a dedicated page.`,
   }
 
   // Add the node interface at the end
+  const nodeKey = 'node'
   root_query.fields.push({
-    key: 'node',
+    key: nodeKey,
     args: [argNodeId],
     value: `Node`,
     comment: `Grab any Remult entity given it's globally unique \`ID\``,
