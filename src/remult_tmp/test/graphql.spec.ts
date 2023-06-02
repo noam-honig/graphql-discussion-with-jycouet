@@ -45,8 +45,7 @@ describe('graphql-connection', () => {
     }
   })
 
-  // todo: Noam - fix this test
-  it.skip('test count', async () => {
+  it('test count', async () => {
     await withRemult(() =>
       remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
     )
@@ -68,8 +67,7 @@ describe('graphql-connection', () => {
     `)
   })
 
-  // todo: Noam - fix this test
-  it.skip('test count 2', async () => {
+  it('test count 2', async () => {
     await withRemult(() =>
       remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
     )
@@ -143,8 +141,7 @@ describe('graphql-connection', () => {
     expect(result).toMatchSnapshot()
   })
 
-  // TODO Noam when the resolver is back with items
-  it.skip('test graphql', async () => {
+  it('test graphql', async () => {
     await withRemult(async () => {
       await remult.repo(Task).insert([{ title: 'task c' }])
       await remult.repo(Task).insert([{ title: 'task b' }])
@@ -173,15 +170,5 @@ describe('graphql-connection', () => {
     })
 
     expect(typeDefs).toMatchSnapshot()
-  })
-
-  // TODO Noam when the resolver is back with items
-  it.skip('test get values', async () => {
-    await withRemult(async () => {
-      await remult.repo(Task).insert([{ title: 'task a' }])
-      expect(await remult.repo(Task).count()).toBe(1)
-    })
-    const { resolvers } = remultGraphql(api)
-    expect((await (resolvers.Query.tasks as any)(undefined, {}, {})).length).toBe(1)
   })
 })
