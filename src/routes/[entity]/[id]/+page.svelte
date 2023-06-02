@@ -2,14 +2,13 @@
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import Form from '$lib/Form.svelte'
-  import { getEntity } from '$shared/_entities'
-  import { Task } from '$shared/Task'
+  import { getRepo } from '$shared/_entities'
 
   let mode: 'update' | 'readonly' = 'readonly'
-  const entity = getEntity($page.params.entity)
+  const repo = getRepo($page.params.entity)
 </script>
 
-<h2>Update {entity.name}</h2>
+<h2>Update {$page.params.entity}</h2>
 
 <button
   on:click={() => {
@@ -18,10 +17,10 @@
 >
 
 <Form
-  {entity}
+  {repo}
   {mode}
   id={$page.params.id}
   on:update={() => {
-    goto(`/${entity.name}`)
+    goto(`/${$page.params.entity}`)
   }}
 />

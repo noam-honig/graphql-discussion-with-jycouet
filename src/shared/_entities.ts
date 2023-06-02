@@ -1,24 +1,23 @@
-import type { ClassType } from 'remult/classType'
+import { remult, type Repository } from 'remult'
 
 import { Category } from './Category'
 import { Tag } from './Tag'
 import { Task } from './Task'
 
-export const entities = [Task, Category, Tag]
-// TODO could be inferred from entities?
-export type EntityName = 'Task' | 'Category' | 'Tag'
+export const entitiesObj = { Task: Task, Category: Category, Tag: Tag } as const
 
-export const getEntitiesNames = () =>
-  entities.map(e => {
-    return {
-      name: e.name,
-    }
-  })
+export const entitiesName = Object.keys(entitiesObj)
+export const entities = Object.values(entitiesObj)
 
-export const getEntity = (entity: EntityName | string) => {
-  const found = entities.find(e => e.name === entity)
+export const getRepo = (entity?: string) => {
+  if (!entity) {
+    throw new Error(`Need an entity!`)
+  }
+
+  // @ts-ignore
+  const found = entitiesObj[entity]
   if (!found) {
     throw new Error(`Entity ${entity} not found`)
   }
-  return found as ClassType<any>
+  return remult.repo(found) as Repository<any>
 }

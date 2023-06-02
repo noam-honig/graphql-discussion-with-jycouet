@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { type FieldMetadata, remult } from 'remult'
-  import type { ClassType } from 'remult/classType'
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import type { FieldMetadata, Repository } from 'remult'
+  import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
 
-  export let entity: ClassType<any>
+  export let repo: Repository<any>
   export let mode: 'create' | 'update' | 'readonly' = 'readonly'
   export let id: string | number | null = null
 
@@ -12,15 +11,13 @@
   export let with_readonly: boolean | undefined = undefined
   export let with_hideInCreate: boolean | undefined = undefined
 
-  const currentRepo = remult.repo(entity)
-
   let data = writable<Record<string, any>>({})
   let errors = writable<Record<string, string>>({})
 
   $: reset(mode)
 
   const resetErrors = () => {
-    $errors = currentRepo.fields
+    $errors = repo.fields
       .toArray()
       .map(c => c.key)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {})
@@ -29,9 +26,9 @@
   const reset = async (_mode: 'create' | 'update' | 'readonly') => {
     resetErrors()
     if (!!id && (_mode === 'update' || _mode === 'readonly')) {
-      $data = { ...(await currentRepo.findId(id, { useCache: false })) }
+      $data = { ...(await repo.findId(id, { useCache: false })) }
     } else {
-      $data = { ...currentRepo.create() }
+      $data = { ...repo.create() }
     }
   }
 
@@ -48,9 +45,9 @@
   const submit = async (e: Event) => {
     try {
       if (mode === 'update') {
-        $data = await currentRepo.save($data)
+        $data = await repo.save($data)
       } else if (mode === 'create') {
-        $data = await currentRepo.insert($data)
+        $data = await repo.insert($data)
       }
     } catch (error) {
       // @ts-ignore
@@ -85,7 +82,7 @@
 </script>
 
 <form on:submit|preventDefault={submit}>
-  {#each currentRepo.fields.toArray().filter(c => {
+  {#each repo.fields.toArray().filter(c => {
     if (with_allowNull === undefined && with_readonly === undefined && with_hideInCreate === undefined) {
       if (mode === 'create') {
         with_readonly = false

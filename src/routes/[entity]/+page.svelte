@@ -2,15 +2,13 @@
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
   import { remultStore } from '$lib/stores/remultStore'
-  import { getEntity } from '$shared/_entities'
-  import { remult } from 'remult'
+  import { getRepo } from '$shared/_entities'
 
   import type { PageData } from './$types'
 
   export let data: PageData
 
-  const entity = getEntity(data.entity)
-  const repo = remult.repo(entity)
+  const repo = getRepo(data.entity)
 
   const list = remultStore(repo, data.list)
   $: browser && list.listen()
@@ -19,7 +17,7 @@
 <button
   style="float: right;"
   on:click={() => {
-    goto(`/${entity.name}/create`)
+    goto(`/${data.entity}/create`)
   }}>Add</button
 >
 <h2>List of {repo.metadata.caption} ({#await repo.count() then rez}{rez}{/await})</h2>
@@ -36,7 +34,7 @@
         <td>
           {#if cell.key === 'id'}
             <a href={`/${data.entity}/${row[cell.key]}`}>
-              {row[cell.key]}
+              {cell.displayValue(row)}
             </a>
           {:else}
             {cell.displayValue(row)}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getEntitiesNames } from '$shared/_entities'
+  import { entitiesName } from '$shared/_entities'
   import { signOut } from '@auth/sveltekit/client'
   import { remult } from 'remult'
 
@@ -9,8 +9,6 @@
 
   // set this globaly
   remult.user = data.user
-
-  const entitiesNames = getEntitiesNames().map(c => c.name)
 </script>
 
 <svelte:head>
@@ -23,7 +21,7 @@
 
 <nav>
   <a href="/">Home</a>
-  {#each entitiesNames as entityName}
+  {#each entitiesName as entityName}
     |
     <a href="/{entityName}">{entityName}</a>&nbsp;
   {/each}

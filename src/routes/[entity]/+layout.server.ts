@@ -1,14 +1,13 @@
-import { getEntity } from '$shared/_entities'
+import { getRepo } from '$shared/_entities'
 import { redirect } from '@sveltejs/kit'
-import { remult } from 'remult'
 
 import type { LayoutServerLoad } from '../$types'
 
 export const load = (async ({ params }) => {
   try {
     // to check if it exists
-    const entity = getEntity(params.entity ?? '')
-    const listPOJO = await remult.repo(entity).find()
+    const repo = getRepo(params.entity)
+    const listPOJO = await repo.find()
     const list = [...structuredClone(listPOJO)]
 
     return {
