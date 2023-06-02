@@ -29,6 +29,7 @@ npm run dev
   - [x] typedefs
   - [ ] resolver
 - [ ] scalars (TODO JYC)
+- [ ] throw new GraphQLError(`Forbidden`) (to speak about)
 
 a. need to check the field selection. (you can copy this:
 https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts)

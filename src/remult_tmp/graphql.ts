@@ -1,7 +1,3 @@
-import { GraphQLError } from 'graphql'
-import { type FieldNode, type GraphQLResolveInfo, Kind as KindGQL } from 'graphql'
-import type { InlineFragmentNode } from 'graphql'
-import type { FragmentDefinitionNode } from 'graphql'
 import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 import type { DataApi, DataApiResponse } from 'remult/src/data-api'
@@ -240,6 +236,7 @@ Select a dedicated page.`,
         },
         { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
         { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
+        // for cursor pagination (v2)
         //         {
         //           key: 'first',
         //           value: 'Int',
@@ -315,6 +312,7 @@ Select a dedicated page.`,
         key: totalCountKey,
         value: 'Int!',
       })
+      // for cursor pagination (v2)
       // connection.fields.push({
       //   key: 'edges',
       //   value: `[${getMetaType(meta)}Edge!]!`,
@@ -328,6 +326,7 @@ Select a dedicated page.`,
         value: `PageInfo!`,
       })
 
+      // for cursor pagination (v2)
       // const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
       // edge.fields.push({
       //   key: 'node',
@@ -347,6 +346,7 @@ Select a dedicated page.`,
         }
 
         setResult({
+          // TODO Noam, thx :)
           //           [edgesKey]: async () => {
           //             const rows = await rowsPromise()
           //             return rows.map((row: any) => ({
@@ -679,6 +679,7 @@ Select a dedicated page.`,
   }
 }
 
+// For cursor pagination (v2)
 // function checkPaginationArgs(args: any) {
 //   let paginationPage = !!args.limit ? 1 : 0
 //   paginationPage += !!args.page ? 1 : 0
@@ -825,40 +826,4 @@ function bridgeQueryOptionsToDataApiGet(arg1: any) {
       }
     }
   }
-}
-
-// From https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts
-function extractSelectionSet(
-  node: FieldNode | InlineFragmentNode | FragmentDefinitionNode,
-  info: GraphQLResolveInfo,
-) {
-  const a: any[] = []
-
-  node.selectionSet?.selections.map(c => {
-    if (c.kind === KindGQL.FIELD) {
-      a.push(c.name.value)
-    } else if (c.kind === KindGQL.INLINE_FRAGMENT) {
-      extractSelectionSet(c, info).forEach(d => {
-        a.push(d)
-      })
-    } else if (c.kind === KindGQL.FRAGMENT_SPREAD) {
-      extractSelectionSet(info.fragments[c.name.value], info).forEach(d => {
-        a.push(d)
-      })
-    } else {
-      console.error(`extractSelectionSet, unknown kind: "${JSON.stringify(c)}"`)
-      throw new Error('Unknown kind')
-    }
-  })
-
-  // make it unique!
-  return [...new Set(a)]
-}
-
-export const rootFields = (info: GraphQLResolveInfo) => {
-  const fields = info.fieldNodes.flatMap(c => {
-    return extractSelectionSet(c, info)
-  })
-
-  return fields
 }
