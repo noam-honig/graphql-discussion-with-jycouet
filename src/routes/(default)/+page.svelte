@@ -13,6 +13,6 @@
 
 <h2>The Other side</h2>
 
-<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/dashboard"
+<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/app/dashboard"
   >Dashboard</a
 >

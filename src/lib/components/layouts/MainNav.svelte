@@ -1,14 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { cn } from '$lib/utils'
+  import { entitiesName } from '$shared/_entities'
 
   let className: string | undefined | null = undefined
 
   const links = [
-    { href: '/dashboard', label: 'Overview' },
-    { href: '/customers', label: 'Customers' },
-    { href: '/tasks', label: 'Tasks' },
-  ]
+    { href: '/app/dashboard', label: 'Overview' },
+    { href: '/app/customers', label: 'Customers' },
+  ].concat(entitiesName.map(entity => ({ href: `/app/${entity}`, label: entity })))
 
   export { className as class }
 </script>

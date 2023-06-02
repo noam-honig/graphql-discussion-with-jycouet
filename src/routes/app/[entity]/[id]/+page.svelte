@@ -5,16 +5,11 @@
   import Button from '$components/ui/button/Button.svelte'
   import { CardContent, CardDescription, CardHeader, CardTitle } from '$components/ui/card'
   import Card from '$components/ui/card/Card.svelte'
-  import { Task } from '$shared/Task'
+  import { getRepo } from '$shared/_entities'
   import { ArrowUpCircle } from 'lucide-svelte'
-  import { remult } from 'remult'
 
-  import type { PageData } from './$types'
-
-  export let data: PageData
-
-  $: repo = remult.repo(Task)
-  $: exclude = [repo.fields.category!]
+  $: repo = getRepo($page.params.entity)
+  // $: exclude = [repo.fields.category!]
 </script>
 
 <div class="flex items-center justify-between space-y-2">
@@ -37,11 +32,10 @@
   <CardContent class="grid gap-4">
     <Form
       {repo}
-      {exclude}
       mode="update"
       id={$page.params.id}
       on:update={() => {
-        goto('/tasks')
+        goto(`/app/${$page.params.entity}`)
       }}
     />
   </CardContent>

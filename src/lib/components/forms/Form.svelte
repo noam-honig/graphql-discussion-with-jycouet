@@ -3,7 +3,6 @@
   import { Checkbox } from '$components/ui/checkbox'
   import Input from '$components/ui/input/Input.svelte'
   import Label from '$components/ui/label/Label.svelte'
-  import { filter } from 'graphql-yoga'
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
@@ -117,7 +116,7 @@
         <Label class="text-red-400">{$errors[field.key]}</Label>
       </div>
       {#if mode === 'readonly'}
-        <Label>{field.displayValue($data)}</Label>
+        <Label>{field.displayValue($data[field.key])}</Label>
       {:else if inputType === 'checkbox'}
         <Checkbox {...common(field)} bind:checked={$data[field.key]} />
       {:else if inputType === 'select'}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment'
+  import { page } from '$app/stores'
   import Button from '$components/ui/button/Button.svelte'
   import Card from '$components/ui/card/Card.svelte'
   import CardContent from '$components/ui/card/CardContent.svelte'
@@ -7,26 +8,26 @@
   import CardHeader from '$components/ui/card/CardHeader.svelte'
   import CardTitle from '$components/ui/card/CardTitle.svelte'
   import { remultStore } from '$lib/stores/remultStore'
-  import { Task } from '$shared/Task'
+  import { getRepo } from '$shared/_entities'
   import { Pencil, PlusCircle } from 'lucide-svelte'
-  import { type FieldMetadata, remult } from 'remult'
 
   import type { PageData } from './$types'
 
   export let data: PageData
 
-  $: repo = remult.repo(Task)
-  $: exclude = [repo.fields.id, repo.fields.category!]
+  $: repo = getRepo($page.params.entity)
+  // $: exclude = [repo.fields.id, repo.fields.category]
+  $: exclude = [repo.fields.id]
 
   $: list = remultStore(repo, data.list)
   $: browser && list.listen()
 </script>
 
 <div class="flex items-center justify-between space-y-2">
-  <h2 class="text-3xl font-bold tracking-tight">Tasks</h2>
+  <h2 class="text-3xl font-bold tracking-tight">{repo.metadata.caption}</h2>
   <div class="flex items-center space-x-2">
     <!-- JYC Question to Ermin titles move a bit if I don't have the button! -->
-    <Button href={`/tasks/create`} size="sm">
+    <Button href={`/app/${$page.params.entity}/create`} size="sm">
       <PlusCircle class="mr-2 h-4 w-4" />
       Add
     </Button>
@@ -35,7 +36,7 @@
 
 <Card>
   <CardHeader class="space-y-1">
-    <CardTitle class="text-2xl">List tasks ({#await repo.count() then rez}{rez}{/await})</CardTitle>
+    <CardTitle class="text-2xl">List ({#await repo.count() then rez}{rez}{/await})</CardTitle>
     <CardDescription>Look at your list... You should probably start working on it!</CardDescription>
   </CardHeader>
 
@@ -59,7 +60,7 @@
           <td class="text-center">
             <Button
               data-sveltekit-preload-data="off"
-              href={`/tasks/${row['id']}`}
+              href={`/app/${$page.params.entity}/${row['id']}`}
               size="sm"
               variant="ghost"
             >
