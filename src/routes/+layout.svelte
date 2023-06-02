@@ -3,6 +3,7 @@
   import { signOut } from '@auth/sveltekit/client'
   import { remult } from 'remult'
 
+  import '../app.postcss'
   import type { LayoutData } from './$types'
 
   export let data: LayoutData
@@ -12,10 +13,10 @@
 </script>
 
 <svelte:head>
-  <title>Remult & SvelteKit</title>
+  <title>Remult &amp; SvelteKit</title>
 </svelte:head>
 
-<h1>Welcome to Remult & SvelteKit</h1>
+<h1>Welcome to Remult &amp; SvelteKit</h1>
 
 <hr />
 
@@ -23,7 +24,7 @@
   <a href="/">Home</a>
   {#each entitiesName as entityName}
     |
-    <a href="/{entityName}">{entityName}</a>&nbsp;
+    <a href="/{entityName}">{entityName}</a>&#xa0;
   {/each}
 
   <div style="float: right;">
