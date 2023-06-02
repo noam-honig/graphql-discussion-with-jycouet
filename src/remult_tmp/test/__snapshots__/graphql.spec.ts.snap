@@ -3,11 +3,9 @@
 exports[`graphql-connection > test basics 1`] = `
 "type Query {
     task(id: ID!): Task
-    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-    tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere, first: Int, after: String, last: Int, before: String): TaskConnection
+    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
     category(id: ID!): Category
-    categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
-    categoriesConnection(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere, first: Int, after: String, last: Int, before: String): CategoryConnection
+    categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): CategoryConnection
     node(nodeId: ID!): Node
 }
 
@@ -48,13 +46,8 @@ input tasksWhere {
 
 type TaskConnection {
     totalCount: Int!
-    edges: [TaskEdge!]!
+    items: [Task!]!
     pageInfo: PageInfo!
-}
-
-type TaskEdge {
-    node: Task!
-    cursor: String!
 }
 
 input CreateTaskInput {
@@ -88,7 +81,6 @@ type Category implements Node {
     id: String!
     name: String!
     tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-    tasksConnection(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere, first: Int, after: String, last: Int, before: String): TaskConnection
     nodeId: ID!
 }
 
@@ -106,13 +98,8 @@ input categoriesWhere {
 
 type CategoryConnection {
     totalCount: Int!
-    edges: [CategoryEdge!]!
+    items: [Category!]!
     pageInfo: PageInfo!
-}
-
-type CategoryEdge {
-    node: Category!
-    cursor: String!
 }
 
 input CreateCategoryInput {
@@ -278,7 +265,7 @@ exports[`graphql-connection > test graphql 1`] = `
         "id": 1,
         "title": "task c",
       },
-    ],
+  ],
   },
 }
 `;
@@ -302,7 +289,7 @@ exports[`graphql-connection > test mutation create 2`] = `
     "category": null,
     "completed": false,
     "id": 1,
-    "thePriority": 0,
+    "thePriority": 1,
     "title": "testing",
   },
 ]
@@ -324,14 +311,14 @@ exports[`graphql-connection > test mutation delete 2`] = `
     "category": null,
     "completed": false,
     "id": 1,
-    "thePriority": 0,
+    "thePriority": 1,
     "title": "task a",
   },
   Task {
     "category": null,
     "completed": false,
     "id": 3,
-    "thePriority": 0,
+    "thePriority": 1,
     "title": "task c",
   },
 ]

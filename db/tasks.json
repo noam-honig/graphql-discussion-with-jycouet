@@ -2,15 +2,6 @@
   {
     "id": 1,
     "title": "Getting organized",
-    "dueDate": "2023-06-01",
-    "thePriority": "High",
-    "completed": false,
-    "category": null
-  },
-  {
-    "id": 2,
-    "title": "second2",
-    "dueDate": "2023-06-01",
     "thePriority": "High",
     "completed": false,
     "category": null

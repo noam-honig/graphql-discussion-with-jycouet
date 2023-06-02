@@ -9,11 +9,7 @@ type Query {
   """
   List all `Task` entity (with pagination, sorting and filtering)
   """
-  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-  """
-  List all `Task` entity (with pagination, sorting and filtering)
-  """
-  tasksConnection(
+  tasks(
     """
     
 For **page by page** pagination.
@@ -38,34 +34,6 @@ Select a dedicated page.
     Remult filtering options
     """
     where: tasksWhere
-  , 
-    """
-    
-For **forward cursor** pagination
-Takes the `first`: `n` elements from the list.
-    """
-    first: Int
-  , 
-    """
-    
-For **forward cursor** pagination
-`after` this `cursor`.
-    """
-    after: String
-  , 
-    """
-    
-For **backward cursor** pagination
-Takes the `last`: `n` elements from the list.
-    """
-    last: Int
-  , 
-    """
-    
-For **backward cursor** pagination
-`before` this `cursor`.
-    """
-    before: String
   ): TaskConnection
   """
   Get `Category` entity
@@ -74,11 +42,7 @@ For **backward cursor** pagination
   """
   List all `Category` entity (with pagination, sorting and filtering)
   """
-  categories(limit: Int, page: Int, orderBy: categoriesOrderBy, where: categoriesWhere): [Category!]!
-  """
-  List all `Category` entity (with pagination, sorting and filtering)
-  """
-  categoriesConnection(
+  categories(
     """
     
 For **page by page** pagination.
@@ -103,34 +67,6 @@ Select a dedicated page.
     Remult filtering options
     """
     where: categoriesWhere
-  , 
-    """
-    
-For **forward cursor** pagination
-Takes the `first`: `n` elements from the list.
-    """
-    first: Int
-  , 
-    """
-    
-For **forward cursor** pagination
-`after` this `cursor`.
-    """
-    after: String
-  , 
-    """
-    
-For **backward cursor** pagination
-Takes the `last`: `n` elements from the list.
-    """
-    last: Int
-  , 
-    """
-    
-For **backward cursor** pagination
-`before` this `cursor`.
-    """
-    before: String
   ): CategoryConnection
   """
   Get `Tag` entity
@@ -139,11 +75,7 @@ For **backward cursor** pagination
   """
   List all `Tag` entity (with pagination, sorting and filtering)
   """
-  tags(limit: Int, page: Int, orderBy: tagsOrderBy, where: tagsWhere): [Tag!]!
-  """
-  List all `Tag` entity (with pagination, sorting and filtering)
-  """
-  tagsConnection(
+  tags(
     """
     
 For **page by page** pagination.
@@ -168,34 +100,6 @@ Select a dedicated page.
     Remult filtering options
     """
     where: tagsWhere
-  , 
-    """
-    
-For **forward cursor** pagination
-Takes the `first`: `n` elements from the list.
-    """
-    first: Int
-  , 
-    """
-    
-For **forward cursor** pagination
-`after` this `cursor`.
-    """
-    after: String
-  , 
-    """
-    
-For **backward cursor** pagination
-Takes the `last`: `n` elements from the list.
-    """
-    last: Int
-  , 
-    """
-    
-For **backward cursor** pagination
-`before` this `cursor`.
-    """
-    before: String
   ): TagConnection
   """
   Grab any Remult entity given it's globally unique `ID`
@@ -263,17 +167,13 @@ type Task implements Node {
   """
   title: String!
   """
-  The Due Date
+  Is it completed?
   """
-  dueDate: String!
+  completed: Boolean!
   """
   The Priority
   """
   thePriority: String!
-  """
-  Is it completed?
-  """
-  completed: Boolean!
   """
   Category
   """
@@ -290,9 +190,8 @@ OrderBy options for `tasks`
 input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
-  dueDate: OrderByDirection
-  thePriority: OrderByDirection
   completed: OrderByDirection
+  thePriority: OrderByDirection
   category: OrderByDirection
 }
 
@@ -302,9 +201,8 @@ Where options for `tasks`
 input tasksWhere {
   id: WhereInt
   title: WhereString
-  dueDate: WhereString
-  thePriority: WhereString
   completed: WhereBoolean
+  thePriority: WhereString
   OR: [tasksWhere!]
   AND: [tasksWhere!]
 }
@@ -314,16 +212,8 @@ The type for `TaskConnection`
 """
 type TaskConnection {
     totalCount: Int!
-    edges: [TaskEdge!]!
+    items: [Task!]!
     pageInfo: PageInfo!
-}
-
-"""
-The type for `TaskEdge`
-"""
-type TaskEdge {
-    node: Task!
-    cursor: String!
 }
 
 """
@@ -331,9 +221,8 @@ The input for `CreateTaskInput`
 """
 input CreateTaskInput {
     title: String
-    dueDate: String
-    thePriority: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -349,9 +238,8 @@ The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
     title: String
-    dueDate: String
-    thePriority: String
     completed: Boolean
+    thePriority: String
 }
 
 """
@@ -385,8 +273,7 @@ type Category implements Node {
   """
   List all `Task` of `categories`
   """
-  tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
-    tasksConnection(
+  tasks(
     """
     
 For **page by page** pagination.
@@ -411,35 +298,7 @@ Select a dedicated page.
     Remult filtering options
     """
     where: tasksWhere
-  , 
-    """
-    
-For **forward cursor** pagination
-Takes the `first`: `n` elements from the list.
-    """
-    first: Int
-  , 
-    """
-    
-For **forward cursor** pagination
-`after` this `cursor`.
-    """
-    after: String
-  , 
-    """
-    
-For **backward cursor** pagination
-Takes the `last`: `n` elements from the list.
-    """
-    last: Int
-  , 
-    """
-    
-For **backward cursor** pagination
-`before` this `cursor`.
-    """
-    before: String
-  ): TaskConnection
+  ): [Task!]!
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -469,16 +328,8 @@ The type for `CategoryConnection`
 """
 type CategoryConnection {
     totalCount: Int!
-    edges: [CategoryEdge!]!
+    items: [Category!]!
     pageInfo: PageInfo!
-}
-
-"""
-The type for `CategoryEdge`
-"""
-type CategoryEdge {
-    node: Category!
-    cursor: String!
 }
 
 """
@@ -562,16 +413,8 @@ The type for `TagConnection`
 """
 type TagConnection {
     totalCount: Int!
-    edges: [TagEdge!]!
+    items: [Tag!]!
     pageInfo: PageInfo!
-}
-
-"""
-The type for `TagEdge`
-"""
-type TagEdge {
-    node: Tag!
-    cursor: String!
 }
 
 """

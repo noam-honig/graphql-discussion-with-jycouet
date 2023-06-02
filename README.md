@@ -41,10 +41,16 @@ d. return the object
   - [x] To test with Auth (TODO JYC)
 - [ ] How to use defaultGetLimit in the graphql schema (at least in description)
 - [ ] api in context to not re create it at each resolver?
+- [ ] @Field Virtual (resolving a primitive or an Entity or an Entity Virtual) (server expression)
+- [x] Connection items
+- [ ] Scalars?! (JYC todo)
+
+### v2
+
+- [ ] Connection (args & sttructure)
 - [ ] dataloader (optimisation)
-- [ ] @Field Virtual (resolving a primitive or an Entity or an Entity Virtual)
 - [ ] @Entity Virtual
-- [ ] Souscription
+- [ ] Subscriptions
 
 ## Open questions
 
@@ -72,6 +78,7 @@ d. return the object
   - [ ] We already have "Connection & PageInfo". I think it's already good.
 - [x] Should category connection return a task connection at it's tasks?
   - [x] Yes, good idea. (JYC todo)
+  - [ ] items (JYC todo)
 
 ## Noam thinks todo required
 

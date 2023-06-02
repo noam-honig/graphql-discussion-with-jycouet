@@ -22,15 +22,18 @@ class Task {
   })
   title = ''
 
-  @Fields.dateOnly({
-    caption: 'The Due Date',
-    allowNull: false,
-    inputType: 'date', // Should come automatically?!
-    valueConverter: {
-      toInput: value => value?.toISOString().split('T')[0],
-    },
-  })
-  dueDate?: Date
+  @Fields.boolean({ caption: 'Is it completed?', hideInCreate: true })
+  completed = false
+
+  // @Fields.dateOnly({
+  //   caption: 'The Due Date',
+  //   allowNull: false,
+  //   // inputType: 'date', // Should come automatically?!
+  //   // valueConverter: {
+  //   //   toInput: value => value?.toISOString().split('T')[0],
+  //   // },
+  // })
+  // dueDate?: Date
 
   @Fields.object({
     dbName: 'the_priority',
@@ -39,9 +42,6 @@ class Task {
     defaultInsert: 'High',
   })
   thePriority = Priority.High
-
-  @Fields.boolean({ caption: 'Is it completed?', hideInCreate: true })
-  completed = false
 
   @Field(() => Category, { allowNull: true })
   category?: Category

@@ -209,12 +209,6 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }
       }
 
-      const queryArgsList: Arg[] = [
-        { key: 'limit', value: 'Int' },
-        { key: 'page', value: 'Int' },
-        { key: 'orderBy', value: `${key}OrderBy` },
-        { key: 'where', value: `${key}Where` },
-      ]
       const queryArgsConnection: Arg[] = [
         {
           key: 'limit',
@@ -233,34 +227,34 @@ Select a dedicated page.`,
         },
         { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
         { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
-        {
-          key: 'first',
-          value: 'Int',
-          comment: `
-For **forward cursor** pagination
-Takes the \`first\`: \`n\` elements from the list.`,
-        },
-        {
-          key: 'after',
-          value: 'String',
-          comment: `
-For **forward cursor** pagination
-\`after\` this \`cursor\`.`,
-        },
-        {
-          key: 'last',
-          value: 'Int',
-          comment: `
-For **backward cursor** pagination
-Takes the \`last\`: \`n\` elements from the list.`,
-        },
-        {
-          key: 'before',
-          value: 'String',
-          comment: `
-For **backward cursor** pagination
-\`before\` this \`cursor\`.`,
-        },
+        //         {
+        //           key: 'first',
+        //           value: 'Int',
+        //           comment: `
+        // For **forward cursor** pagination
+        // Takes the \`first\`: \`n\` elements from the list.`,
+        //         },
+        //         {
+        //           key: 'after',
+        //           value: 'String',
+        //           comment: `
+        // For **forward cursor** pagination
+        // \`after\` this \`cursor\`.`,
+        //         },
+        //         {
+        //           key: 'last',
+        //           value: 'Int',
+        //           comment: `
+        // For **backward cursor** pagination
+        // Takes the \`last\`: \`n\` elements from the list.`,
+        //         },
+        //         {
+        //           key: 'before',
+        //           value: 'String',
+        //           comment: `
+        // For **backward cursor** pagination
+        // \`before\` this \`cursor\`.`,
+        //         },
       ]
 
       root_query.fields.push({
@@ -268,15 +262,6 @@ For **backward cursor** pagination
         args: [argId],
         value: `${getMetaType(meta)}`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
-      })
-      // list
-      root_query.fields.push({
-        key,
-        args: queryArgsList,
-        value: `[${getMetaType(meta)}!]!`,
-        comment: `List all \`${getMetaType(
-          meta,
-        )}\` entity (with pagination, sorting and filtering)`,
       })
 
       root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
@@ -301,10 +286,9 @@ For **backward cursor** pagination
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[key](args, req, gqlInfo)
 
-      // Connection
-      const connectionKey = `${key}Connection`
+      // Connection (v1 items, v2 edges)
       root_query.fields.push({
-        key: connectionKey,
+        key,
         args: queryArgsConnection,
         value: `${getMetaType(meta)}Connection`,
         comment: `List all \`${getMetaType(
@@ -317,66 +301,34 @@ For **backward cursor** pagination
         key: 'totalCount',
         value: 'Int!',
       })
+      // connection.fields.push({
+      //   key: 'edges',
+      //   value: `[${getMetaType(meta)}Edge!]!`,
+      // })
       connection.fields.push({
-        key: 'edges',
-        value: `[${getMetaType(meta)}Edge!]!`,
+        key: 'items',
+        value: `[${getMetaType(meta)}!]!`,
       })
       connection.fields.push({
         key: 'pageInfo',
         value: `PageInfo!`,
       })
 
-      const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
-      edge.fields.push({
-        key: 'node',
-        value: `${getMetaType(meta)}!`,
-      })
-      edge.fields.push({
-        key: 'cursor',
-        value: `String!`,
-      })
+      // const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
+      // edge.fields.push({
+      //   key: 'node',
+      //   value: `${getMetaType(meta)}!`,
+      // })
+      // edge.fields.push({
+      //   key: 'cursor',
+      //   value: `String!`,
+      // })
 
-      root[connectionKey] = buildIt(
-        async (dApi, response, setResult, arg1: any, req: any, gqlInfo: any) => {
-          const what_is_asked = rootFields(gqlInfo)
+      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {})
 
-          if (what_is_asked.includes('totalCount')) {
-            // ...
-          }
-          if (what_is_asked.includes('edges')) {
-            // ...
-          }
-          if (what_is_asked.includes('pageInfo')) {
-            // ...
-          }
-
-          await dApi.getArray(
-            {
-              ...response,
-              success: (x: any) => {
-                const connectionObj = {
-                  edges: x.map((node: any) => {
-                    return {
-                      node,
-                      cursor: 'TODO Noam',
-                    }
-                  }),
-                  totalCount: 77,
-                }
-
-                setResult(connectionObj)
-              },
-            },
-            {
-              get: bridgeQueryOptionsToDataApiGet(arg1),
-            },
-          )
-        },
-      )
-
-      resolversQuery[connectionKey] = (origItem: any, args: any, req: any, gqlInfo: any) => {
-        checkPaginationArgs(args)
-        return root[connectionKey](args, req, gqlInfo)
+      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) => {
+        // checkPaginationArgs(args)
+        return root[key](args, req, gqlInfo)
       }
 
       // Mutation
@@ -542,18 +494,10 @@ For **backward cursor** pagination
           const refT = upsertTypes(getMetaType(ref), 'type_impl_node')
           refT.fields.push({
             key,
-            args: queryArgsList,
+            args: queryArgsConnection,
             value: `[${getMetaType(meta)}!]!`,
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
-          })
-
-          const connectionKey = `${key}Connection`
-          refT.fields.push({
-            key: connectionKey,
-            args: queryArgsConnection,
-            value: `${getMetaType(meta)}Connection`,
-            order: 11,
           })
 
           refT.query.resultProcessors.push(r => {
@@ -689,21 +633,21 @@ For **backward cursor** pagination
   }
 }
 
-function checkPaginationArgs(args: any) {
-  let paginationPage = !!args.limit ? 1 : 0
-  paginationPage += !!args.page ? 1 : 0
+// function checkPaginationArgs(args: any) {
+//   let paginationPage = !!args.limit ? 1 : 0
+//   paginationPage += !!args.page ? 1 : 0
 
-  let paginationCursor = !!args.first ? 1 : 0
-  paginationCursor += !!args.after ? 1 : 0
-  paginationCursor += !!args.last ? 1 : 0
-  paginationCursor += !!args.before ? 1 : 0
+//   let paginationCursor = !!args.first ? 1 : 0
+//   paginationCursor += !!args.after ? 1 : 0
+//   paginationCursor += !!args.last ? 1 : 0
+//   paginationCursor += !!args.before ? 1 : 0
 
-  if (paginationPage > 0 && paginationCursor > 0) {
-    throw new GraphQLError(
-      `You can't use \`limit,page\` and \`first,after,last,before\` at the same time. Choose your pagination style.`,
-    )
-  }
-}
+//   if (paginationPage > 0 && paginationCursor > 0) {
+//     throw new GraphQLError(
+//       `You can't use \`limit,page\` and \`first,after,last,before\` at the same time. Choose your pagination style.`,
+//     )
+//   }
+// }
 
 function blockFormat(obj: { prefix: string; data: string[]; comment: string }) {
   if (obj.data.length === 0) {
