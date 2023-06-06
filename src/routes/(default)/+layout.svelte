@@ -1,4 +1,5 @@
 <script lang="ts">
+  import NavBar from '$lib/layout/NavBar.svelte'
   import { entitiesName } from '$shared/_entities'
   import { signOut } from '@auth/sveltekit/client'
   import { remult } from 'remult'
@@ -10,11 +11,7 @@
   remult.user = data.user
 </script>
 
-<svelte:head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css" />
-</svelte:head>
-
-<h1>Welcome to Remult &amp; SvelteKit</h1>
+<!-- <h1>Welcome to Remult &amp; SvelteKit</h1>
 
 <hr />
 
@@ -33,6 +30,10 @@
   </div>
 </nav>
 
-<hr />
+<hr /> -->
 
-<slot />
+<NavBar />
+
+<div class="p-4">
+  <slot />
+</div>

@@ -10,11 +10,3 @@
     <a href="https://houdinigraphql.com/" target="_blank">Houdini</a>
   </li>
 </ul>
-
-<h2>The Other side</h2>
-
-<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/shadcn/dashboard"
-  >Shadcn</a
->
-<br />
-<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/radix">Radix</a>
