@@ -10,7 +10,7 @@ npm run dev
 ## TO DOs
 - [x] remove page info from schema for v1
 - [ ] respect include in api
-- [ ] Test fetch tasks of categories
+- [x] Test fetch tasks of categories
 - [ ] on create and update operation
   - [x] ,id of related entities
   - [x] reflect in the schema the apiUpdateAllowed and includeInApi
