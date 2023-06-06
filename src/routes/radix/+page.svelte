@@ -1,3 +1,7 @@
+<script>
+  import { entitiesName } from '$shared/_entities'
+</script>
+
 <h2>This demo showcase</h2>
 <ul>
   <li>
@@ -11,10 +15,12 @@
   </li>
 </ul>
 
-<h2>The Other side</h2>
+<h2>Radix</h2>
 
-<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/shadcn/dashboard"
-  >Shadcn</a
->
-<br />
-<a data-sveltekit-preload-data="off" data-sveltekit-preload-code="off" href="/radix">Radix</a>
+<ul>
+  {#each entitiesName as entityName}
+    <li>
+      <a href="/radix/{entityName}">{entityName}</a>
+    </li>
+  {/each}
+</ul>

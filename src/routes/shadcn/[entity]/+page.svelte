@@ -8,7 +8,7 @@
   import CardDescription from '$components/ui/card/CardDescription.svelte'
   import CardHeader from '$components/ui/card/CardHeader.svelte'
   import CardTitle from '$components/ui/card/CardTitle.svelte'
-  import { remultLive } from '$lib/stores/remultLive'
+  import { remultLive } from '$lib/remult-svelte/remultLive'
   import { getRepo } from '$shared/_entities'
   import { Pencil, PlusCircle } from 'lucide-svelte'
   import type { FieldMetadata } from 'remult'

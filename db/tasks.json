@@ -22,7 +22,7 @@
   },
   {
     "id": 10,
-    "title": "",
+    "title": "coucou",
     "completed": false,
     "dueDate": "2023-06-10",
     "thePriority": "HIGH",
@@ -41,6 +41,22 @@
     "title": "new one",
     "completed": false,
     "dueDate": "2023-06-10",
+    "thePriority": "HIGH",
+    "category": null
+  },
+  {
+    "id": 13,
+    "title": "titi",
+    "completed": false,
+    "dueDate": "2023-06-13",
+    "thePriority": "HIGH",
+    "category": null
+  },
+  {
+    "id": 14,
+    "title": "tutu222",
+    "completed": false,
+    "dueDate": "2023-06-13",
     "thePriority": "HIGH",
     "category": null
   }
