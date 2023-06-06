@@ -8,7 +8,7 @@ npm run dev
 ```
 
 ## TO DOs
-- [ ] remove page info from schema for v1
+- [x] remove page info from schema for v1
 - [ ] on create and update operation
   - [ ] ,id of related entities
   - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
@@ -29,8 +29,11 @@ npm run dev
   - [ ] Where AND
     - [x] typedefs
     - [ ] resolver (TODO Noam)
-- [ ] single entity query
-  - [ ] typedefs (JYC TODO) => rmv hardcoded id
+- [x] single entity query
+  - [x] typedefs (JYC TODO) => rmv hardcoded id
+  - [x] resolver
+- [ ] node
+  - [x] typedef JYC
   - [ ] resolver
 - [ ] Test Request hack in graphql security - and test on all servers that security works
 ## JYC

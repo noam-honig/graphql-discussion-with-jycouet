@@ -237,6 +237,17 @@ interface Node {
 "
 `;
 
+exports[`graphql-connection > test get single task by id 1`] = `
+{
+  "data": {
+    "task": {
+      "id": 2,
+      "title": "bbb",
+    },
+  },
+}
+`;
+
 exports[`graphql-connection > test graphql 1`] = `
 {
   "data": {

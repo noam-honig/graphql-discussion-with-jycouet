@@ -201,7 +201,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         }
       }
 
-      const buildIt = (
+      const handleRequestWithDataApiContext = (
         work: (
           dataApi: DataApi,
           response: DataApiResponse,
@@ -274,16 +274,30 @@ Select a dedicated page.`,
           },
         )
       }
-
+      const getSingleEntityKey = toPascalCase(getMetaType(meta))
       root_query.fields.push({
-        key: toPascalCase(getMetaType(meta)),
+        key: getSingleEntityKey,
         args: [argId],
         value: `${getMetaType(meta)}`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
       })
 
-      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-        root[key](args, req, gqlInfo)
+      root[getSingleEntityKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.get(
+            {
+              ...response,
+              success: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult(y)
+              },
+            },
+            arg1.id,
+          )
+        },
+      )
+      resolversQuery[getSingleEntityKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[getSingleEntityKey](args, req, gqlInfo)
 
       // Connection (v1 items, v2 edges)
       root_query.fields.push({
@@ -333,49 +347,51 @@ Select a dedicated page.`,
         })
       }
 
-      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        let rowsPromise = () => {
-          const p = new Promise<any[]>(setResult => {
-            dApi.getArray(
-              {
-                ...response,
-                success: (x: any) => {
-                  setResult(
-                    x.map((y: any) => {
-                      currentType.query.resultProcessors.forEach(z => z(y))
-                      return y
-                    }),
-                  )
+      root[key] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          let rowsPromise = () => {
+            const p = new Promise<any[]>(setResult => {
+              dApi.getArray(
+                {
+                  ...response,
+                  success: (x: any) => {
+                    setResult(
+                      x.map((y: any) => {
+                        currentType.query.resultProcessors.forEach(z => z(y))
+                        return y
+                      }),
+                    )
+                  },
                 },
-              },
-              {
-                get: bridgeQueryOptionsToDataApiGet(arg1),
-              },
-            )
+                {
+                  get: bridgeQueryOptionsToDataApiGet(arg1),
+                },
+              )
+            })
+            rowsPromise = () => p
+
+            return p
+          }
+
+          setResult({
+            [itemsKey]: createResultPromise(async (response, setResult) => {
+              setResult(await rowsPromise())
+            }),
+            [totalCountKey]: createResultPromise(async (response, setResult) => {
+              // [ ] count should ignore limit, page etc....
+              await dApi.count(
+                {
+                  ...response,
+                  success: x => setResult(x.count),
+                },
+                {
+                  get: bridgeQueryOptionsToDataApiGet(arg1),
+                },
+              )
+            }),
           })
-          rowsPromise = () => p
-
-          return p
-        }
-
-        setResult({
-          [itemsKey]: createResultPromise(async (response, setResult) => {
-            setResult(await rowsPromise())
-          }),
-          [totalCountKey]: createResultPromise(async (response, setResult) => {
-            // [ ] count should ignore limit, page etc....
-            await dApi.count(
-              {
-                ...response,
-                success: x => setResult(x.count),
-              },
-              {
-                get: bridgeQueryOptionsToDataApiGet(arg1),
-              },
-            )
-          }),
-        })
-      })
+        },
+      )
 
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) => {
         return root[key](args, req, gqlInfo)
@@ -406,20 +422,22 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.post(
-          {
-            ...response,
-            created: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
+      root[createResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.post(
+            {
+              ...response,
+              created: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult({
+                  [toPascalCase(getMetaType(meta))]: y,
+                })
+              },
             },
-          },
-          arg1.input,
-        )
-      })
+            arg1.input,
+          )
+        },
+      )
       resolversMutation[createResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[createResolverKey](args, req, gqlInfo)
 
@@ -444,21 +462,23 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.put(
-          {
-            ...response,
-            success: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
+      root[updateResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.put(
+            {
+              ...response,
+              success: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult({
+                  [toPascalCase(getMetaType(meta))]: y,
+                })
+              },
             },
-          },
-          arg1.id,
-          arg1.patch,
-        )
-      })
+            arg1.id,
+            arg1.patch,
+          )
+        },
+      )
       resolversMutation[updateResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[updateResolverKey](args, req, gqlInfo)
 
@@ -481,17 +501,19 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.delete(
-          {
-            ...response,
-            deleted: () => {
-              setResult({ [deletedResultKey]: arg1.id })
+      root[deleteResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.delete(
+            {
+              ...response,
+              deleted: () => {
+                setResult({ [deletedResultKey]: arg1.id })
+              },
             },
-          },
-          arg1.id,
-        )
-      })
+            arg1.id,
+          )
+        },
+      )
       resolversMutation[deleteResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[deleteResolverKey](args, req, gqlInfo)
 

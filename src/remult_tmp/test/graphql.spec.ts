@@ -44,6 +44,18 @@ describe('graphql-connection', () => {
       })
     }
   })
+  it('test get single task by id', async () => {
+    const tasks = await withRemult(() =>
+      remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
+    )
+    expect(await gql(`
+    query{
+      task(id: ${tasks[1].id}){
+        id,
+        title
+      }
+    }`)).toMatchSnapshot()
+  })
 
   it('test count', async () => {
     await withRemult(() =>
