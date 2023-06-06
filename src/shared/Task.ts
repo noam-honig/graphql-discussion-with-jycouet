@@ -43,7 +43,7 @@ class Task {
   })
   thePriority = Priority.High
 
-  @Field(() => Category, { allowNull: true })
+  @Field(() => Category, { allowNull: true})
   category?: Category
 }
 

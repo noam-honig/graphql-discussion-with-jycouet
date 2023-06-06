@@ -7,29 +7,38 @@ npm i
 npm run dev
 ```
 
-## TODOs
-
+## TO DOs
+- [ ] remove page info from schema for v1
+- [ ] on create and update operation
+  - [ ] ,id of related entities
+  - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
+  - [x] update
+  - [x] create
+  - [x] delete
 - [x] # where not in (nin?) TODO JYC
-- [ ] where not in (nin?)
-  - [ ] typedefs
-  - [ ] implementation
-- [ ] where in
-  - [x] typedefs
-  - [ ] resolver TODO Noam
-- [ ] Where OR
-  - [x] typedefs
-  - [x] resolver (TODO Noam)
-- [ ] Where AND
-  - [x] typedefs
-  - [ ] resolver (TODO Noam)
+- [ ] Where:
+  - [ ] where not in (nin?)
+    - [ ] typedefs
+    - [ ] implementation
+  - [ ] where in
+    - [x] typedefs
+    - [ ] resolver TODO Noam
+  - [ ] Where OR
+    - [x] typedefs
+    - [x] resolver (TODO Noam)
+  - [ ] Where AND
+    - [x] typedefs
+    - [ ] resolver (TODO Noam)
 - [ ] single entity query
   - [ ] typedefs (JYC TODO) => rmv hardcoded id
   - [ ] resolver
-- [ ] Connection
-  - [x] typedefs
-  - [ ] resolver
+- [ ] Test Request hack in graphql security - and test on all servers that security works
+## JYC
 - [ ] scalars (TODO JYC)
 - [ ] throw new GraphQLError(`Forbidden`) (to speak about)
+
+
+
 
 a. need to check the field selection. (you can copy this:
 https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts)
@@ -55,6 +64,8 @@ d. return the object
 ### v2
 
 - [ ] Connection (args & sttructure)
+  - [x] typedefs
+  - [ ] resolver
 - [ ] dataloader (optimisation)
 - [ ] @Entity Virtual
 - [ ] Subscriptions
@@ -87,12 +98,4 @@ d. return the object
   - [x] Yes, good idea. (JYC todo)
   - [x] items (JYC todo)
 
-## Noam thinks todo required
 
-- [ ] on create and update operation
-  - [ ] ,id of related entities
-  - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
-  - [x] update
-  - [x] create
-  - [x] delete
-- [ ]

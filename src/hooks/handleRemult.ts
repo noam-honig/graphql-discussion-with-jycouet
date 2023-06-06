@@ -1,5 +1,5 @@
 // import { DATABASE_URL } from '$env/static/private'
-import { SqlDatabase } from 'remult'
+import { remult, SqlDatabase } from 'remult'
 import { remultSveltekit } from 'remult/remult-sveltekit'
 
 import { Category } from '../shared/Category'
@@ -17,8 +17,5 @@ export const handleRemult = remultSveltekit({
     const session = await event?.locals?.getSession()
     return session?.user
   },
-  // defaultGetLimit: 11,
-  // dataProvider: await createPostgresConnection({
-  //   connectionString: DATABASE_URL,
-  // }),
+  initApi: async () => {},
 })
