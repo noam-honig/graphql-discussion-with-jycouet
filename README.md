@@ -67,8 +67,9 @@ d. return the object
 - [x] Connection items
 - [ ] Scalars?! (JYC todo)
 
-### v2
+### v later
 
+- [ ] Better support for Compound column id entities
 - [ ] Connection (args & sttructure)
   - [x] typedefs
   - [ ] resolver
