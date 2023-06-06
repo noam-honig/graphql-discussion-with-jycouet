@@ -10,6 +10,7 @@
   import { remultLive } from '$lib/stores/remultLive'
   import { getRepo } from '$shared/_entities'
   import { Pencil, PlusCircle } from 'lucide-svelte'
+  import type { FieldMetadata } from 'remult'
 
   import type { PageData } from './$types'
 
@@ -20,9 +21,23 @@
   $: exclude = [repo.fields.id]
 
   // bring it back for SSR. (issue when changing from Task to Category)
-  // $: list = remultLive(repo, data.list)
-  $: list = remultLive(repo, [])
+  $: list = remultLive(repo, data.list)
+  // $: list = remultLive(repo, [])
   $: browser && list.listen()
+
+  const display = (field: FieldMetadata, row: any) => {
+    try {
+      const toRet = field.displayValue(row)
+      // console.log(`all good`)
+
+      return toRet
+    } catch (error) {
+      // TODO: Why do we have error "sometimes"?
+      // return this.remult.repo(this.entityDefs.entityType).getEntityRef(item).fields.find(this.key).displayValue;
+      // console.log(`repo.getEntityRef(row).fields.find(field.key)`, repo.getEntityRef(row).fields)
+      // console.log(`error field`, field, error)
+    }
+  }
 </script>
 
 <div class="flex items-center justify-between space-y-2">
@@ -56,7 +71,8 @@
             .toArray()
             .filter(f => !exclude.map(c => c.key).includes(f.key)) as field}
             <td class="text-center">
-              {field.displayValue(row)}
+              {display(field, row)}
+              <!-- {field.displayValue(row)} -->
             </td>
           {/each}
           <td class="text-center">

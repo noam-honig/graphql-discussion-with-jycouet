@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PageTitle from '$components/layouts/PageTitle.svelte'
   import { Button } from '$components/ui/button'
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$components/ui/card'
   import { Tabs, TabsContent, TabsList, TabsTrigger } from '$components/ui/tabs'
@@ -8,15 +9,14 @@
   import RecentSales from './RecentSales.svelte'
 </script>
 
-<div class="flex items-center justify-between space-y-2">
-  <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-  <div class="flex items-center space-x-2">
+<PageTitle text="Dashboard">
+  <svelte:fragment slot="right">
     <Button size="sm">
       <Download class="mr-2 h-4 w-4" />
       Download
     </Button>
-  </div>
-</div>
+  </svelte:fragment>
+</PageTitle>
 <Tabs value="overview" class="space-y-4">
   <TabsList>
     <TabsTrigger value="overview">Overview</TabsTrigger>

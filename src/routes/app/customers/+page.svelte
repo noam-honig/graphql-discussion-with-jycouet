@@ -1,19 +1,12 @@
 <script lang="ts">
-  import { Button } from '$components/ui/button'
+  import PageTitle from '$components/layouts/PageTitle.svelte'
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$components/ui/card'
   import { Tabs, TabsContent, TabsList, TabsTrigger } from '$components/ui/tabs'
-  import { Activity, CreditCard, DollarSign, Download, Users } from 'lucide-svelte'
+  import { Activity, CreditCard, DollarSign, Users } from 'lucide-svelte'
 </script>
 
-<div class="flex items-center justify-between space-y-2">
-  <h2 class="text-3xl font-bold tracking-tight">Customers</h2>
-  <div class="flex items-center space-x-2">
-    <Button size="sm">
-      <Download class="mr-2 h-4 w-4" />
-      Download
-    </Button>
-  </div>
-</div>
+<PageTitle text="Customers" />
+
 <Tabs value="overview" class="space-y-4">
   <TabsList>
     <TabsTrigger value="overview">Overview</TabsTrigger>
