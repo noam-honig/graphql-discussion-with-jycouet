@@ -313,10 +313,12 @@ Select a dedicated page.`,
         key: itemsKey,
         value: `[${getMetaType(meta)}!]!`,
       })
-      connection.fields.push({
-        key: 'pageInfo',
-        value: `PageInfo!`,
-      })
+      if (v2ConnectionAndPagination) {
+        connection.fields.push({
+          key: 'pageInfo',
+          value: `PageInfo!`,
+        })
+      }
 
       if (v2ConnectionAndPagination) {
         const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
@@ -626,12 +628,13 @@ Select a dedicated page.`,
     value: `Node`,
     comment: `Grab any Remult entity given it's globally unique \`ID\``,
   })
-
-  const pageInfo = upsertTypes('PageInfo', 'type', 30)
-  pageInfo.fields.push({ key: 'endCursor', value: 'String!' })
-  pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
-  pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
-  pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  if (v2ConnectionAndPagination) {
+    const pageInfo = upsertTypes('PageInfo', 'type', 30)
+    pageInfo.fields.push({ key: 'endCursor', value: 'String!' })
+    pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
+    pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
+    pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  }
 
   const orderByDirection = upsertTypes('OrderByDirection', 'enum', 30)
   orderByDirection.comment = `Determines the order of returned elements`

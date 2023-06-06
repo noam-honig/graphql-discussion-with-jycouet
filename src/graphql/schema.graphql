@@ -213,7 +213,6 @@ The type for `TaskConnection`
 type TaskConnection {
     totalCount: Int!
     items: [Task!]!
-    pageInfo: PageInfo!
 }
 
 """
@@ -329,7 +328,6 @@ The type for `CategoryConnection`
 type CategoryConnection {
     totalCount: Int!
     items: [Category!]!
-    pageInfo: PageInfo!
 }
 
 """
@@ -414,7 +412,6 @@ The type for `TagConnection`
 type TagConnection {
     totalCount: Int!
     items: [Tag!]!
-    pageInfo: PageInfo!
 }
 
 """
@@ -586,16 +583,6 @@ input WhereIDNullable {
     in: [ID!]
     nin: [ID!]
     null: Boolean
-}
-
-"""
-The type for `PageInfo`
-"""
-type PageInfo {
-    endCursor: String!
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String!
 }
 
 """
