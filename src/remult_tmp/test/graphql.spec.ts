@@ -17,32 +17,50 @@ describe('graphql-connection', () => {
   }
   let gql: (gql: string) => Promise<any>
 
-  beforeEach(async () => {
-    // api = remultSveltekit({
-    api = remultExpress({
-      logApiEndPoints: false, // We don't need this in tests
-      dataProvider: new InMemoryDataProvider(),
-      entities: [Task, Category],
-      controllers: [TasksController],
+  it('gets related entities', async () => {
+    await withRemult(async () => {
+      const cat = await remult.repo(Category).insert([{ name: 'c1' }, { name: 'c2' }])
+      return [
+        await remult.repo(Task).insert({ title: 'task a', category: cat[0] }),
+        await remult.repo(Task).insert({ title: 'task b', category: cat[1] }),
+      ]
     })
 
-    const { typeDefs, resolvers } = remultGraphql(api)
-
-    const yoga = createYoga({
-      schema: createSchema({
-        typeDefs,
-        resolvers,
-      }),
-    })
-
-    gql = async (query: string) => {
-      return await yoga.getResultForParams({
-        request: {} as any,
-        params: {
-          query,
-        },
-      })
-    }
+    const result = await gql(`
+    query{
+      tasks{
+        items{
+          title
+          category{
+            name
+            tasks{
+              items {
+              title
+            }
+            }
+          }
+        }
+      }
+    }`)
+    expect(result).toMatchSnapshot()
+    expect(result.data.tasks.items[0].category.name).toBe('c1')
+    expect(result.data.tasks.items[0].category.tasks.items[0].title).toBe('task a')
+    expect(result.data.tasks.items[1].category.name).toBe('c2')
+    expect(result.data.tasks.items[1].category.tasks.items[0].title).toBe('task b')
+  })
+  it('test get single task by id', async () => {
+    const tasks = await withRemult(() =>
+      remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
+    )
+    expect(
+      await gql(`
+    query{
+      task(id: ${tasks[1].id}){
+        id,
+        title
+      }
+    }`),
+    ).toMatchSnapshot()
   })
 
   it('test count', async () => {
@@ -170,5 +188,32 @@ describe('graphql-connection', () => {
     })
 
     expect(typeDefs).toMatchSnapshot()
+  })
+  beforeEach(async () => {
+    // api = remultSveltekit({
+    api = remultExpress({
+      logApiEndPoints: false, // We don't need this in tests
+      dataProvider: new InMemoryDataProvider(),
+      entities: [Task, Category],
+      controllers: [TasksController],
+    })
+
+    const { typeDefs, resolvers } = remultGraphql(api)
+
+    const yoga = createYoga({
+      schema: createSchema({
+        typeDefs,
+        resolvers,
+      }),
+    })
+
+    gql = async (query: string) => {
+      return await yoga.getResultForParams({
+        request: {} as any,
+        params: {
+          query,
+        },
+      })
+    }
   })
 })

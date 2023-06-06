@@ -40,7 +40,7 @@ class Task {
   @Field(() => TaskPriority, { inputType: 'select' }) // TODO: how to bind this to a select from the type directly?
   thePriority = TaskPriority.High
 
-  @Field(() => Category, { allowNull: true })
+  @Field(() => Category, { allowNull: true})
   category?: Category
 }
 

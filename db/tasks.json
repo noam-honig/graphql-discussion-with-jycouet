@@ -11,25 +11,14 @@
     "id": 7,
     "title": "Yop ooo2",
     "completed": false,
-    "dueDate": "2023-06-09",
-    "thePriority": "HIGH",
-    "category": "cliel404a0000ktbyb0oibhwq"
-  },
-  {
-    "id": 8,
-    "title": "one two",
-    "completed": false,
-    "dueDate": "2023-06-10",
-    "thePriority": "HIGH",
-    "category": null
+    "category": "123"
   },
   {
     "id": 9,
     "title": "Hello",
     "completed": false,
-    "dueDate": "2023-06-10",
-    "thePriority": "HIGH",
-    "category": null
+    "thePriority": 1,
+    "category": "cli1up0bn000008lac9rpff93"
   },
   {
     "id": 10,

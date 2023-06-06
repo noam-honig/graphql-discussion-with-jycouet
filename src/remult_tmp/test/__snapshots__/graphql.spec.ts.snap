@@ -1,5 +1,42 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`graphql-connection > gets related entities 1`] = `
+{
+  "data": {
+    "tasks": {
+      "items": [
+        {
+          "category": {
+            "name": "c1",
+            "tasks": {
+              "items": [
+                {
+                  "title": "task a",
+                },
+              ],
+            },
+          },
+          "title": "task a",
+        },
+        {
+          "category": {
+            "name": "c2",
+            "tasks": {
+              "items": [
+                {
+                  "title": "task b",
+                },
+              ],
+            },
+          },
+          "title": "task b",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`graphql-connection > test basics 1`] = `
 "type Query {
     task(id: ID!): Task
@@ -50,7 +87,6 @@ input tasksWhere {
 type TaskConnection {
     totalCount: Int!
     items: [Task!]!
-    pageInfo: PageInfo!
 }
 
 input CreateTaskInput {
@@ -58,6 +94,7 @@ input CreateTaskInput {
     completed: Boolean
     dueDate: String
     thePriority: String
+    category: ID
 }
 
 type CreateTaskPayload {
@@ -70,6 +107,7 @@ input UpdateTaskInput {
     completed: Boolean
     dueDate: String
     thePriority: String
+    category: ID
 }
 
 type UpdateTaskPayload {
@@ -85,7 +123,7 @@ type DeleteTaskPayload {
 type Category implements Node {
     id: String!
     name: String!
-    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
     nodeId: ID!
 }
 
@@ -104,11 +142,9 @@ input categoriesWhere {
 type CategoryConnection {
     totalCount: Int!
     items: [Category!]!
-    pageInfo: PageInfo!
 }
 
 input CreateCategoryInput {
-    id: String
     name: String
 }
 
@@ -118,7 +154,6 @@ type CreateCategoryPayload {
 }
 
 input UpdateCategoryInput {
-    id: String
     name: String
 }
 
@@ -233,13 +268,6 @@ input WhereIDNullable {
     null: Boolean
 }
 
-type PageInfo {
-    endCursor: String!
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String!
-}
-
 enum OrderByDirection {
     ASC
     DESC
@@ -249,6 +277,17 @@ interface Node {
     nodeId: ID!
 }
 "
+`;
+
+exports[`graphql-connection > test get single task by id 1`] = `
+{
+  "data": {
+    "task": {
+      "id": 2,
+      "title": "bbb",
+    },
+  },
+}
 `;
 
 exports[`graphql-connection > test graphql 1`] = `

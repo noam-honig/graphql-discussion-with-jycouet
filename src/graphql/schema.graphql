@@ -219,7 +219,6 @@ The type for `TaskConnection`
 type TaskConnection {
     totalCount: Int!
     items: [Task!]!
-    pageInfo: PageInfo!
 }
 
 """
@@ -230,6 +229,7 @@ input CreateTaskInput {
     completed: Boolean
     dueDate: String
     thePriority: String
+    category: ID
 }
 
 """
@@ -248,6 +248,7 @@ input UpdateTaskInput {
     completed: Boolean
     dueDate: String
     thePriority: String
+    category: ID
 }
 
 """
@@ -306,7 +307,7 @@ Select a dedicated page.
     Remult filtering options
     """
     where: tasksWhere
-  ): [Task!]!
+  ): TaskConnection
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -337,14 +338,12 @@ The type for `CategoryConnection`
 type CategoryConnection {
     totalCount: Int!
     items: [Category!]!
-    pageInfo: PageInfo!
 }
 
 """
 The input for `CreateCategoryInput`
 """
 input CreateCategoryInput {
-    id: String
     name: String
 }
 
@@ -360,7 +359,6 @@ type CreateCategoryPayload {
 The input for `UpdateCategoryInput`
 """
 input UpdateCategoryInput {
-    id: String
     name: String
 }
 
@@ -422,14 +420,12 @@ The type for `TagConnection`
 type TagConnection {
     totalCount: Int!
     items: [Tag!]!
-    pageInfo: PageInfo!
 }
 
 """
 The input for `CreateTagInput`
 """
 input CreateTagInput {
-    id: String
     value: String
 }
 
@@ -445,7 +441,6 @@ type CreateTagPayload {
 The input for `UpdateTagInput`
 """
 input UpdateTagInput {
-    id: String
     value: String
 }
 
@@ -594,16 +589,6 @@ input WhereIDNullable {
     in: [ID!]
     nin: [ID!]
     null: Boolean
-}
-
-"""
-The type for `PageInfo`
-"""
-type PageInfo {
-    endCursor: String!
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String!
 }
 
 """

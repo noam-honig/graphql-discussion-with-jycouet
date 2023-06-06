@@ -2,6 +2,8 @@ import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 import type { DataApi, DataApiResponse } from 'remult/src/data-api'
 
+const v2ConnectionAndPagination = false
+
 type Enum = { Enum: true }
 
 type Arg = {
@@ -168,7 +170,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         ) => Promise<void>,
       ) => {
         return async (arg1: any, req: any) => {
-          return new Promise(async (res, error) => {
+          return new Promise((res, error) => {
             let result: any
             let err: any
             const response = {
@@ -186,17 +188,20 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
               notFound: () => (err = 'not found'),
               progress: () => {},
             }
-            await work(response, x => (result = x), arg1, req)
-            if (err) {
-              error(err)
-              return
-            }
-            res(result)
+            work(response, x => (result = x), arg1, req)
+              .then(() => {
+                if (err) {
+                  error(err)
+                  return
+                }
+                res(result)
+              })
+              .catch(err => error(err))
           })
         }
       }
 
-      const buildIt = (
+      const handleRequestWithDataApiContext = (
         work: (
           dataApi: DataApi,
           response: DataApiResponse,
@@ -236,133 +241,158 @@ Select a dedicated page.`,
         },
         { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
         { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
-        // for cursor pagination (v2)
-        //         {
-        //           key: 'first',
-        //           value: 'Int',
-        //           comment: `
-        // For **forward cursor** pagination
-        // Takes the \`first\`: \`n\` elements from the list.`,
-        //         },
-        //         {
-        //           key: 'after',
-        //           value: 'String',
-        //           comment: `
-        // For **forward cursor** pagination
-        // \`after\` this \`cursor\`.`,
-        //         },
-        //         {
-        //           key: 'last',
-        //           value: 'Int',
-        //           comment: `
-        // For **backward cursor** pagination
-        // Takes the \`last\`: \`n\` elements from the list.`,
-        //         },
-        //         {
-        //           key: 'before',
-        //           value: 'String',
-        //           comment: `
-        // For **backward cursor** pagination
-        // \`before\` this \`cursor\`.`,
-        //         },
       ]
-
+      if (v2ConnectionAndPagination) {
+        queryArgsConnection.push(
+          {
+            key: 'first',
+            value: 'Int',
+            comment: `
+        For **forward cursor** pagination
+        Takes the \`first\`: \`n\` elements from the list.`,
+          },
+          {
+            key: 'after',
+            value: 'String',
+            comment: `
+        For **forward cursor** pagination
+        \`after\` this \`cursor\`.`,
+          },
+          {
+            key: 'last',
+            value: 'Int',
+            comment: `
+        For **backward cursor** pagination
+        Takes the \`last\`: \`n\` elements from the list.`,
+          },
+          {
+            key: 'before',
+            value: 'String',
+            comment: `
+        For **backward cursor** pagination
+        \`before\` this \`cursor\`.`,
+          },
+        )
+      }
+      const getSingleEntityKey = toPascalCase(getMetaType(meta))
       root_query.fields.push({
-        key: toPascalCase(getMetaType(meta)),
+        key: getSingleEntityKey,
         args: [argId],
         value: `${getMetaType(meta)}`,
         comment: `Get \`${getMetaType(meta)}\` entity`,
       })
 
-      resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) =>
-        root[key](args, req, gqlInfo)
+      root[getSingleEntityKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.get(
+            {
+              ...response,
+              success: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult(y)
+              },
+            },
+            arg1.id,
+          )
+        },
+      )
+      resolversQuery[getSingleEntityKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+        root[getSingleEntityKey](args, req, gqlInfo)
 
       // Connection (v1 items, v2 edges)
+      const connectionKey = `${getMetaType(meta)}Connection`
       root_query.fields.push({
         key,
         args: queryArgsConnection,
-        value: `${getMetaType(meta)}Connection`,
+        value: connectionKey,
         comment: `List all \`${getMetaType(
           meta,
         )}\` entity (with pagination, sorting and filtering)`,
       })
 
-      const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
+      const connection = upsertTypes(connectionKey, 'type')
       const totalCountKey = 'totalCount'
       connection.fields.push({
         key: totalCountKey,
         value: 'Int!',
       })
-      // for cursor pagination (v2)
-      // connection.fields.push({
-      //   key: 'edges',
-      //   value: `[${getMetaType(meta)}Edge!]!`,
-      // })
+
+      if (v2ConnectionAndPagination) {
+        connection.fields.push({
+          key: 'edges',
+          value: `[${getMetaType(meta)}Edge!]!`,
+        })
+      }
       const itemsKey = 'items'
       connection.fields.push({
         key: itemsKey,
         value: `[${getMetaType(meta)}!]!`,
       })
-      connection.fields.push({
-        key: 'pageInfo',
-        value: `PageInfo!`,
-      })
-
-      // for cursor pagination (v2)
-      // const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
-      // edge.fields.push({
-      //   key: 'node',
-      //   value: `${getMetaType(meta)}!`,
-      // })
-      // const cursorKey = 'cursor'
-      // edge.fields.push({
-      //   key: cursorKey,
-      //   value: `String!`,
-      // })
-
-      root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        let rowsPromise = () => {
-          const p = new Promise<any[]>(setResult => {
-            dApi.getArray(
-              {
-                ...response,
-                success: (x: any) => {
-                  setResult(
-                    x.map((y: any) => {
-                      currentType.query.resultProcessors.forEach(z => z(y))
-                      return y
-                    }),
-                  )
-                },
-              },
-              {
-                get: bridgeQueryOptionsToDataApiGet(arg1),
-              },
-            )
-          })
-          rowsPromise = () => p
-
-          return p
-        }
-
-        setResult({
-          [itemsKey]: createResultPromise(async (response, setResult) => {
-            setResult(await rowsPromise())
-          }),
-          [totalCountKey]: createResultPromise(async (response, setResult) => {
-            // [ ] count should ignore limit, page etc....
-            await dApi.count(
-              {
-                ...response,
-                success: x => setResult(x.count),
-              },
-              {
-                get: bridgeQueryOptionsToDataApiGet(arg1),
-              },
-            )
-          }),
+      if (v2ConnectionAndPagination) {
+        connection.fields.push({
+          key: 'pageInfo',
+          value: `PageInfo!`,
         })
-      })
+      }
+
+      if (v2ConnectionAndPagination) {
+        const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
+        edge.fields.push({
+          key: 'node',
+          value: `${getMetaType(meta)}!`,
+        })
+        const cursorKey = 'cursor'
+        edge.fields.push({
+          key: cursorKey,
+          value: `String!`,
+        })
+      }
+
+      root[key] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          let rowsPromise = () => {
+            const p = new Promise<any[]>(setResult => {
+              dApi.getArray(
+                {
+                  ...response,
+                  success: (x: any) => {
+                    setResult(
+                      x.map((y: any) => {
+                        currentType.query.resultProcessors.forEach(z => z(y))
+                        return y
+                      }),
+                    )
+                  },
+                },
+                {
+                  get: bridgeQueryOptionsToDataApiGet(arg1),
+                },
+              )
+            })
+            rowsPromise = () => p
+
+            return p
+          }
+
+          setResult({
+            [itemsKey]: createResultPromise(async (response, setResult) => {
+              setResult(await rowsPromise())
+            }),
+            [totalCountKey]: createResultPromise(async (response, setResult) => {
+              // [ ] count should ignore limit, page etc....
+              await dApi.count(
+                {
+                  ...response,
+                  success: x => setResult(x.count),
+                },
+                {
+                  get: bridgeQueryOptionsToDataApiGet(arg1),
+                },
+              )
+            }),
+          })
+        },
+      )
 
       resolversQuery[key] = (origItem: any, args: any, req: any, gqlInfo: any) => {
         return root[key](args, req, gqlInfo)
@@ -393,20 +423,22 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[createResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.post(
-          {
-            ...response,
-            created: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
+      root[createResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.post(
+            {
+              ...response,
+              created: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult({
+                  [toPascalCase(getMetaType(meta))]: y,
+                })
+              },
             },
-          },
-          arg1.input,
-        )
-      })
+            arg1.input,
+          )
+        },
+      )
       resolversMutation[createResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[createResolverKey](args, req, gqlInfo)
 
@@ -431,21 +463,23 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[updateResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.put(
-          {
-            ...response,
-            success: y => {
-              currentType.query.resultProcessors.forEach(z => z(y))
-              setResult({
-                [toPascalCase(getMetaType(meta))]: y,
-              })
+      root[updateResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.put(
+            {
+              ...response,
+              success: y => {
+                currentType.query.resultProcessors.forEach(z => z(y))
+                setResult({
+                  [toPascalCase(getMetaType(meta))]: y,
+                })
+              },
             },
-          },
-          arg1.id,
-          arg1.patch,
-        )
-      })
+            arg1.id,
+            arg1.patch,
+          )
+        },
+      )
       resolversMutation[updateResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[updateResolverKey](args, req, gqlInfo)
 
@@ -468,22 +502,25 @@ Select a dedicated page.`,
         },
         argClientMutationId,
       )
-      root[deleteResolverKey] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
-        await dApi.delete(
-          {
-            ...response,
-            deleted: () => {
-              setResult({ [deletedResultKey]: arg1.id })
+      root[deleteResolverKey] = handleRequestWithDataApiContext(
+        async (dApi, response, setResult, arg1: any, req: any) => {
+          await dApi.delete(
+            {
+              ...response,
+              deleted: () => {
+                setResult({ [deletedResultKey]: arg1.id })
+              },
             },
-          },
-          arg1.id,
-        )
-      })
+            arg1.id,
+          )
+        },
+      )
       resolversMutation[deleteResolverKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
         root[deleteResolverKey](args, req, gqlInfo)
 
       const whereTypeFields: string[] = []
       for (const f of meta.fields) {
+        if (f.options.includeInApi === false) continue
         let type = 'String'
         switch (f.valueType) {
           case Boolean:
@@ -513,15 +550,17 @@ Select a dedicated page.`,
             const val = r[f.key]
             if (val === null || val === undefined) return null
             r[f.key] = async (args: any, req: any, gqlInfo: any) => {
-              const queryResult: any[] = await root[refKey](
-                {
-                  ...args.where,
-                  where: { id: val },
-                  options: { limit: 1 },
-                },
-                req,
-                gqlInfo,
-              )
+              const queryResult: any[] = await (
+                await root[refKey](
+                  {
+                    ...args.where,
+                    where: { id: { eq: val } },
+                    options: { limit: 1 },
+                  },
+                  req,
+                  gqlInfo,
+                )
+              ).items()
               if (queryResult.length > 0) return queryResult[0]
               return null
             }
@@ -532,7 +571,7 @@ Select a dedicated page.`,
           refT.fields.push({
             key,
             args: queryArgsConnection,
-            value: `[${getMetaType(meta)}!]!`,
+            value: connectionKey,
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           })
@@ -542,7 +581,7 @@ Select a dedicated page.`,
             r[key] = async (args: any, req: any, gqlInfo: any) => {
               return await root[key](
                 {
-                  where: { ...args.where, [f.key]: val },
+                  where: { ...args.where, [f.key]: { eq: val } },
                   options: { ...args.limit, ...args.page, ...args.orderBy },
                 },
                 req,
@@ -569,20 +608,19 @@ Select a dedicated page.`,
           whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`)
         }
 
-        // TODO Noam: add a `!` for mandatory fields
-        // create
-        if (!f.dbReadOnly && it_is_not_at_ref) {
+        const includeInUpdateOrInsert = f.options.allowApiUpdate !== false
+        const updateType = it_is_not_at_ref ? type : 'ID'
+        if (includeInUpdateOrInsert) {
+          // create
           currentType.mutation.create.input.fields.push({
             key: f.key,
-            value: `${type}`,
+            value: updateType,
           })
-        }
 
-        // update
-        if (!f.dbReadOnly && it_is_not_at_ref) {
+          // update
           currentType.mutation.update.input.fields.push({
             key: f.key,
-            value: `${type}`,
+            value: updateType,
           })
         }
       }
@@ -615,12 +653,13 @@ Select a dedicated page.`,
     value: `Node`,
     comment: `Grab any Remult entity given it's globally unique \`ID\``,
   })
-
-  const pageInfo = upsertTypes('PageInfo', 'type', 30)
-  pageInfo.fields.push({ key: 'endCursor', value: 'String!' })
-  pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
-  pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
-  pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  if (v2ConnectionAndPagination) {
+    const pageInfo = upsertTypes('PageInfo', 'type', 30)
+    pageInfo.fields.push({ key: 'endCursor', value: 'String!' })
+    pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
+    pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
+    pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  }
 
   const orderByDirection = upsertTypes('OrderByDirection', 'enum', 30)
   orderByDirection.comment = `Determines the order of returned elements`
