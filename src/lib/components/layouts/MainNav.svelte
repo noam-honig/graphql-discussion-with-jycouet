@@ -6,9 +6,9 @@
   let className: string | undefined | null = undefined
 
   const links = [
-    { href: '/app/dashboard', label: 'Overview' },
-    { href: '/app/customers', label: 'Customers' },
-  ].concat(entitiesName.map(entity => ({ href: `/app/${entity}`, label: entity })))
+    { href: '/shadcn/dashboard', label: 'Overview' },
+    { href: '/shadcn/customers', label: 'Customers' },
+  ].concat(entitiesName.map(entity => ({ href: `/shadcn/${entity}`, label: entity })))
 
   export { className as class }
 </script>
