@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { displayValue } from '$lib/remult-svelte/helper'
-  import { CheckIcon } from 'lucide-svelte'
-  import { Checkbox, Label } from 'radix-svelte'
+  import { goto } from '$app/navigation'
+  import { displayValue, fieldVisibility } from '$lib/remult-svelte/helper'
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
 
+  import Button from './Button/Button.svelte'
   import Input from './Input.svelte'
 
   export let repo: Repository<any>
@@ -13,6 +13,7 @@
   export let exclude: FieldMetadata[] = []
   export let mode: 'create' | 'update' | 'readonly' = 'readonly'
   export let id: string | number | null = null
+  export let redirect: string | null = null
 
   let data = writable<Record<string, any>>({})
   let errors = writable<Record<string, string>>({})
@@ -37,12 +38,28 @@
 
   const dispatch = createEventDispatcher()
 
-  const dispatchCreate = (_data: any) => {
-    dispatch('create', { _data })
+  const dispatchCreate = async (_data: any) => {
+    if (redirect) {
+      await goto(redirect)
+    } else {
+      dispatch('create', { _data })
+    }
   }
 
-  const dispatchUpdate = (_data: any) => {
-    dispatch('update', { _data })
+  const dispatchUpdate = async (_data: any) => {
+    if (redirect) {
+      await goto(redirect)
+    } else {
+      dispatch('update', { _data })
+    }
+  }
+
+  const dispatchCancel = async (_data: any) => {
+    if (redirect) {
+      await goto(redirect)
+    } else {
+      dispatch('cancel', { _data })
+    }
   }
 
   const submit = async (e: Event) => {
@@ -80,136 +97,81 @@
   }
 </script>
 
-<!-- error? -->
-
 <form on:submit|preventDefault={submit}>
-  {#each repo.fields.toArray().filter(f => {
-    const isExcluded = exclude.map(c => c.key).includes(f.key)
-    if (isExcluded) {
-      return false
-    }
-    const isIncluded = include.map(c => c.key).includes(f.key)
-    if (isIncluded) {
-      return true
-    }
+  <div class="grid grid-cols-3 gap-4">
+    {#each repo.fields.toArray().filter(f => fieldVisibility(f, mode, include, exclude)) as field}
+      {@const inputType = field.inputType}
+      <div class="form-control">
+        <label class="label" for={field.key}>
+          <span class="label-text">{field.caption}</span>
+          <span class="label-text-alt text-error">{$errors[field.key]}</span>
+        </label>
 
-    // good defaults?
-    let with_readonly = false
-    let with_allowNull = false
+        {#if mode === 'readonly'}
+          <span class="h-12 pl-4 grid content-center">{displayValue(field, $data)}</span>
+        {:else if inputType === 'select'}
+          <select
+            {...common(field)}
+            value={field.toInput($data[field.key])}
+            class="select select-bordered"
+            on:change={e => {
+              // @ts-ignore
+              $data[field.key] = field.fromInput(e.target.value)
+            }}
+          >
+            {#each getValues(field) ?? [] as { id, caption }}
+              <option value={id}>{caption}</option>
+            {/each}
+          </select>
+        {:else if inputType === 'checkbox'}
+          <div class="h-12 pl-4 grid content-center">
+            <input
+              type="checkbox"
+              {...common(field)}
+              class="checkbox"
+              bind:checked={$data[field.key]}
+            />
+          </div>
+        {:else}
+          <Input
+            class="input-bordered"
+            {...common(field)}
+            type={inputType}
+            value={field.toInput($data[field.key])}
+            on:change={e => {
+              // @ts-ignore
+              $data[field.key] = field.fromInput(e.target.value)
+            }}
+          />
+        {/if}
+      </div>
+    {/each}
 
-    if (mode === 'create') {
-      with_readonly = false
-      with_allowNull = false
-    } else if (mode === 'update') {
-      with_readonly = false
-      with_allowNull = true
-    }
-
-    const allowNull = with_allowNull ? true : !f.allowNull
-    const readOnly = with_readonly ? true : !f.dbReadOnly && f.options.allowApiUpdate === undefined
-
-    return allowNull && readOnly
-  }) as field}
-    {@const inputType = field.inputType}
-    <div>
-      <Label.Root for={field.key}>{field.caption}</Label.Root>
-      <Label.Root>{$errors[field.key]}</Label.Root>
+    <div class="col-span-3 grid justify-items-end">
+      <div class="flex gap-4">
+        {#if mode === 'readonly'}
+          <Button on:click={() => (mode = 'update')} variant="neutral" type="button">Edit</Button>
+        {:else}
+          {#if mode === 'update'}
+            <span>
+              <Button on:click={() => (mode = 'readonly')} variant="ghost" type="button">
+                Cancel
+              </Button>
+            </span>
+          {:else}
+            <span>
+              <Button on:click={() => dispatchCancel(null)} variant="ghost" type="button">
+                Cancel
+              </Button>
+            </span>
+          {/if}
+          <span>
+            <Button variant="success" type="submit">
+              {mode === 'create' ? 'Create' : 'Update'}
+            </Button>
+          </span>
+        {/if}
+      </div>
     </div>
-    {#if mode === 'readonly'}
-      <Label.Root>{displayValue(field, $data)}</Label.Root>
-    {:else if inputType === 'checkbox'}
-      <!-- <Checkbox.Root {...common(field)} bind:checked={$data[field.key]} /> -->
-
-      <!-- disabled={rootDisabled} -->
-      <!-- name={rootName}
-			value={rootValue}
-			required={rootRequired} -->
-      <!-- <Checkbox.Root {...common(field)} bind:checked={$data[field.key]}>
-        <Checkbox.Indicator>x</Checkbox.Indicator>
-      </Checkbox.Root>
-      <Label.Root for={field.key}>{field.caption}</Label.Root> -->
-
-      <!-- <div class="cb">
-        <Checkbox.Root class="CheckboxRoot" checked id="c1">
-          <Checkbox.Indicator class="CheckboxIndicator">
-            <CheckIcon />
-          </Checkbox.Indicator>
-        </Checkbox.Root>
-        <label class="Label" for="c1"> Accept terms and conditions. </label>
-      </div> -->
-
-      <Checkbox.Root class="checkbox" id="c1" bind:checked={$data[field.key]} />
-
-      <!-- <input type="checkbox" checked="checked" class="checkbox" /> -->
-
-      <!-- <Checkbox {...common(field)} bind:checked={$data[field.key]} /> -->
-    {:else if inputType === 'select'}
-      <!-- Whaiting for the "comming soon" feature -->
-      <select
-        {...common(field)}
-        value={field.toInput($data[field.key])}
-        on:change={e => {
-          // @ts-ignore
-          $data[field.key] = field.fromInput(e.target.value)
-        }}
-      >
-        {#each getValues(field) ?? [] as { id, caption }}
-          <option value={id}>{caption}</option>
-        {/each}
-      </select>
-    {:else}
-      <Input
-        {...common(field)}
-        type={inputType}
-        value={field.toInput($data[field.key])}
-        on:change={e => {
-          // @ts-ignore
-          $data[field.key] = field.fromInput(e.target.value)
-        }}
-      />
-    {/if}
-  {/each}
-
-  {#if mode !== 'readonly'}
-    <button type="submit">{mode === 'create' ? 'Create' : 'Update'}</button>
-  {/if}
+  </div>
 </form>
-
-<!-- <style>
-  .cb {
-    display: 'flex';
-    align-items: 'center';
-  }
-  /* reset */
-  /* button {
-    all: unset;
-  } */
-
-  .CheckboxRoot {
-    background-color: white;
-    width: 25px;
-    height: 25px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 10px var(--blackA7);
-  }
-  .CheckboxRoot:hover {
-    background-color: var(--violet3);
-  }
-  .CheckboxRoot:focus {
-    box-shadow: 0 0 0 2px black;
-  }
-
-  .CheckboxIndicator {
-    color: var(--violet11);
-  }
-
-  .Label {
-    color: white;
-    padding-left: 15px;
-    font-size: 15px;
-    line-height: 1;
-  }
-</style> -->

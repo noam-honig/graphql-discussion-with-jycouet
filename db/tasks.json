@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "Non?",
+    "title": "Oui",
     "completed": true,
     "dueDate": "2023-06-14",
     "thePriority": "CRITICAL",
@@ -10,22 +10,23 @@
   {
     "id": 7,
     "title": "Yop ooo2",
-    "completed": false,
-    "category": "123"
+    "completed": true,
+    "category": null,
+    "dueDate": "2020-02-04"
   },
   {
     "id": 9,
     "title": "Hello",
-    "completed": false,
+    "completed": true,
     "thePriority": 1,
-    "category": "cli1up0bn000008lac9rpff93"
+    "category": null
   },
   {
     "id": 10,
     "title": "coucou",
     "completed": false,
     "dueDate": "2023-06-10",
-    "thePriority": "HIGH",
+    "thePriority": "CRITICAL",
     "category": null
   },
   {
@@ -38,7 +39,7 @@
   },
   {
     "id": 12,
-    "title": "new one",
+    "title": "Yes!",
     "completed": false,
     "dueDate": "2023-06-10",
     "thePriority": "HIGH",
@@ -58,6 +59,14 @@
     "completed": false,
     "dueDate": "2023-06-13",
     "thePriority": "HIGH",
+    "category": null
+  },
+  {
+    "id": 15,
+    "title": "xsxqsxqxs",
+    "completed": false,
+    "dueDate": "2023-06-13",
+    "thePriority": "CRITICAL",
     "category": null
   }
 ]

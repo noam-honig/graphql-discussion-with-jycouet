@@ -12,3 +12,36 @@ export const displayValue = (field: FieldMetadata, row: any) => {
     // console.log(`error field`, field, error)
   }
 }
+
+export const fieldVisibility = (
+  f: FieldMetadata<any, any>,
+  mode: 'create' | 'update' | 'readonly',
+  include: FieldMetadata<any, any>[],
+  exclude: FieldMetadata<any, any>[],
+) => {
+  const isExcluded = exclude.map(c => c.key).includes(f.key)
+  if (isExcluded) {
+    return false
+  }
+  const isIncluded = include.map(c => c.key).includes(f.key)
+  if (isIncluded) {
+    return true
+  }
+
+  // good defaults?
+  let with_readonly = false
+  let with_allowNull = false
+
+  if (mode === 'create') {
+    with_readonly = false
+    with_allowNull = false
+  } else if (mode === 'update') {
+    with_readonly = false
+    with_allowNull = true
+  }
+
+  const allowNull = with_allowNull ? true : !f.allowNull
+  const readOnly = with_readonly ? true : !f.dbReadOnly && f.options.allowApiUpdate === undefined
+
+  return allowNull && readOnly
+}

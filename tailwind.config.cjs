@@ -55,5 +55,5 @@ module.exports = {
       'winter',
     ],
   },
-  plugins: [require('@tailwindcss/typography'), require('daisyui')],
+  plugins: [require('@tailwindcss/forms'), require('daisyui')],
 }

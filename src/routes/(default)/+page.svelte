@@ -1,5 +1,10 @@
-<h2>This demo showcase</h2>
-<ul>
+<script>
+  import H2 from '$lib/svelte-fields/Text/H2.svelte'
+</script>
+
+<H2>This demo showcase</H2>
+
+<ul class="ml-4 list-disc">
   <li>
     <a href="https://remult.dev/" target="_blank">Remult</a>
   </li>

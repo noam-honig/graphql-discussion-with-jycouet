@@ -3,12 +3,12 @@
 
   export let value: HTMLInputAttributes['value'] = undefined
 
-  export { className as class }
   let className: string | undefined | null = undefined
+  export { className as class }
 </script>
 
 <input
-  class={className}
+  class={`input ${className ?? ''}`}
   bind:value
   on:blur
   on:change
