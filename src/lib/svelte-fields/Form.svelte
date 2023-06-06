@@ -1,5 +1,6 @@
 <script lang="ts">
   import { displayValue } from '$lib/remult-svelte/helper'
+  import { CheckIcon } from 'lucide-svelte'
   import { Checkbox, Label } from 'radix-svelte'
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
@@ -128,12 +129,18 @@
       </Checkbox.Root>
       <Label.Root for={field.key}>{field.caption}</Label.Root> -->
 
-      <div style="display: 'flex', alignItems: 'center'">
+      <!-- <div class="cb">
         <Checkbox.Root class="CheckboxRoot" checked id="c1">
-          <Checkbox.Indicator class="CheckboxIndicator">x</Checkbox.Indicator>
+          <Checkbox.Indicator class="CheckboxIndicator">
+            <CheckIcon />
+          </Checkbox.Indicator>
         </Checkbox.Root>
         <label class="Label" for="c1"> Accept terms and conditions. </label>
-      </div>
+      </div> -->
+
+      <Checkbox.Root class="checkbox" id="c1" bind:checked={$data[field.key]} />
+
+      <!-- <input type="checkbox" checked="checked" class="checkbox" /> -->
 
       <!-- <Checkbox {...common(field)} bind:checked={$data[field.key]} /> -->
     {:else if inputType === 'select'}
@@ -168,11 +175,15 @@
   {/if}
 </form>
 
-<style>
-  /* reset */
-  button {
-    all: unset;
+<!-- <style>
+  .cb {
+    display: 'flex';
+    align-items: 'center';
   }
+  /* reset */
+  /* button {
+    all: unset;
+  } */
 
   .CheckboxRoot {
     background-color: white;
@@ -201,4 +212,4 @@
     font-size: 15px;
     line-height: 1;
   }
-</style>
+</style> -->
