@@ -1,7 +1,7 @@
 import { getRepo } from '$shared/_entities'
 import { redirect } from '@sveltejs/kit'
 
-import type { LayoutServerLoad } from '../$types'
+import type { LayoutLoad } from './$types'
 
 export const load = (async ({ params }) => {
   try {
@@ -18,4 +18,4 @@ export const load = (async ({ params }) => {
 
   // Something was wrong!
   throw redirect(303, '/')
-}) satisfies LayoutServerLoad
+}) satisfies LayoutLoad

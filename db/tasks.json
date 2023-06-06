@@ -3,13 +3,13 @@
     "id": 1,
     "title": "Non?",
     "completed": true,
-    "dueDate": "2023-06-02",
+    "dueDate": "2023-06-13",
     "thePriority": "CRITICAL",
     "category": "cliel404a0000ktbyb0oibhwq"
   },
   {
     "id": 7,
-    "title": "Yop ooo",
+    "title": "Yop ooo2",
     "completed": false,
     "dueDate": "2023-06-09",
     "thePriority": "HIGH",

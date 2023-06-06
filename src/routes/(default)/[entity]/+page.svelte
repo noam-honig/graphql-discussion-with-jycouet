@@ -1,7 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
-  import { remultStore } from '$lib/stores/remultStore'
+  import { remultLive } from '$lib/stores/remultLive'
   import { getRepo } from '$shared/_entities'
 
   import type { PageData } from './$types'
@@ -10,7 +10,7 @@
 
   $: repo = getRepo(data.entity)
 
-  $: list = remultStore(repo, data.list)
+  $: list = remultLive(repo, data.list)
   $: browser && list.listen()
 </script>
 

@@ -7,7 +7,7 @@
   import CardDescription from '$components/ui/card/CardDescription.svelte'
   import CardHeader from '$components/ui/card/CardHeader.svelte'
   import CardTitle from '$components/ui/card/CardTitle.svelte'
-  import { remultStore } from '$lib/stores/remultStore'
+  import { remultLive } from '$lib/stores/remultLive'
   import { getRepo } from '$shared/_entities'
   import { Pencil, PlusCircle } from 'lucide-svelte'
 
@@ -19,7 +19,9 @@
   // $: exclude = [repo.fields.id, repo.fields.category]
   $: exclude = [repo.fields.id]
 
-  $: list = remultStore(repo, data.list)
+  // bring it back for SSR. (issue when changing from Task to Category)
+  // $: list = remultLive(repo, data.list)
+  $: list = remultLive(repo, [])
   $: browser && list.listen()
 </script>
 

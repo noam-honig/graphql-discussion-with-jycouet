@@ -37,7 +37,7 @@ class Task {
   })
   dueDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 7)
 
-  @Field(() => TaskPriority, { inputType: 'select' }) // how to bind this to a select from the type directly?
+  @Field(() => TaskPriority, { inputType: 'select' }) // TODO: how to bind this to a select from the type directly?
   thePriority = TaskPriority.High
 
   @Field(() => Category, { allowNull: true })
