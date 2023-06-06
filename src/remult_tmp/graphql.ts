@@ -2,6 +2,8 @@ import type { EntityMetadata, Field } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 import type { DataApi, DataApiResponse } from 'remult/src/data-api'
 
+const v2ConnectionAndPagination = false
+
 type Enum = { Enum: true }
 
 type Arg = {
@@ -168,7 +170,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
         ) => Promise<void>,
       ) => {
         return async (arg1: any, req: any) => {
-          return new Promise(async (res, error) => {
+          return new Promise((res, error) => {
             let result: any
             let err: any
             const response = {
@@ -186,12 +188,15 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
               notFound: () => (err = 'not found'),
               progress: () => {},
             }
-            await work(response, x => (result = x), arg1, req)
-            if (err) {
-              error(err)
-              return
-            }
-            res(result)
+            work(response, x => (result = x), arg1, req)
+              .then(() => {
+                if (err) {
+                  error(err)
+                  return
+                }
+                res(result)
+              })
+              .catch(err => error(err))
           })
         }
       }
@@ -236,36 +241,39 @@ Select a dedicated page.`,
         },
         { key: 'orderBy', value: `${key}OrderBy`, comment: `Remult sorting options` },
         { key: 'where', value: `${key}Where`, comment: `Remult filtering options` },
-        // for cursor pagination (v2)
-        //         {
-        //           key: 'first',
-        //           value: 'Int',
-        //           comment: `
-        // For **forward cursor** pagination
-        // Takes the \`first\`: \`n\` elements from the list.`,
-        //         },
-        //         {
-        //           key: 'after',
-        //           value: 'String',
-        //           comment: `
-        // For **forward cursor** pagination
-        // \`after\` this \`cursor\`.`,
-        //         },
-        //         {
-        //           key: 'last',
-        //           value: 'Int',
-        //           comment: `
-        // For **backward cursor** pagination
-        // Takes the \`last\`: \`n\` elements from the list.`,
-        //         },
-        //         {
-        //           key: 'before',
-        //           value: 'String',
-        //           comment: `
-        // For **backward cursor** pagination
-        // \`before\` this \`cursor\`.`,
-        //         },
       ]
+      if (v2ConnectionAndPagination) {
+        queryArgsConnection.push(
+          {
+            key: 'first',
+            value: 'Int',
+            comment: `
+        For **forward cursor** pagination
+        Takes the \`first\`: \`n\` elements from the list.`,
+          },
+          {
+            key: 'after',
+            value: 'String',
+            comment: `
+        For **forward cursor** pagination
+        \`after\` this \`cursor\`.`,
+          },
+          {
+            key: 'last',
+            value: 'Int',
+            comment: `
+        For **backward cursor** pagination
+        Takes the \`last\`: \`n\` elements from the list.`,
+          },
+          {
+            key: 'before',
+            value: 'String',
+            comment: `
+        For **backward cursor** pagination
+        \`before\` this \`cursor\`.`,
+          },
+        )
+      }
 
       root_query.fields.push({
         key: toPascalCase(getMetaType(meta)),
@@ -293,11 +301,13 @@ Select a dedicated page.`,
         key: totalCountKey,
         value: 'Int!',
       })
-      // for cursor pagination (v2)
-      // connection.fields.push({
-      //   key: 'edges',
-      //   value: `[${getMetaType(meta)}Edge!]!`,
-      // })
+
+      if (v2ConnectionAndPagination) {
+        connection.fields.push({
+          key: 'edges',
+          value: `[${getMetaType(meta)}Edge!]!`,
+        })
+      }
       const itemsKey = 'items'
       connection.fields.push({
         key: itemsKey,
@@ -308,17 +318,18 @@ Select a dedicated page.`,
         value: `PageInfo!`,
       })
 
-      // for cursor pagination (v2)
-      // const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
-      // edge.fields.push({
-      //   key: 'node',
-      //   value: `${getMetaType(meta)}!`,
-      // })
-      // const cursorKey = 'cursor'
-      // edge.fields.push({
-      //   key: cursorKey,
-      //   value: `String!`,
-      // })
+      if (v2ConnectionAndPagination) {
+        const edge = upsertTypes(`${getMetaType(meta)}Edge`, 'type')
+        edge.fields.push({
+          key: 'node',
+          value: `${getMetaType(meta)}!`,
+        })
+        const cursorKey = 'cursor'
+        edge.fields.push({
+          key: cursorKey,
+          value: `String!`,
+        })
+      }
 
       root[key] = buildIt(async (dApi, response, setResult, arg1: any, req: any) => {
         let rowsPromise = () => {
