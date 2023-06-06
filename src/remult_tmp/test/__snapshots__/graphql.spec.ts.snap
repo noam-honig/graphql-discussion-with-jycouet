@@ -47,7 +47,6 @@ input tasksWhere {
 type TaskConnection {
     totalCount: Int!
     items: [Task!]!
-    pageInfo: PageInfo!
 }
 
 input CreateTaskInput {
@@ -99,7 +98,6 @@ input categoriesWhere {
 type CategoryConnection {
     totalCount: Int!
     items: [Category!]!
-    pageInfo: PageInfo!
 }
 
 input CreateCategoryInput {
@@ -226,13 +224,6 @@ input WhereIDNullable {
     in: [ID!]
     nin: [ID!]
     null: Boolean
-}
-
-type PageInfo {
-    endCursor: String!
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String!
 }
 
 enum OrderByDirection {
