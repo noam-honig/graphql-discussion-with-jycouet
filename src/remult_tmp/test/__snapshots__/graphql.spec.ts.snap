@@ -1,5 +1,42 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`graphql-connection > gets related entities 1`] = `
+{
+  "data": {
+    "tasks": {
+      "items": [
+        {
+          "category": {
+            "name": "c1",
+            "tasks": {
+              "items": [
+                {
+                  "title": "task a",
+                },
+              ],
+            },
+          },
+          "title": "task a",
+        },
+        {
+          "category": {
+            "name": "c2",
+            "tasks": {
+              "items": [
+                {
+                  "title": "task b",
+                },
+              ],
+            },
+          },
+          "title": "task b",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`graphql-connection > test basics 1`] = `
 "type Query {
     task(id: ID!): Task
@@ -53,6 +90,7 @@ input CreateTaskInput {
     title: String
     completed: Boolean
     thePriority: String
+    category: ID
 }
 
 type CreateTaskPayload {
@@ -64,6 +102,7 @@ input UpdateTaskInput {
     title: String
     completed: Boolean
     thePriority: String
+    category: ID
 }
 
 type UpdateTaskPayload {
@@ -79,7 +118,7 @@ type DeleteTaskPayload {
 type Category implements Node {
     id: String!
     name: String!
-    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): [Task!]!
+    tasks(limit: Int, page: Int, orderBy: tasksOrderBy, where: tasksWhere): TaskConnection
     nodeId: ID!
 }
 
@@ -101,7 +140,6 @@ type CategoryConnection {
 }
 
 input CreateCategoryInput {
-    id: String
     name: String
 }
 
@@ -111,7 +149,6 @@ type CreateCategoryPayload {
 }
 
 input UpdateCategoryInput {
-    id: String
     name: String
 }
 

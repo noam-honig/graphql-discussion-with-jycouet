@@ -300,16 +300,17 @@ Select a dedicated page.`,
         root[getSingleEntityKey](args, req, gqlInfo)
 
       // Connection (v1 items, v2 edges)
+      const connectionKey = `${getMetaType(meta)}Connection`
       root_query.fields.push({
         key,
         args: queryArgsConnection,
-        value: `${getMetaType(meta)}Connection`,
+        value: connectionKey,
         comment: `List all \`${getMetaType(
           meta,
         )}\` entity (with pagination, sorting and filtering)`,
       })
 
-      const connection = upsertTypes(`${getMetaType(meta)}Connection`, 'type')
+      const connection = upsertTypes(connectionKey, 'type')
       const totalCountKey = 'totalCount'
       connection.fields.push({
         key: totalCountKey,
@@ -548,15 +549,17 @@ Select a dedicated page.`,
             const val = r[f.key]
             if (val === null || val === undefined) return null
             r[f.key] = async (args: any, req: any, gqlInfo: any) => {
-              const queryResult: any[] = await root[refKey](
-                {
-                  ...args.where,
-                  where: { id: val },
-                  options: { limit: 1 },
-                },
-                req,
-                gqlInfo,
-              )
+              const queryResult: any[] = await (
+                await root[refKey](
+                  {
+                    ...args.where,
+                    where: { id: { eq: val } },
+                    options: { limit: 1 },
+                  },
+                  req,
+                  gqlInfo,
+                )
+              ).items()
               if (queryResult.length > 0) return queryResult[0]
               return null
             }
@@ -567,7 +570,7 @@ Select a dedicated page.`,
           refT.fields.push({
             key,
             args: queryArgsConnection,
-            value: `[${getMetaType(meta)}!]!`,
+            value: connectionKey,
             order: 10,
             comment: `List all \`${getMetaType(meta)}\` of \`${refKey}\``,
           })
@@ -577,7 +580,7 @@ Select a dedicated page.`,
             r[key] = async (args: any, req: any, gqlInfo: any) => {
               return await root[key](
                 {
-                  where: { ...args.where, [f.key]: val },
+                  where: { ...args.where, [f.key]: { eq: val } },
                   options: { ...args.limit, ...args.page, ...args.orderBy },
                 },
                 req,
@@ -604,20 +607,19 @@ Select a dedicated page.`,
           whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`)
         }
 
-        // TODO Noam: add a `!` for mandatory fields
-        // create
-        if (!f.dbReadOnly && it_is_not_at_ref) {
+        const includeInUpdateOrInsert = f.options.allowApiUpdate !== false
+        const updateType = it_is_not_at_ref ? type : 'ID'
+        if (includeInUpdateOrInsert) {
+          // create
           currentType.mutation.create.input.fields.push({
             key: f.key,
-            value: `${type}`,
+            value: updateType,
           })
-        }
 
-        // update
-        if (!f.dbReadOnly && it_is_not_at_ref) {
+          // update
           currentType.mutation.update.input.fields.push({
             key: f.key,
-            value: `${type}`,
+            value: updateType,
           })
         }
       }

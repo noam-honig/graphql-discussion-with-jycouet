@@ -9,9 +9,11 @@ npm run dev
 
 ## TO DOs
 - [x] remove page info from schema for v1
+- [ ] respect include in api
+- [ ] Test fetch tasks of categories
 - [ ] on create and update operation
-  - [ ] ,id of related entities
-  - [ ] reflect in the schema the apiUpdateAllowed and includeInApi
+  - [x] ,id of related entities
+  - [x] reflect in the schema the apiUpdateAllowed and includeInApi
   - [x] update
   - [x] create
   - [x] delete
@@ -29,6 +31,7 @@ npm run dev
   - [ ] Where AND
     - [x] typedefs
     - [ ] resolver (TODO Noam)
+  - [ ] filter on ref type id
 - [x] single entity query
   - [x] typedefs (JYC TODO) => rmv hardcoded id
   - [x] resolver
