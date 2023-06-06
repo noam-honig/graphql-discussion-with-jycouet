@@ -520,6 +520,7 @@ Select a dedicated page.`,
 
       const whereTypeFields: string[] = []
       for (const f of meta.fields) {
+        if (f.options.includeInApi === false) continue
         let type = 'String'
         switch (f.valueType) {
           case Boolean:
