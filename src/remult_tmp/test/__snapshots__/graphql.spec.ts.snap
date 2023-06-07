@@ -376,6 +376,42 @@ exports[`graphql-connection > test mutation update 1`] = `
 }
 `;
 
+exports[`graphql-connection > test nodes 1`] = `
+{
+  "data": {
+    "tasks": {
+      "items": [
+        {
+          "category": {
+            "nodeId": "categories:0",
+          },
+          "nodeId": "tasks:1",
+          "title": "task a",
+        },
+        {
+          "category": {
+            "nodeId": "categories:1",
+          },
+          "nodeId": "tasks:2",
+          "title": "task b",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`graphql-connection > test nodes 2`] = `
+{
+  "data": {
+    "node": {
+      "nodeId": "tasks:1",
+      "title": "task a",
+    },
+  },
+}
+`;
+
 exports[`graphql-connection > test where translator 1`] = `
 {
   "title": "aaa",

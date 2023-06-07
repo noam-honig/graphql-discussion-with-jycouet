@@ -16,6 +16,44 @@ describe('graphql-connection', () => {
     return await api['get internal server']().run({} as any, what)
   }
   let gql: (gql: string) => Promise<any>
+
+  it('test nodes', async () => {
+    await withRemult(async () => {
+      const cat = await remult.repo(Category).insert([{ name: 'c1' }, { name: 'c2' }])
+      return [
+        await remult.repo(Task).insert({ title: 'task a', category: cat[0] }),
+        await remult.repo(Task).insert({ title: 'task b', category: cat[1] }),
+      ]
+    })
+
+    const tasks: any = await gql(`
+    query{
+      tasks{
+        items{
+          title,
+          nodeId,
+          category{
+            nodeId
+          }
+        }
+      }
+    }`)
+
+    expect(tasks).toMatchSnapshot()
+    const taskNode = await gql(`
+    query{
+        node(nodeId: "${tasks.data.tasks.items[0].nodeId}"){
+          nodeId,
+          ... on Task{
+            title
+          }
+        }
+    }
+    `)
+    expect(taskNode).toMatchSnapshot()
+    expect(taskNode.data.node.title).toBe('task a')
+  })
+
   it('test where translator', async () => {
     const fields = await withRemult(async () => remult.repo(Task).fields)
     expect(
@@ -36,9 +74,7 @@ describe('graphql-connection', () => {
       },
     })
     expect(result).toMatchSnapshot()
-    
   })
-
 
   it('test where', async () => {
     await withRemult(() =>
@@ -110,7 +146,7 @@ describe('graphql-connection', () => {
       ).data.tasks.totalCount,
     ).toBe(2)
   })
-  
+
   it('test where not in', async () => {
     await withRemult(() =>
       remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
@@ -199,7 +235,7 @@ describe('graphql-connection', () => {
     `)
   })
 
-  it('test count 2', async () => {
+  it('test count two', async () => {
     await withRemult(() =>
       remult.repo(Task).insert([{ title: 'aaa' }, { title: 'bbb' }, { title: 'ccc' }]),
     )
@@ -333,4 +369,3 @@ describe('graphql-connection', () => {
 })
 
 remult.authenticated()
-

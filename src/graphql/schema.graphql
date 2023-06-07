@@ -204,7 +204,6 @@ input tasksWhere {
   completed: WhereBoolean
   thePriority: WhereString
   OR: [tasksWhere!]
-  AND: [tasksWhere!]
 }
 
 """
@@ -321,7 +320,6 @@ input categoriesWhere {
   id: WhereString
   name: WhereString
   OR: [categoriesWhere!]
-  AND: [categoriesWhere!]
 }
 
 """
@@ -403,7 +401,6 @@ input tagsWhere {
   id: WhereString
   value: WhereString
   OR: [tagsWhere!]
-  AND: [tagsWhere!]
 }
 
 """

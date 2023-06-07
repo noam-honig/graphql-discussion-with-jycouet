@@ -34,7 +34,7 @@ npm run dev
   - [x] resolver
 - [ ] node
   - [x] typedef JYC
-  - [ ] resolver
+  - [x] resolver
 - [ ] Test Request hack in graphql security - and test on all servers that security works
 - [ ] fix that loading of child entities will not cause getUser or init request again
 
@@ -67,6 +67,7 @@ d. return the object
 ### v later
 
 - [ ] Better support for Compound column id entities
+- [ ] support for id columns that are not called id
 - [ ] Connection (args & sttructure)
   - [x] typedefs
   - [ ] resolver

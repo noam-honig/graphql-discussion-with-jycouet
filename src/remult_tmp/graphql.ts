@@ -147,8 +147,9 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
   const root_query = upsertTypes('Query', 'type', -10)
   root_query.comment = `Represents all Remult entities.`
   const argId: Arg = { key: `id`, value: `ID!` }
+  const nodeIdKey = 'nodeId'
   const argNodeId: Arg = {
-    key: 'nodeId',
+    key: nodeIdKey,
     value: `ID!`,
     comment: `The globally unique \`ID\` _(_typename:id)_`,
   }
@@ -160,6 +161,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const key = meta.key
 
     const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
+    const nodeKey = 'node'
 
     if (key) {
       const createResultPromise = (
@@ -542,6 +544,9 @@ Select a dedicated page.`,
             break
         }
         const ref = entities.find((i: any) => i.entityType === f.valueType)
+        currentType.query.resultProcessors.push(r => {
+          r[nodeIdKey] = () => meta.key + ':' + meta.idMetadata.getId(r)
+        })
         if (ref !== undefined) {
           // will do: Task.category
           currentType.fields.push({
@@ -663,6 +668,22 @@ Select a dedicated page.`,
     pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
     pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
     pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  }
+  resolversQuery[nodeKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+    root[nodeKey](args, req, gqlInfo)
+  root[nodeKey] = async (args: any, req: any, gqlInfo: any) => {
+    const nodeId = args.nodeId
+    const sp = nodeId.split(':')
+    const meta = entities.find(x => x.key == sp[0])!
+    const r: any = await root[toPascalCase(getMetaType(meta))](
+      {
+        id: sp[1],
+      },
+      req,
+      gqlInfo,
+    )
+    r.__typename = getMetaType(meta)
+    return r
   }
 
   const orderByDirection = upsertTypes('OrderByDirection', 'enum', 30)
