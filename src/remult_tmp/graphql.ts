@@ -1,8 +1,9 @@
-import type { EntityMetadata, Field } from 'remult'
+import type { EntityMetadata, Field, FieldsMetadata } from 'remult'
 import type { RemultServerCore } from 'remult/server'
 import type { DataApi, DataApiResponse } from 'remult/src/data-api'
 
 const v2ConnectionAndPagination = false
+const andImplementation = false
 
 type Enum = { Enum: true }
 
@@ -146,8 +147,9 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
   const root_query = upsertTypes('Query', 'type', -10)
   root_query.comment = `Represents all Remult entities.`
   const argId: Arg = { key: `id`, value: `ID!` }
+  const nodeIdKey = 'nodeId'
   const argNodeId: Arg = {
-    key: 'nodeId',
+    key: nodeIdKey,
     value: `ID!`,
     comment: `The globally unique \`ID\` _(_typename:id)_`,
   }
@@ -215,9 +217,10 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
             req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
             // req should be "ctx" for context. inside, you have by default "YogaInitialContext", now I added session for example.
           }
-
+// [ ] reconsider if this should be moved outside the call to graphql
           await server.run(req, async () => {
-            const dApi = await server.getDataApi(req, meta)
+            const dApi = await server.getDataApi(req, meta) // [ ] - fix api to return also an up to date meta object, that we can use it's include in api etc... also in the where
+
             await work(dApi, response, setResult, arg1, req)
           })
         })
@@ -367,6 +370,7 @@ Select a dedicated page.`,
                 {
                   get: bridgeQueryOptionsToDataApiGet(arg1),
                 },
+                translateWhereToRestBody(meta.fields, arg1),
               )
             })
             rowsPromise = () => p
@@ -388,6 +392,7 @@ Select a dedicated page.`,
                 {
                   get: bridgeQueryOptionsToDataApiGet(arg1),
                 },
+                translateWhereToRestBody(meta.fields, arg1),
               )
             }),
           })
@@ -538,6 +543,9 @@ Select a dedicated page.`,
             break
         }
         const ref = entities.find((i: any) => i.entityType === f.valueType)
+        currentType.query.resultProcessors.push(r => {
+          r[nodeIdKey] = () => meta.key + ':' + meta.idMetadata.getId(r)
+        })
         if (ref !== undefined) {
           // will do: Task.category
           currentType.fields.push({
@@ -598,13 +606,13 @@ Select a dedicated page.`,
         }
 
         // sorting
-        orderByFields.push(`${f.key}: OrderByDirection`)
+        if (!f.isServerExpression) orderByFields.push(`${f.key}: OrderByDirection`)
 
         // helper
         const it_is_not_at_ref = ref === undefined
 
         // where
-        if (it_is_not_at_ref) {
+        if (it_is_not_at_ref && !f.isServerExpression) {
           whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`)
         }
 
@@ -634,7 +642,7 @@ Select a dedicated page.`,
       )
 
       whereTypeFields.push(`OR: [${key}Where!]`)
-      whereTypeFields.push(`AND: [${key}Where!]`)
+      if (andImplementation) whereTypeFields.push(`AND: [${key}Where!]`)
       currentType.query.whereType.push(
         blockFormat({
           prefix: `input ${key}Where`,
@@ -659,6 +667,22 @@ Select a dedicated page.`,
     pageInfo.fields.push({ key: 'hasNextPage', value: 'Boolean!' })
     pageInfo.fields.push({ key: 'hasPreviousPage', value: 'Boolean!' })
     pageInfo.fields.push({ key: 'startCursor', value: 'String!' })
+  }
+  resolversQuery[nodeKey] = (origItem: any, args: any, req: any, gqlInfo: any) =>
+    root[nodeKey](args, req, gqlInfo)
+  root[nodeKey] = async (args: any, req: any, gqlInfo: any) => {
+    const nodeId = args.nodeId
+    const sp = nodeId.split(':')
+    const meta = entities.find(x => x.key == sp[0])!
+    const r: any = await root[toPascalCase(getMetaType(meta))](
+      {
+        id: sp[1],
+      },
+      req,
+      gqlInfo,
+    )
+    r.__typename = getMetaType(meta)
+    return r
   }
 
   const orderByDirection = upsertTypes('OrderByDirection', 'enum', 30)
@@ -832,29 +856,30 @@ function bridgeQueryOptionsToDataApiGet(arg1: any) {
         }
       }
     }
-    if (where) {
-      // TODO Noam: OR management?
-      // TODO Noam: AND management?
+  }
+}
 
-      const whereAND: string[] = []
-      Object.keys(where).forEach(w => {
-        const subWhere = where[w]
-        Object.keys(subWhere).forEach(sw => {
-          let map = `${w}.${sw}`
-
-          if (map.endsWith('.eq')) {
-            map = `${w}`
-          }
-
-          if (map === key) {
-            whereAND.push(subWhere[sw])
-            return subWhere[sw]
-          }
-        })
-      })
-      if (whereAND.length > 0) {
-        return whereAND.join(',')
+export function translateWhereToRestBody<T>(fields: FieldsMetadata<T>, { where }: { where: any }) {
+  if (!where) return undefined
+  const result: any = {}
+  for (const field of fields) {
+    if (field.includedInApi === false) continue
+    const condition: any = where[field.key]
+    if (condition) {
+      const tr = (key: string, what: (val: any) => void) => {
+        const val = condition[key]
+        if (val != undefined) what(val)
       }
+
+      for (const op of ['gt', 'gte', 'lt', 'lte', 'ne', 'in']) {
+        tr(op, val => (result[field.key + '.' + op] = val))
+      }
+      tr('nin', x => (result[field.key + '.ne'] = x))
+      tr('eq', x => (result[field.key] = x))
     }
   }
+  if (where.OR) {
+    result.OR = where.OR.map((where: any) => translateWhereToRestBody(fields, { where }))
+  }
+  return result
 }

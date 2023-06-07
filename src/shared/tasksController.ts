@@ -10,4 +10,8 @@ export class TasksController {
       await taskRepo.save({ ...task, completed })
     }
   }
+  @BackendMethod({ allowed: true })
+  static testIt() {
+    return remult.user
+  }
 }

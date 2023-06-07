@@ -183,6 +183,10 @@ type Task implements Node {
   """
   category: Category
   """
+  User On Server
+  """
+  userOnServer: String!
+  """
   The globally unique `ID` _(_typename:id)_
   """
   nodeId: ID!
@@ -210,7 +214,6 @@ input tasksWhere {
   dueDate: WhereString
   thePriority: WhereString
   OR: [tasksWhere!]
-  AND: [tasksWhere!]
 }
 
 """
@@ -230,6 +233,7 @@ input CreateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 """
@@ -249,6 +253,7 @@ input UpdateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 """
@@ -329,7 +334,6 @@ input categoriesWhere {
   id: WhereString
   name: WhereString
   OR: [categoriesWhere!]
-  AND: [categoriesWhere!]
 }
 
 """
@@ -411,7 +415,6 @@ input tagsWhere {
   id: WhereString
   value: WhereString
   OR: [tagsWhere!]
-  AND: [tagsWhere!]
 }
 
 """

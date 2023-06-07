@@ -1,4 +1,4 @@
-import { describeClass, Entity, Field, Fields, ValueListFieldType } from 'remult'
+import { describeClass, Entity, Field, Fields, remult, ValueListFieldType } from 'remult'
 
 import { Category } from './Category'
 
@@ -46,6 +46,14 @@ class Task {
 
   @Field(() => Category, { allowNull: true })
   category?: Category
+
+  @Fields.string({
+    serverExpression: () => {
+      if (!remult.authenticated()) return 'noOne'
+      return JSON.stringify(remult.user)
+    },
+  })
+  userOnServer = ''
 }
 
 export class TaskPriority {

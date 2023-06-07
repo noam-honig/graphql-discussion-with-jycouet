@@ -62,6 +62,7 @@ type Task implements Node {
     dueDate: String!
     thePriority: String!
     category: Category
+    userOnServer: String!
     nodeId: ID!
 }
 
@@ -81,7 +82,6 @@ input tasksWhere {
   dueDate: WhereString
   thePriority: WhereString
   OR: [tasksWhere!]
-  AND: [tasksWhere!]
 }
 
 type TaskConnection {
@@ -95,6 +95,7 @@ input CreateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 type CreateTaskPayload {
@@ -108,6 +109,7 @@ input UpdateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 type UpdateTaskPayload {
@@ -136,7 +138,6 @@ input categoriesWhere {
   id: WhereString
   name: WhereString
   OR: [categoriesWhere!]
-  AND: [categoriesWhere!]
 }
 
 type CategoryConnection {
@@ -341,6 +342,7 @@ exports[`graphql-connection > test mutation create 2`] = `
       "id": "HIGH",
     },
     "title": "testing",
+    "userOnServer": "",
   },
 ]
 `;
@@ -367,6 +369,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
       "id": "HIGH",
     },
     "title": "task a",
+    "userOnServer": "",
   },
   Task {
     "category": null,
@@ -378,6 +381,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
       "id": "HIGH",
     },
     "title": "task c",
+    "userOnServer": "",
   },
 ]
 `;
@@ -392,5 +396,56 @@ exports[`graphql-connection > test mutation update 1`] = `
       },
     },
   },
+}
+`;
+
+exports[`graphql-connection > test nodes 1`] = `
+{
+  "data": {
+    "tasks": {
+      "items": [
+        {
+          "category": {
+            "nodeId": "categories:0",
+          },
+          "nodeId": "tasks:1",
+          "title": "task a",
+        },
+        {
+          "category": {
+            "nodeId": "categories:1",
+          },
+          "nodeId": "tasks:2",
+          "title": "task b",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`graphql-connection > test nodes 2`] = `
+{
+  "data": {
+    "node": {
+      "nodeId": "tasks:1",
+      "title": "task a",
+    },
+  },
+}
+`;
+
+exports[`graphql-connection > test where translator 1`] = `
+{
+  "title": "aaa",
+}
+`;
+
+exports[`graphql-connection > test where translator in 1`] = `
+{
+  "title.in": [
+    "aaa",
+    "ccc",
+  ],
 }
 `;

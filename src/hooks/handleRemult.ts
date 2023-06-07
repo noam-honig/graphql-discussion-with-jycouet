@@ -12,7 +12,8 @@ export const handleRemult = remultSveltekit({
   entities,
   controllers: [TasksController],
   getUser: async event => {
-    const session = await event?.locals?.getSession()
+    let session = (event as any).session
+    if (!session) session = await event?.locals?.getSession()
     return session?.user
   },
   initApi: async () => {},
