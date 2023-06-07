@@ -89,11 +89,11 @@ export const entitySytleCols = (s?: EntitySytle) => {
   classes.push(`lg:${s?.style?.cols ?? def}`)
 
   // Remove duplicates
-  let seenClasses = new Set()
-  let uniqueClasses = []
-  for (let classVal of classes) {
-    let splitVal = classVal.split(':')
-    let classValSuffix = splitVal.length > 1 ? splitVal.slice(1).join(':') : splitVal[0] // Get class value after : or the value itself if there's no :
+  const seenClasses = new Set()
+  const uniqueClasses = []
+  for (const classVal of classes) {
+    const splitVal = classVal.split(':')
+    const classValSuffix = splitVal.length > 1 ? splitVal.slice(1).join(':') : splitVal[0] // Get class value after : or the value itself if there's no :
     if (!seenClasses.has(classValSuffix)) {
       seenClasses.add(classValSuffix)
       uniqueClasses.push(classVal)

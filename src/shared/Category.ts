@@ -5,8 +5,9 @@ export
 @Entity('categories', { allowApiCrud: true })
 class Category {
   @Fields.string({
-    allowApiUpdate:false,
-    saving: async (_, ref) => {// created a consistent id for testing
+    allowApiUpdate: false,
+    saving: async (_, ref) => {
+      // created a consistent id for testing
       ref.value = (await ref.entityRef.repository.count()).toString()
     },
   })

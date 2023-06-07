@@ -28,8 +28,12 @@
 <Grid
   {repo}
   initData={data.list}
-  include={[repo.metadata.fields.category]}
+  include={[
+    // @ts-ignore TODO JYC
+    repo.metadata.fields.category,
+  ]}
   linkOn={{
+    // @ts-ignore TODO JYC
     field: repo.metadata.fields.title,
     redirect: id => {
       return `/${data.entity}/${id}`

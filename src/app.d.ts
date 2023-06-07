@@ -19,7 +19,7 @@ declare module 'remult' {
   export interface FieldOptions<entityType, valueType> extends EntitySytle {
     placeholder?: string
   }
-  export interface EntityOptions<entityType> extends EntitySytle {}
+  export type EntityOptions<entityType> = EntitySytle
 }
 
 export {}

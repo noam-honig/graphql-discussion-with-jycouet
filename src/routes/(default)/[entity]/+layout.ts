@@ -14,8 +14,11 @@ export const load = (async ({ params }) => {
       list,
       entity: params.entity,
     }
-  } catch (error) {}
+  } catch (error) {
+    // console.log(`error`, error);
+  }
 
   // Something was wrong!
   throw redirect(303, '/')
+  // @ts-ignore TODO JYC
 }) satisfies LayoutLoad

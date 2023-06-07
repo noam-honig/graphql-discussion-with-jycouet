@@ -24,7 +24,9 @@ export const getRepo = (
     // 100% sure it can be better!
     // @ts-ignore
     return remult.repo(entitiesObj[entity])
-  } catch (error) {}
+  } catch (error) {
+    // console.error(error)
+  }
 
   throw new Error(`Entity ${entity} not found`)
 }

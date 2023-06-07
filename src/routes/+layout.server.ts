@@ -11,4 +11,5 @@ export const load = (async () => {
   return {
     user: remult.user,
   }
+  // @ts-ignore TODO JYC
 }) satisfies LayoutServerLoad

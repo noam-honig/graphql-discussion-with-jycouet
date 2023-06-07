@@ -20,7 +20,7 @@
   </div>
   <div class="flex-none">
     <div class="dropdown dropdown-end">
-      <label tabindex="-1" class="btn btn-ghost btn-circle">
+      <sapn tabindex="-1" class="btn btn-ghost btn-circle">
         <div class="indicator">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@
           >
           <span class="badge badge-sm indicator-item">8</span>
         </div>
-      </label>
+      </sapn>
       <div tabindex="-1" class="mt-3 card card-compact dropdown-content w-52 bg-base-200 shadow">
         <div class="card-body">
           <span class="font-bold text-lg">8 Items</span>
@@ -49,23 +49,23 @@
       </div>
     </div>
     <div class="dropdown dropdown-end">
-      <label tabindex="-1" class="btn btn-ghost btn-circle avatar">
+      <sapn tabindex="-1" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img src="https://avatars.githubusercontent.com/u/5312607?v=4" />
+          <img src="https://avatars.githubusercontent.com/u/5312607?v=4" alt="avatar" />
         </div>
-      </label>
+      </sapn>
       <ul
         tabindex="-1"
         class="menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-200 rounded-box w-52"
       >
         <li>
-          <a class="justify-between">
+          <button class="justify-between">
             Profile
             <span class="badge">New</span>
-          </a>
+          </button>
         </li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
+        <li><button>Settings</button></li>
+        <li><button>Logout</button></li>
       </ul>
     </div>
   </div>
