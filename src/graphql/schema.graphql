@@ -11,20 +11,25 @@ type Query {
   """
   tasks(
     """
-    For **page by page** pagination.
-    Limit the number of result.
-    _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
     limit: Int
+  , 
     """
-    For **page by page** pagination.
-    Select a dedicated page.
+    
+For **page by page** pagination.
+Select a dedicated page.
     """
     page: Int
+  , 
     """
     Remult sorting options
     """
     orderBy: tasksOrderBy
+  , 
     """
     Remult filtering options
     """
@@ -39,20 +44,25 @@ type Query {
   """
   categories(
     """
-    For **page by page** pagination.
-    Limit the number of result.
-    _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
     limit: Int
+  , 
     """
-    For **page by page** pagination.
-    Select a dedicated page.
+    
+For **page by page** pagination.
+Select a dedicated page.
     """
     page: Int
+  , 
     """
     Remult sorting options
     """
     orderBy: categoriesOrderBy
+  , 
     """
     Remult filtering options
     """
@@ -67,20 +77,25 @@ type Query {
   """
   tags(
     """
-    For **page by page** pagination.
-    Limit the number of result.
-    _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
     limit: Int
+  , 
     """
-    For **page by page** pagination.
-    Select a dedicated page.
+    
+For **page by page** pagination.
+Select a dedicated page.
     """
     page: Int
+  , 
     """
     Remult sorting options
     """
     orderBy: tagsOrderBy
+  , 
     """
     Remult filtering options
     """
@@ -120,11 +135,7 @@ type Mutation {
   """
   Update a `Category`
   """
-  updateCategory(
-    id: ID!
-    patch: UpdateCategoryInput!
-    clientMutationId: String
-  ): UpdateCategoryPayload
+  updateCategory(id: ID!, patch: UpdateCategoryInput!, clientMutationId: String): UpdateCategoryPayload
   """
   Delete a `Category`
   """
@@ -209,56 +220,56 @@ input tasksWhere {
 The type for `TaskConnection`
 """
 type TaskConnection {
-  totalCount: Int!
-  items: [Task!]!
+    totalCount: Int!
+    items: [Task!]!
 }
 
 """
 The input for `CreateTaskInput`
 """
 input CreateTaskInput {
-  title: String
-  completed: Boolean
-  dueDate: String
-  thePriority: String
-  category: ID
-  userOnServer: String
+    title: String
+    completed: Boolean
+    dueDate: String
+    thePriority: String
+    category: ID
+    userOnServer: String
 }
 
 """
 The type for `CreateTaskPayload`
 """
 type CreateTaskPayload {
-  task: Task
-  clientMutationId: String
+    task: Task
+    clientMutationId: String
 }
 
 """
 The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
-  title: String
-  completed: Boolean
-  dueDate: String
-  thePriority: String
-  category: ID
-  userOnServer: String
+    title: String
+    completed: Boolean
+    dueDate: String
+    thePriority: String
+    category: ID
+    userOnServer: String
 }
 
 """
 The type for `UpdateTaskPayload`
 """
 type UpdateTaskPayload {
-  task: Task
-  clientMutationId: String
+    task: Task
+    clientMutationId: String
 }
 
 """
 The type for `DeleteTaskPayload`
 """
 type DeleteTaskPayload {
-  id: ID
-  clientMutationId: String
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -278,20 +289,25 @@ type Category implements Node {
   """
   tasks(
     """
-    For **page by page** pagination.
-    Limit the number of result.
-    _Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
+    
+For **page by page** pagination.
+Limit the number of result. 
+_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
     """
     limit: Int
+  , 
     """
-    For **page by page** pagination.
-    Select a dedicated page.
+    
+For **page by page** pagination.
+Select a dedicated page.
     """
     page: Int
+  , 
     """
     Remult sorting options
     """
     orderBy: tasksOrderBy
+  , 
     """
     Remult filtering options
     """
@@ -324,46 +340,46 @@ input categoriesWhere {
 The type for `CategoryConnection`
 """
 type CategoryConnection {
-  totalCount: Int!
-  items: [Category!]!
+    totalCount: Int!
+    items: [Category!]!
 }
 
 """
 The input for `CreateCategoryInput`
 """
 input CreateCategoryInput {
-  name: String
+    name: String
 }
 
 """
 The type for `CreateCategoryPayload`
 """
 type CreateCategoryPayload {
-  category: Category
-  clientMutationId: String
+    category: Category
+    clientMutationId: String
 }
 
 """
 The input for `UpdateCategoryInput`
 """
 input UpdateCategoryInput {
-  name: String
+    name: String
 }
 
 """
 The type for `UpdateCategoryPayload`
 """
 type UpdateCategoryPayload {
-  category: Category
-  clientMutationId: String
+    category: Category
+    clientMutationId: String
 }
 
 """
 The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
-  id: ID
-  clientMutationId: String
+    id: ID
+    clientMutationId: String
 }
 
 """
@@ -405,177 +421,177 @@ input tagsWhere {
 The type for `TagConnection`
 """
 type TagConnection {
-  totalCount: Int!
-  items: [Tag!]!
+    totalCount: Int!
+    items: [Tag!]!
 }
 
 """
 The input for `CreateTagInput`
 """
 input CreateTagInput {
-  value: String
+    value: String
 }
 
 """
 The type for `CreateTagPayload`
 """
 type CreateTagPayload {
-  tag: Tag
-  clientMutationId: String
+    tag: Tag
+    clientMutationId: String
 }
 
 """
 The input for `UpdateTagInput`
 """
 input UpdateTagInput {
-  value: String
+    value: String
 }
 
 """
 The type for `UpdateTagPayload`
 """
 type UpdateTagPayload {
-  tag: Tag
-  clientMutationId: String
+    tag: Tag
+    clientMutationId: String
 }
 
 """
 The type for `DeleteTagPayload`
 """
 type DeleteTagPayload {
-  id: ID
-  clientMutationId: String
+    id: ID
+    clientMutationId: String
 }
 
 """
 The input for `WhereString`
 """
 input WhereString {
-  eq: String
-  ne: String
-  in: [String!]
-  nin: [String!]
-  gt: String
-  gte: String
-  lt: String
-  lte: String
-  st: String
+    eq: String
+    ne: String
+    in: [String!]
+    nin: [String!]
+    gt: String
+    gte: String
+    lt: String
+    lte: String
+    st: String
 }
 
 """
 The input for `WhereStringNullable`
 """
 input WhereStringNullable {
-  eq: String
-  ne: String
-  in: [String!]
-  nin: [String!]
-  gt: String
-  gte: String
-  lt: String
-  lte: String
-  st: String
-  null: Boolean
+    eq: String
+    ne: String
+    in: [String!]
+    nin: [String!]
+    gt: String
+    gte: String
+    lt: String
+    lte: String
+    st: String
+    null: Boolean
 }
 
 """
 The input for `WhereInt`
 """
 input WhereInt {
-  eq: Int
-  ne: Int
-  in: [Int!]
-  nin: [Int!]
-  gt: Int
-  gte: Int
-  lt: Int
-  lte: Int
+    eq: Int
+    ne: Int
+    in: [Int!]
+    nin: [Int!]
+    gt: Int
+    gte: Int
+    lt: Int
+    lte: Int
 }
 
 """
 The input for `WhereIntNullable`
 """
 input WhereIntNullable {
-  eq: Int
-  ne: Int
-  in: [Int!]
-  nin: [Int!]
-  gt: Int
-  gte: Int
-  lt: Int
-  lte: Int
-  null: Boolean
+    eq: Int
+    ne: Int
+    in: [Int!]
+    nin: [Int!]
+    gt: Int
+    gte: Int
+    lt: Int
+    lte: Int
+    null: Boolean
 }
 
 """
 The input for `WhereFloat`
 """
 input WhereFloat {
-  eq: Float
-  ne: Float
-  in: [Float!]
-  nin: [Float!]
-  gt: Float
-  gte: Float
-  lt: Float
-  lte: Float
+    eq: Float
+    ne: Float
+    in: [Float!]
+    nin: [Float!]
+    gt: Float
+    gte: Float
+    lt: Float
+    lte: Float
 }
 
 """
 The input for `WhereFloatNullable`
 """
 input WhereFloatNullable {
-  eq: Float
-  ne: Float
-  in: [Float!]
-  nin: [Float!]
-  gt: Float
-  gte: Float
-  lt: Float
-  lte: Float
-  null: Boolean
+    eq: Float
+    ne: Float
+    in: [Float!]
+    nin: [Float!]
+    gt: Float
+    gte: Float
+    lt: Float
+    lte: Float
+    null: Boolean
 }
 
 """
 The input for `WhereBoolean`
 """
 input WhereBoolean {
-  eq: Boolean
-  ne: Boolean
-  in: [Boolean!]
-  nin: [Boolean!]
+    eq: Boolean
+    ne: Boolean
+    in: [Boolean!]
+    nin: [Boolean!]
 }
 
 """
 The input for `WhereBooleanNullable`
 """
 input WhereBooleanNullable {
-  eq: Boolean
-  ne: Boolean
-  in: [Boolean!]
-  nin: [Boolean!]
-  null: Boolean
+    eq: Boolean
+    ne: Boolean
+    in: [Boolean!]
+    nin: [Boolean!]
+    null: Boolean
 }
 
 """
 The input for `WhereID`
 """
 input WhereID {
-  eq: ID
-  ne: ID
-  in: [ID!]
-  nin: [ID!]
+    eq: ID
+    ne: ID
+    in: [ID!]
+    nin: [ID!]
 }
 
 """
 The input for `WhereIDNullable`
 """
 input WhereIDNullable {
-  eq: ID
-  ne: ID
-  in: [ID!]
-  nin: [ID!]
-  null: Boolean
+    eq: ID
+    ne: ID
+    in: [ID!]
+    nin: [ID!]
+    null: Boolean
 }
 
 """

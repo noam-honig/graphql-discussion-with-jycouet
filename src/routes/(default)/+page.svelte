@@ -9,6 +9,9 @@
     <Link href="/tasks-graphql">tasks-graphql</Link>
   </li>
   <li>
+    <Link href="/api/graphql" target="_blank">GraphiQL</Link>
+  </li>
+  <li>
     <Link href="/Task">Task</Link>
   </li>
   <li>

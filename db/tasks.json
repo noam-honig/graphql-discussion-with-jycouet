@@ -1,72 +1,37 @@
 [
   {
     "id": 1,
-    "title": "Oui",
-    "completed": true,
-    "dueDate": "2023-06-14",
-    "thePriority": "CRITICAL",
-    "category": "cliel404a0000ktbyb0oibhwq"
-  },
-  {
-    "id": 7,
-    "title": "Yop ooo2",
-    "completed": true,
-    "category": null,
-    "dueDate": "2020-02-04"
-  },
-  {
-    "id": 9,
-    "title": "Hello",
-    "completed": true,
-    "thePriority": 1,
-    "category": null
-  },
-  {
-    "id": 10,
-    "title": "coucou",
+    "title": "Getting organized",
+    "thePriority": "HIGH",
     "completed": false,
-    "dueDate": "2023-06-10",
-    "thePriority": "CRITICAL",
-    "category": null
+    "category": "123"
   },
   {
-    "id": 11,
-    "title": "Hello you?yes?",
+    "id": 2,
+    "title": "test",
     "completed": false,
-    "dueDate": "2023-06-10",
-    "thePriority": "LOW",
-    "category": null
+    "thePriority": "HIGH",
+    "category": "cli1up0bn000008lac9rpff93"
   },
   {
-    "id": 12,
-    "title": "Yes!",
+    "id": 3,
+    "title": "test",
     "completed": false,
-    "dueDate": "2023-06-10",
     "thePriority": "HIGH",
     "category": null
   },
   {
-    "id": 13,
-    "title": "titi",
+    "id": 4,
+    "title": "test",
     "completed": false,
-    "dueDate": "2023-06-13",
     "thePriority": "HIGH",
     "category": null
   },
   {
-    "id": 14,
-    "title": "tutu222",
+    "id": 5,
+    "title": "test",
     "completed": false,
-    "dueDate": "2023-06-13",
     "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 15,
-    "title": "xsxqsxqxs",
-    "completed": false,
-    "dueDate": "2023-06-13",
-    "thePriority": "CRITICAL",
     "category": null
   }
 ]
