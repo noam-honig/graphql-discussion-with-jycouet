@@ -49,6 +49,7 @@ class Task {
 
   @Fields.string({
     serverExpression: () => {
+      return ''
       if (!remult.authenticated()) return 'noOne'
       return JSON.stringify(remult.user)
     },
