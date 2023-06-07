@@ -1,6 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { displayValue, fieldVisibility } from '$lib/remult-svelte/helper'
+  import {
+    displayValue,
+    entitySytleCols,
+    entitySytleSpan,
+    fieldVisibility,
+  } from '$lib/remult-svelte/helper'
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
@@ -98,7 +103,7 @@
 </script>
 
 <form on:submit|preventDefault={submit}>
-  <div class="grid grid-cols-3 gap-4">
+  <div class={`grid ${entitySytleCols(repo.metadata.options)} gap-4`}>
     {#each repo.fields.toArray().filter(f => fieldVisibility(f, mode, include, exclude)) as field}
       {@const inputType = field.inputType}
       <div class="form-control">
@@ -147,7 +152,7 @@
       </div>
     {/each}
 
-    <div class="col-span-3 grid justify-items-end">
+    <div class="grid {entitySytleSpan(repo.metadata.options)} justify-items-end">
       <div class="flex gap-4">
         {#if mode === 'readonly'}
           <Button on:click={() => (mode = 'update')} variant="neutral" type="button">Edit</Button>

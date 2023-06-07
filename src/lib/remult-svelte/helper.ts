@@ -45,3 +45,66 @@ export const fieldVisibility = (
 
   return allowNull && readOnly
 }
+
+export type EntitySytle = {
+  style?: EntitySytleScreen & {
+    tablet?: EntitySytleScreen
+    mobile?: EntitySytleScreen
+  }
+}
+
+export type EntitySytleScreen = {
+  cols?:
+    | 'grid-cols-1'
+    | 'grid-cols-2'
+    | 'grid-cols-3'
+    | 'grid-cols-4'
+    | 'grid-cols-5'
+    | 'grid-cols-6'
+}
+
+export type FieldSytleScreen = {
+  hide?: boolean
+  cols?: number
+  span?: number
+}
+
+export type FieldSytle = {
+  style?: FieldSytleScreen & {
+    tablet?: FieldSytleScreen
+    mobile?: FieldSytleScreen
+  }
+}
+
+export const entitySytleCols = (s?: EntitySytle) => {
+  const classes = []
+  const def = 'grid-cols-3'
+  // Mobile first
+  classes.push(`${s?.style?.mobile?.cols ?? s?.style?.tablet?.cols ?? s?.style?.cols ?? def}`)
+
+  // Then tablet
+  classes.push(`sm:${s?.style?.tablet?.cols ?? s?.style?.cols ?? def}`)
+
+  // Then desktop
+  classes.push(`lg:${s?.style?.cols ?? def}`)
+
+  // Remove duplicates
+  let seenClasses = new Set()
+  let uniqueClasses = []
+  for (let classVal of classes) {
+    let splitVal = classVal.split(':')
+    let classValSuffix = splitVal.length > 1 ? splitVal.slice(1).join(':') : splitVal[0] // Get class value after : or the value itself if there's no :
+    if (!seenClasses.has(classValSuffix)) {
+      seenClasses.add(classValSuffix)
+      uniqueClasses.push(classVal)
+    }
+  }
+
+  // Restore original order & join
+  return uniqueClasses.join(' ')
+}
+
+export const entitySytleSpan = (s?: EntitySytle) => {
+  const str = entitySytleCols(s)
+  return str.replace(/grid-cols-/g, 'col-span-')
+}

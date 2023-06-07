@@ -5,6 +5,11 @@ import { Category } from './Category'
 export
 @Entity('tasks', {
   allowApiCrud: true,
+  style: {
+    // cols: 'grid-cols-4',
+    tablet: { cols: 'grid-cols-2' },
+    mobile: { cols: 'grid-cols-1' },
+  },
   // We will set this later to see the behavior in GraphQL
   // allowApiInsert: 'admin',
 })
@@ -26,7 +31,6 @@ class Task {
 
   @Fields.boolean({
     caption: 'Is it completed?',
-    hideInCreate: true,
     displayValue: task => (task.completed ? 'Yes' : 'No'),
   })
   completed = false
@@ -40,7 +44,7 @@ class Task {
   @Field(() => TaskPriority, { inputType: 'select' }) // TODO: how to bind this to a select from the type directly?
   thePriority = TaskPriority.High
 
-  @Field(() => Category, { allowNull: true})
+  @Field(() => Category, { allowNull: true })
   category?: Category
 }
 

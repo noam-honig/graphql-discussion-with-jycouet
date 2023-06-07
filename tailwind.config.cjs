@@ -2,6 +2,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
+  safelist: [
+    {
+      pattern: /grid-cols-(1|2|3|4|5|6)/, // You can display all the colors that you need
+      variants: ['sm', 'lg'], // Optional
+    },
+    {
+      pattern: /col-span-(1|2|3|4|5|6)/, // You can display all the colors that you need
+      variants: ['sm', 'lg'], // Optional
+    },
+  ],
   daisyui: {
     themes: [
       {

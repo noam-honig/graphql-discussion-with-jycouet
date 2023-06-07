@@ -1,4 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
+import type { EntitySytle, FieldSytle } from '$lib/remult-svelte/helper'
+
 // for information about these interfaces
 declare global {
   namespace App {
@@ -14,10 +16,10 @@ declare global {
 }
 
 declare module 'remult' {
-  export interface FieldOptions<entityType, valueType> {
+  export interface FieldOptions<entityType, valueType> extends EntitySytle {
     placeholder?: string
-    hideInCreate?: boolean
   }
+  export interface EntityOptions<entityType> extends EntitySytle {}
 }
 
 export {}
