@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from '$lib/svelte-fields/Button/Button.svelte'
   import Grid from '$lib/svelte-fields/Grid/Grid.svelte'
   import Link from '$lib/svelte-fields/Link/Link.svelte'
   import H2 from '$lib/svelte-fields/Text/H2.svelte'

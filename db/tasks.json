@@ -4,34 +4,39 @@
     "title": "Getting organized",
     "thePriority": "HIGH",
     "completed": false,
-    "category": "123"
+    "category": "cli1up0bn000008lac9rpff93",
+    "dueDate": "2023-06-14"
   },
   {
     "id": 2,
-    "title": "test",
+    "title": "Write the plan",
     "completed": false,
-    "thePriority": "HIGH",
-    "category": "cli1up0bn000008lac9rpff93"
+    "thePriority": "CRITICAL",
+    "category": "cli1up0bn000008lac9rpff93",
+    "dueDate": "2023-06-14"
   },
   {
     "id": 3,
-    "title": "test",
+    "title": "Rest a bit",
     "completed": false,
     "thePriority": "HIGH",
-    "category": null
+    "category": null,
+    "dueDate": "2023-06-14"
   },
   {
     "id": 4,
-    "title": "test",
+    "title": "Finish v1",
     "completed": false,
     "thePriority": "HIGH",
-    "category": null
+    "category": null,
+    "dueDate": "2023-06-14"
   },
   {
     "id": 5,
-    "title": "test",
+    "title": "Review",
     "completed": false,
     "thePriority": "HIGH",
-    "category": null
+    "category": null,
+    "dueDate": "2023-06-14"
   }
 ]
