@@ -335,7 +335,7 @@ exports[`graphql-connection > test mutation create 2`] = `
   Task {
     "category": null,
     "completed": false,
-    "dueDate": 2023-06-08T22:00:00.000Z,
+    "dueDate": 2023-06-13T22:00:00.000Z,
     "id": 1,
     "thePriority": TaskPriority {
       "caption": "High ‼️",
@@ -362,7 +362,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
   Task {
     "category": null,
     "completed": false,
-    "dueDate": 2023-06-08T22:00:00.000Z,
+    "dueDate": 2023-06-13T22:00:00.000Z,
     "id": 1,
     "thePriority": TaskPriority {
       "caption": "High ‼️",
@@ -374,7 +374,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
   Task {
     "category": null,
     "completed": false,
-    "dueDate": 2023-06-08T22:00:00.000Z,
+    "dueDate": 2023-06-13T22:00:00.000Z,
     "id": 3,
     "thePriority": TaskPriority {
       "caption": "High ‼️",
@@ -406,16 +406,16 @@ exports[`graphql-connection > test nodes 1`] = `
       "items": [
         {
           "category": {
-            "nodeId": "categories:0",
+            "nodeId": "Category:0",
           },
-          "nodeId": "tasks:1",
+          "nodeId": "Task:1",
           "title": "task a",
         },
         {
           "category": {
-            "nodeId": "categories:1",
+            "nodeId": "Category:1",
           },
-          "nodeId": "tasks:2",
+          "nodeId": "Task:2",
           "title": "task b",
         },
       ],
@@ -428,7 +428,7 @@ exports[`graphql-connection > test nodes 2`] = `
 {
   "data": {
     "node": {
-      "nodeId": "tasks:1",
+      "nodeId": "Task:1",
       "title": "task a",
     },
   },

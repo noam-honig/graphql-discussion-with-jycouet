@@ -130,8 +130,9 @@ describe('graphql-connection', () => {
     ).toBe(2)
   })
   it('test where or', async () => {
-    await withRemult(() =>
-      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    await withRemult(
+      async () =>
+        await remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
     )
     expect(
       (

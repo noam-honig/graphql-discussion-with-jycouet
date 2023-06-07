@@ -277,7 +277,7 @@ Select a dedicated page.`,
           },
         )
       }
-      const getSingleEntityKey = toPascalCase(getMetaType(meta))
+      const getSingleEntityKey = toCamelCase(getMetaType(meta))
       root_query.fields.push({
         key: getSingleEntityKey,
         args: [argId],
@@ -423,7 +423,7 @@ Select a dedicated page.`,
       currentType.mutation.create.payload = upsertTypes(createPayload)
       currentType.mutation.create.payload.fields.push(
         {
-          key: `${toPascalCase(getMetaType(meta))}`,
+          key: `${toCamelCase(getMetaType(meta))}`,
           value: `${getMetaType(meta)}`,
         },
         argClientMutationId,
@@ -436,7 +436,7 @@ Select a dedicated page.`,
               created: y => {
                 currentType.query.resultProcessors.forEach(z => z(y))
                 setResult({
-                  [toPascalCase(getMetaType(meta))]: y,
+                  [toCamelCase(getMetaType(meta))]: y,
                 })
               },
             },
@@ -463,7 +463,7 @@ Select a dedicated page.`,
       currentType.mutation.update.payload = upsertTypes(updatePayload)
       currentType.mutation.update.payload.fields.push(
         {
-          key: `${toPascalCase(getMetaType(meta))}`,
+          key: `${toCamelCase(getMetaType(meta))}`,
           value: `${getMetaType(meta)}`,
         },
         argClientMutationId,
@@ -476,7 +476,7 @@ Select a dedicated page.`,
               success: y => {
                 currentType.query.resultProcessors.forEach(z => z(y))
                 setResult({
-                  [toPascalCase(getMetaType(meta))]: y,
+                  [toCamelCase(getMetaType(meta))]: y,
                 })
               },
             },
@@ -544,7 +544,7 @@ Select a dedicated page.`,
         }
         const ref = entities.find((i: any) => i.entityType === f.valueType)
         currentType.query.resultProcessors.push(r => {
-          r[nodeIdKey] = () => meta.key + ':' + meta.idMetadata.getId(r)
+          r[nodeIdKey] = () => getMetaType(meta) + ':' + meta.idMetadata.getId(r)
         })
         if (ref !== undefined) {
           // will do: Task.category
@@ -673,15 +673,14 @@ Select a dedicated page.`,
   root[nodeKey] = async (args: any, req: any, gqlInfo: any) => {
     const nodeId = args.nodeId
     const sp = nodeId.split(':')
-    const meta = entities.find(x => x.key == sp[0])!
-    const r: any = await root[toPascalCase(getMetaType(meta))](
+    const r: any = await root[toCamelCase(sp[0])](
       {
         id: sp[1],
       },
       req,
       gqlInfo,
     )
-    r.__typename = getMetaType(meta)
+    r.__typename = sp[0]
     return r
   }
 
@@ -820,7 +819,7 @@ function getMetaType(entityMeta: EntityMetadata) {
   return entityMeta.entityType.name
 }
 
-function toPascalCase(str: string) {
+function toCamelCase(str: string) {
   return str
     .split('')
     .map((c, i) => (i === 0 ? c.toLowerCase() : c))
