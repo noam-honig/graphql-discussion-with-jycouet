@@ -217,7 +217,7 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
             req = req.req //TODO - yoga sends its own request object - and in it you get the original request (need to test with svelte and next)
             // req should be "ctx" for context. inside, you have by default "YogaInitialContext", now I added session for example.
           }
-
+// [ ] reconsider if this should be moved outside the call to graphql
           await server.run(req, async () => {
             const dApi = await server.getDataApi(req, meta) // [ ] - fix api to return also an up to date meta object, that we can use it's include in api etc... also in the where
 
