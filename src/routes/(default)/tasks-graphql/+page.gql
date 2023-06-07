@@ -1,4 +1,4 @@
-query Tasks @cache(policy: CacheAndNetwork) {
+query Tasks {
   tasks(orderBy: { id: DESC }) {
     totalCount
     items {

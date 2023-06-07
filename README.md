@@ -35,6 +35,7 @@ npm run dev
 - [x] node
   - [x] typedef JYC
   - [x] resolver
+- [ ] remove "express"?
 - [ ] Test Request hack in graphql security - and test on all servers that security works
 - [ ] fix that loading of child entities will not cause getUser or init request again
 
