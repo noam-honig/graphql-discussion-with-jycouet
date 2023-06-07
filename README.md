@@ -32,7 +32,7 @@ npm run dev
   - [x] single entity query
   - [x] typedefs (JYC TODO) => rmv hardcoded id
   - [x] resolver
-- [ ] node
+- [x] node
   - [x] typedef JYC
   - [x] resolver
 - [ ] Test Request hack in graphql security - and test on all servers that security works
