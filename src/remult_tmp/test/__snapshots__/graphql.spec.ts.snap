@@ -61,6 +61,7 @@ type Task implements Node {
     completed: Boolean!
     thePriority: String!
     category: Category
+    userOnServer: String!
     nodeId: ID!
 }
 
@@ -90,6 +91,7 @@ input CreateTaskInput {
     completed: Boolean
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 type CreateTaskPayload {
@@ -102,6 +104,7 @@ input UpdateTaskInput {
     completed: Boolean
     thePriority: String
     category: ID
+    userOnServer: String
 }
 
 type UpdateTaskPayload {
@@ -330,6 +333,7 @@ exports[`graphql-connection > test mutation create 2`] = `
     "id": 1,
     "thePriority": 1,
     "title": "testing",
+    "userOnServer": "",
   },
 ]
 `;
@@ -352,6 +356,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
     "id": 1,
     "thePriority": 1,
     "title": "task a",
+    "userOnServer": "",
   },
   Task {
     "category": null,
@@ -359,6 +364,7 @@ exports[`graphql-connection > test mutation delete 2`] = `
     "id": 3,
     "thePriority": 1,
     "title": "task c",
+    "userOnServer": "",
   },
 ]
 `;

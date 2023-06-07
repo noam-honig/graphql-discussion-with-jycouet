@@ -1,4 +1,4 @@
-import { Entity, Field, Fields } from 'remult'
+import { Entity, Field, Fields, remult } from 'remult'
 
 import { Category } from './Category'
 
@@ -43,8 +43,15 @@ class Task {
   })
   thePriority = Priority.High
 
-  @Field(() => Category, { allowNull: true})
+  @Field(() => Category, { allowNull: true })
   category?: Category
+
+  @Fields.string({
+    serverExpression: () => {
+      return ""
+    },
+  })
+  userOnServer = ''
 }
 
 export enum Priority {

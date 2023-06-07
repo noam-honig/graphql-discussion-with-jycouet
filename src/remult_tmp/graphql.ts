@@ -161,7 +161,6 @@ export function remultGraphql(api: RemultServerCore<any>, options?: { removeComm
     const key = meta.key
 
     const currentType = upsertTypes(getMetaType(meta), 'type_impl_node')
-    const nodeKey = 'node'
 
     if (key) {
       const createResultPromise = (
@@ -607,13 +606,13 @@ Select a dedicated page.`,
         }
 
         // sorting
-        orderByFields.push(`${f.key}: OrderByDirection`)
+        if (!f.isServerExpression) orderByFields.push(`${f.key}: OrderByDirection`)
 
         // helper
         const it_is_not_at_ref = ref === undefined
 
         // where
-        if (it_is_not_at_ref) {
+        if (it_is_not_at_ref && !f.isServerExpression) {
           whereTypeFields.push(`${f.key}: Where${type}${f.allowNull ? 'Nullable' : ''}`)
         }
 
