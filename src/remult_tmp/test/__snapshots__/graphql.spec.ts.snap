@@ -78,7 +78,6 @@ input tasksWhere {
   completed: WhereBoolean
   thePriority: WhereString
   OR: [tasksWhere!]
-  AND: [tasksWhere!]
 }
 
 type TaskConnection {
@@ -131,7 +130,6 @@ input categoriesWhere {
   id: WhereString
   name: WhereString
   OR: [categoriesWhere!]
-  AND: [categoriesWhere!]
 }
 
 type CategoryConnection {
@@ -375,5 +373,20 @@ exports[`graphql-connection > test mutation update 1`] = `
       },
     },
   },
+}
+`;
+
+exports[`graphql-connection > test where translator 1`] = `
+{
+  "title": "aaa",
+}
+`;
+
+exports[`graphql-connection > test where translator in 1`] = `
+{
+  "title.in": [
+    "aaa",
+    "ccc",
+  ],
 }
 `;

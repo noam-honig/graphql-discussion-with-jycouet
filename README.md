@@ -8,6 +8,7 @@ npm run dev
 ```
 
 ## TO DOs
+
 - [x] remove page info from schema for v1
 - [x] respect include in api
 - [x] Test fetch tasks of categories
@@ -18,33 +19,29 @@ npm run dev
   - [x] create
   - [x] delete
 - [x] # where not in (nin?) TODO JYC
-- [ ] Where:
-  - [ ] where not in (nin?)
-    - [ ] typedefs
-    - [ ] implementation
-  - [ ] where in
+- [x] Where:
+  - [x] where not in (nin?)
     - [x] typedefs
-    - [ ] resolver TODO Noam
-  - [ ] Where OR
+    - [x] implementation
+  - [x] where in
+    - [x] typedefs
+    - [x] resolver TODO Noam
+  - [x] Where OR
     - [x] typedefs
     - [x] resolver (TODO Noam)
-  - [ ] Where AND
-    - [x] typedefs
-    - [ ] resolver (TODO Noam)
-  - [ ] filter on ref type id
-- [x] single entity query
+  - [x] single entity query
   - [x] typedefs (JYC TODO) => rmv hardcoded id
   - [x] resolver
 - [ ] node
   - [x] typedef JYC
   - [ ] resolver
 - [ ] Test Request hack in graphql security - and test on all servers that security works
+- [ ] fix that loading of child entities will not cause getUser or init request again
+
 ## JYC
+
 - [ ] scalars (TODO JYC)
 - [ ] throw new GraphQLError(`Forbidden`) (to speak about)
-
-
-
 
 a. need to check the field selection. (you can copy this:
 https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts)
@@ -76,6 +73,14 @@ d. return the object
 - [ ] dataloader (optimisation)
 - [ ] @Entity Virtual
 - [ ] Subscriptions
+- [ ] Where
+  - [ ] Where AND - any filter can be expressed without it, since you can set .lt and .gt in the
+        same filter and it'll work - so leaving that out for now
+    - [x] typedefs
+    - [ ] resolver (TODO Noam)
+  - [ ] contains
+  - [ ] null
+  - [ ] filter on ref type id
 
 ## Open questions
 
@@ -104,5 +109,3 @@ d. return the object
 - [x] Should category connection return a task connection at it's tasks?
   - [x] Yes, good idea. (JYC todo)
   - [x] items (JYC todo)
-
-

@@ -1,12 +1,12 @@
 import { createSchema, createYoga } from 'graphql-yoga'
-import { InMemoryDataProvider, remult } from 'remult'
+import { Filter, InMemoryDataProvider, remult } from 'remult'
 import { remultExpress, type RemultExpressServer } from 'remult/remult-express'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { Category } from '../../shared/Category'
 import { Task } from '../../shared/Task'
 import { TasksController } from '../../shared/tasksController'
-import { remultGraphql } from '../graphql'
+import { remultGraphql, translateWhereToRestBody } from '../graphql'
 
 // import { remultSveltekit, type RemultSveltekitServer } from 'remult/remult-sveltekit';
 
@@ -16,6 +16,120 @@ describe('graphql-connection', () => {
     return await api['get internal server']().run({} as any, what)
   }
   let gql: (gql: string) => Promise<any>
+  it('test where translator', async () => {
+    const fields = await withRemult(async () => remult.repo(Task).fields)
+    expect(
+      translateWhereToRestBody(fields, {
+        where: {
+          title: { eq: 'aaa' },
+        },
+      }),
+    ).toMatchSnapshot()
+  })
+  it('test where translator in', async () => {
+    const meta = await withRemult(async () => remult.repo(Task).metadata)
+    const result = translateWhereToRestBody(meta.fields, {
+      where: {
+        title: {
+          in: ['aaa', 'ccc'],
+        },
+      },
+    })
+    expect(result).toMatchSnapshot()
+    
+  })
+
+
+  it('test where', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    )
+    expect(
+      (
+        await gql(`
+    query{
+      tasks(where:{}){
+        totalCount
+      }
+    }`)
+      ).data.tasks.totalCount,
+    ).toBe(4)
+  })
+  it('test where eq', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    )
+    expect(
+      (
+        await gql(`
+    query{
+      tasks(where:{
+        title:{
+          eq:"bbb"
+        }
+      }){
+        totalCount
+      }
+    }`)
+      ).data.tasks.totalCount,
+    ).toBe(1)
+  })
+  it('test where in', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    )
+    expect(
+      (
+        await gql(`
+    query{
+      tasks(where:{
+        title:{
+          in:["bbb","ddd"]
+        }
+      }){
+        totalCount
+      }
+    }`)
+      ).data.tasks.totalCount,
+    ).toBe(2)
+  })
+  it('test where or', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    )
+    expect(
+      (
+        await gql(`
+    query{
+      tasks(where:{
+        OR: [{ title: { eq: "aaa" } }, { title: { eq: "bbb" } }],
+      }){
+        totalCount
+      }
+    }`)
+      ).data.tasks.totalCount,
+    ).toBe(2)
+  })
+  
+  it('test where not in', async () => {
+    await withRemult(() =>
+      remult.repo(Task).insert(['aaa', 'bbb', 'ccc', 'ddd'].map(x => ({ title: x }))),
+    )
+    expect(
+      (
+        await gql(`
+    query{
+      tasks(where:{
+        title:{
+          nin:["bbb"]
+        }
+      }){
+        totalCount
+      }
+    }`)
+      ).data.tasks.totalCount,
+    ).toBe(3)
+  })
 
   it('gets related entities', async () => {
     await withRemult(async () => {
@@ -217,3 +331,6 @@ describe('graphql-connection', () => {
     }
   })
 })
+
+remult.authenticated()
+
