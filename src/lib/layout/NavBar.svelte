@@ -1,3 +1,7 @@
+<script>
+  import { signOut } from '@auth/sveltekit/client'
+</script>
+
 <div class="navbar bg-base-200">
   <div class="flex-none">
     <button class="btn btn-square btn-ghost">
@@ -65,7 +69,7 @@
           </button>
         </li>
         <li><button>Settings</button></li>
-        <li><button>Logout</button></li>
+        <li><button on:click={signOut}>Logout</button></li>
       </ul>
     </div>
   </div>
