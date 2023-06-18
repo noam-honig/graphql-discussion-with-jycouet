@@ -3,7 +3,6 @@
   import Link from '$lib/svelte-fields/Link/Link.svelte'
   import H2 from '$lib/svelte-fields/Text/H2.svelte'
   import { getRepo } from '$shared/_entities'
-
   import type { PageData } from './$types'
 
   export let data: PageData
@@ -11,12 +10,6 @@
   $: repo = getRepo(data.entity)
 </script>
 
-<!-- <button
-  style="float: right;"
-  on:click={() => {
-    goto(`/${data.entity}/create`)
-  }}>Add</button
-> -->
 <div class="flex justify-between items-center">
   <H2>List of {repo.metadata.caption} ({#await repo.count() then rez}{rez}{/await})</H2>
   <div>
@@ -29,13 +22,13 @@
   initData={data.list}
   include={[
     // @ts-ignore TODO JYC
-    repo.metadata.fields.category,
+    // repo.metadata.fields.category,
   ]}
   linkOn={{
     // @ts-ignore TODO JYC
-    field: repo.metadata.fields.title,
-    redirect: id => {
-      return `/${data.entity}/${id}`
-    },
+    // field: repo.metadata.fields.title,
+    // redirect: id => {
+    //   return `/${data.entity}/${id}`
+    // },
   }}
 />

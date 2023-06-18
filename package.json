@@ -26,7 +26,7 @@
     "graphql-yoga": "^3.9.1",
     "houdini": "^1.2.5",
     "houdini-svelte": "^1.2.5",
-    "remult": "0.20.3-exp.2",
+    "remult": "0.20.5-exp.4",
     "svelte-preprocess": "^5.0.3",
     "tailwindcss": "^3.3.1"
   },
