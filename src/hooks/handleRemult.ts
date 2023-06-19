@@ -17,7 +17,7 @@ export const handleRemult = remultSveltekit({
   //   return session?.user
   // },
 
-  dataProvider: await createPostgresConnection({
-    connectionString: DATABASE_URL,
-  }),
+  // dataProvider: await createPostgresConnection({
+  //   connectionString: DATABASE_URL,
+  // }),
 })
