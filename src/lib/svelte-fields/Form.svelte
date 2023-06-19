@@ -62,8 +62,6 @@
   const submit = async (e: Event) => {
     try {
       if (mode === 'update') {
-        console.log(`here`)
-
         $data = await repo.save($data)
       } else if (mode === 'create') {
         $data = await repo.insert($data)
