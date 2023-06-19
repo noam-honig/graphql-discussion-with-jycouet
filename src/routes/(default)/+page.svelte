@@ -25,15 +25,15 @@
 </ul>
 
 <br />
-<H2>This demo showcase</H2>
+<H2>This demo showcase ⭐</H2>
 <ul class="ml-4 list-disc">
   <li>
-    <Link href="https://remult.dev/" target="_blank">Remult</Link>
+    <Link href="https://github.com/remult/remult" target="_blank">Remult</Link>
   </li>
   <li>
-    <Link href="https://kit.svelte.dev/" target="_blank">SvelteKit</Link>
+    <Link href="https://github.com/sveltejs/kit" target="_blank">SvelteKit</Link>
   </li>
   <li>
-    <Link href="https://houdinigraphql.com/" target="_blank">Houdini</Link>
+    <Link href="https://github.com/HoudiniGraphql/houdini" target="_blank">Houdini</Link>
   </li>
 </ul>

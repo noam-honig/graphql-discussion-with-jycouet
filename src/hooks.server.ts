@@ -5,11 +5,11 @@ import { handleRemult } from './hooks/handleRemult'
 
 export const handle = sequence(
   // Auth
-  handleAuth,
+  // handleAuth,
 
   // init Remult
   handleRemult,
 
   // let's start with the GraphQL endpoint
-  handleGraphql(),
+  // handleGraphql(),
 )
