@@ -1,4 +1,5 @@
 import type { AuthConfig } from '@auth/core'
+import { skipCSRFCheck } from '@auth/core'
 import Credentials from '@auth/core/providers/credentials'
 import { SvelteKitAuth } from '@auth/sveltekit'
 import { AUTH_SECRET } from '$env/static/private'
@@ -11,6 +12,8 @@ const validUsers: UserInfo[] = [
 
 export const authConfig: AuthConfig = {
   secret: AUTH_SECRET,
+  // to rmv when in production
+  skipCSRFCheck: skipCSRFCheck,
   trustHost: true,
   providers: [
     Credentials({

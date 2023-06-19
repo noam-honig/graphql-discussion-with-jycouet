@@ -4,9 +4,9 @@ query Tasks {
     items {
       id
       title
-      category {
-        name
-      }
+      # category {
+      #   name
+      # }
     }
   }
 }

@@ -118,25 +118,9 @@ type Task implements Node {
   """
   id: String!
   """
-  The Title
+  Title
   """
   title: String!
-  """
-  Is it completed?
-  """
-  completed: Boolean!
-  """
-  Due Date
-  """
-  dueDate: String!
-  """
-  The Priority
-  """
-  thePriority: String!
-  """
-  Category
-  """
-  category: Category
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -149,10 +133,6 @@ OrderBy options for `tasks`
 input tasksOrderBy {
   id: OrderByDirection
   title: OrderByDirection
-  completed: OrderByDirection
-  dueDate: OrderByDirection
-  thePriority: OrderByDirection
-  category: OrderByDirection
 }
 
 """
@@ -161,9 +141,6 @@ Where options for `tasks`
 input tasksWhere {
   id: WhereString
   title: WhereString
-  completed: WhereBoolean
-  dueDate: WhereString
-  thePriority: WhereString
   OR: [tasksWhere!]
 }
 
@@ -180,10 +157,6 @@ The input for `CreateTaskInput`
 """
 input CreateTaskInput {
     title: String
-    completed: Boolean
-    dueDate: String
-    thePriority: String
-    category: ID
 }
 
 """
@@ -199,10 +172,6 @@ The input for `UpdateTaskInput`
 """
 input UpdateTaskInput {
     title: String
-    completed: Boolean
-    dueDate: String
-    thePriority: String
-    category: ID
 }
 
 """
@@ -233,35 +202,6 @@ type Category implements Node {
   Name
   """
   name: String!
-  """
-  List all `Task` of `categories`
-  """
-  tasks(
-    """
-    
-For **page by page** pagination.
-Limit the number of result. 
-_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
-    """
-    limit: Int
-  , 
-    """
-    
-For **page by page** pagination.
-Select a dedicated page.
-    """
-    page: Int
-  , 
-    """
-    Remult sorting options
-    """
-    orderBy: tasksOrderBy
-  , 
-    """
-    Remult filtering options
-    """
-    where: tasksWhere
-  ): TaskConnection
   """
   The globally unique `ID` _(_typename:id)_
   """
