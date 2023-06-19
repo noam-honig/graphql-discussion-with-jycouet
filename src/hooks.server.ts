@@ -5,7 +5,7 @@ import { handleRemult } from './hooks/handleRemult'
 
 export const handle = sequence(
   // Auth
-  handleAuth,
+  // handleAuth,
 
   // init Remult
   handleRemult,

@@ -14,11 +14,11 @@ export const handleRemult = remultSveltekit({
 
   logApiEndPoints: false,
 
-  getUser: async (event: any) => {
-    let session = (event as any).session
-    if (!session) session = await event?.locals?.getSession()
-    return session?.user
-  },
+  // getUser: async (event: any) => {
+  //   let session = (event as any).session
+  //   if (!session) session = await event?.locals?.getSession()
+  //   return session?.user
+  // },
 
   dataProvider: await createPostgresConnection({
     connectionString: DATABASE_URL,
