@@ -35,24 +35,9 @@ npm run dev
 - [x] node
   - [x] typedef JYC
   - [x] resolver
-- [ ] remove "express"?
+- [x] remove "express"?
 - [ ] Test Request hack in graphql security - and test on all servers that security works
 - [ ] fix that loading of child entities will not cause getUser or init request again
-
-## JYC
-
-- [ ] scalars (TODO JYC)
-- [ ] throw new GraphQLError(`Forbidden`) (to speak about)
-
-a. need to check the field selection. (you can copy this:
-https://github.com/jycouet/kitql/blob/main/packages/all-in/src/lib/graphql/helper.ts)
-
-b. repending on the selection, build the object to return
-
-c. depending on hasPrevious & hasNext, query 1 more infront and/or at the back
-
-d. return the object
-
 - [ ] node Interface
   - [x] typedefs
   - [ ]
@@ -63,7 +48,11 @@ d. return the object
 - [ ] api in context to not re create it at each resolver?
 - [ ] @Field Virtual (resolving a primitive or an Entity or an Entity Virtual) (server expression)
 - [x] Connection items
-- [ ] Scalars?! (JYC todo)
+
+## JYC
+
+- [ ] scalars (TODO JYC)
+- [ ] throw new GraphQLError(`Forbidden`) (GraphQL Error signature)
 
 ### v later
 

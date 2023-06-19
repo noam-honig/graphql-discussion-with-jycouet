@@ -1,50 +1,10 @@
 import { describeClass, Entity, Field, Fields, Validators, ValueListFieldType } from 'remult'
 import { Category } from './Category'
 
-// export
-// @Entity('tasks', { allowApiCrud: true })
-// class Task {
-//   @Fields.cuid()
-//   id = ''
-
-//   @Fields.string()
-//   title = ''
-// }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
 export
 @Entity('tasks', {
   allowApiCrud: true,
-  // allowApiInsert: 'admin',
+  allowApiInsert: 'admin',
 })
 class Task {
   @Fields.cuid()

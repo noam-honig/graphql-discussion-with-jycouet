@@ -5,13 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "ORIGIN=https://svienna-remult-2023-06-19.onrender.com vite build",
+    "build": "vite build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --plugin-search-dir . --write .",
     "lint": "prettier --plugin-search-dir . --check . && eslint --ignore-path .prettierignore --quiet .",
     "preview": "vite preview",
-    "start": "vite preview --port $PORT --host 0.0.0.0",
+    "start": "node build",
     "test": "vitest --watch --inspect --no-threads",
     "test:e2e": "playwright test"
   },
@@ -22,7 +22,6 @@
     "@tailwindcss/forms": "^0.5.3",
     "autoprefixer": "^10.4.14",
     "daisyui": "^3.0.3",
-    "express": "^4.18.2",
     "graphql": "15.8.0",
     "graphql-yoga": "^3.9.1",
     "houdini": "^1.2.5",

@@ -27,9 +27,9 @@
   const reset = async (_mode: 'create' | 'update' | 'readonly') => {
     resetErrors()
     if (!!id && (_mode === 'update' || _mode === 'readonly')) {
-      $data = { ...(await repo.findId(id, { useCache: false })) }
+      $data = await repo.findId(id, { useCache: false })
     } else {
-      $data = { ...repo.create() }
+      $data = repo.create()
     }
   }
 
@@ -62,7 +62,7 @@
   const submit = async (e: Event) => {
     try {
       if (mode === 'update') {
-        $data = await repo.save({ ...$data })
+        $data = await repo.save($data)
       } else if (mode === 'create') {
         $data = await repo.insert($data)
       }
