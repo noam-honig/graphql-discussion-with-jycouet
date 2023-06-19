@@ -17,18 +17,4 @@
   </div>
 </div>
 
-<Grid
-  {repo}
-  initData={data.list}
-  include={[
-    // @ts-ignore TODO JYC
-    // repo.metadata.fields.category,
-  ]}
-  linkOn={{
-    // @ts-ignore TODO JYC
-    // field: repo.metadata.fields.title,
-    // redirect: id => {
-    //   return `/${data.entity}/${id}`
-    // },
-  }}
-/>
+<Grid {repo} initData={data.list} />

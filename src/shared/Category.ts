@@ -12,6 +12,8 @@ class Category {
     },
   })
   id = ''
-  @Fields.string()
+  @Fields.string({
+    withLink: true,
+  })
   name = ''
 }

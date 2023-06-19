@@ -1,4 +1,5 @@
 {
   "todo-tree.tree.showBadges": true,
-  "todo-tree.tree.showCountsInTree": false
+  "todo-tree.tree.showCountsInTree": false,
+  "prettier.prettierPath": "./node_modules/prettier"
 }

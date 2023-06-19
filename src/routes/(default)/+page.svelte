@@ -6,19 +6,19 @@
 <H2>Pages...</H2>
 <ul class="ml-4 list-disc">
   <li>
+    <Link href="/tasks">Tasks</Link>
+  </li>
+  <li>
+    <Link href="/categories">Categories</Link>
+  </li>
+  <li>
+    <Link href="/tags">Tags</Link>
+  </li>
+  <li>
     <Link href="/tasks-graphql">tasks-graphql</Link>
   </li>
   <li>
     <Link href="/api/graphql" target="_blank">GraphiQL</Link>
-  </li>
-  <li>
-    <Link href="/Task">Task</Link>
-  </li>
-  <li>
-    <Link href="/Category">Category</Link>
-  </li>
-  <li>
-    <Link href="/Tag">Tag</Link>
   </li>
 </ul>
 

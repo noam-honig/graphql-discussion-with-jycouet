@@ -9,7 +9,6 @@
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
-
   import Button from './Button/Button.svelte'
   import Input from './Input.svelte'
 
@@ -157,6 +156,11 @@
         {#if mode === 'readonly'}
           <Button on:click={() => (mode = 'update')} variant="neutral" type="button">Edit</Button>
         {:else}
+          <span>
+            <Button variant="success" type="submit">
+              {mode === 'create' ? 'Create' : 'Update'}
+            </Button>
+          </span>
           {#if mode === 'update'}
             <span>
               <Button on:click={() => (mode = 'readonly')} variant="ghost" type="button">
@@ -170,11 +174,6 @@
               </Button>
             </span>
           {/if}
-          <span>
-            <Button variant="success" type="submit">
-              {mode === 'create' ? 'Create' : 'Update'}
-            </Button>
-          </span>
         {/if}
       </div>
     </div>

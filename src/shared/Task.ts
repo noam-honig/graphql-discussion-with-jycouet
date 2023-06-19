@@ -1,5 +1,4 @@
 import { describeClass, Entity, Field, Fields, remult, ValueListFieldType } from 'remult'
-
 import { Category } from './Category'
 
 export
@@ -21,6 +20,7 @@ class Task {
   @Fields.string({
     inputType: 'text', // how to remove? (should be default)
     caption: 'The Title',
+    withLink: true,
     validate: task => {
       if (task.title?.length <= 0) throw Error('Required!')
       if (task.title?.length < 3) throw Error('Too short')
@@ -46,15 +46,6 @@ class Task {
 
   @Field(() => Category, { allowNull: true })
   category?: Category
-
-  @Fields.string({
-    serverExpression: () => {
-      return ''
-      if (!remult.authenticated()) return 'noOne'
-      return JSON.stringify(remult.user)
-    },
-  })
-  userOnServer = ''
 }
 
 export class TaskPriority {

@@ -11,10 +11,10 @@ import { writable } from 'svelte/store'
  * Example
  * ```ts
  * // get the repo
- * const taskRepo = remult.repo(Task)
+ * const repo = remult.repo(Task)
  *
- * const tasks = remultLive(taskRepo, data.tasks)
- * $: browser && tasks.listen(data.options)
+ * const list = remultLive(repo, data.list)
+ * $: browser && list.listen(data.options)
  * ```
  */
 export const remultLive = <T>(repo: Repository<T>, initValues: T[] = []) => {
@@ -28,7 +28,10 @@ export const remultLive = <T>(repo: Repository<T>, initValues: T[] = []) => {
   // if we already have a subscription, unsubscribe (on option update for example)
   const plzUnSub = async () => {
     if (unSub) {
-      await unSub()
+      unSub()
+      // console.log(`plzUnSub DONE`)
+    } else {
+      // console.log(`plzUnSub no need`)
     }
   }
 
@@ -44,11 +47,7 @@ export const remultLive = <T>(repo: Repository<T>, initValues: T[] = []) => {
         })
       } else {
         throw new Error(`xxx.listen() Too early!
-
-You should do like: 
-  let tasks = tasksStore<Task>(taskRepo, data.tasks)
-  $: browser && tasks.listen()
-				`)
+Check the usage of remultLive() in your code.`)
       }
     },
   }

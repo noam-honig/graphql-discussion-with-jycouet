@@ -18,6 +18,7 @@ declare global {
 declare module 'remult' {
   export interface FieldOptions<entityType, valueType> extends EntitySytle {
     placeholder?: string
+    withLink?: boolean
   }
   export type EntityOptions<entityType> = EntitySytle
 }

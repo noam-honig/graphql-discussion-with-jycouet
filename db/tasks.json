@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "Getting organized",
+    "title": "Getting organized ooo",
     "thePriority": "HIGH",
     "completed": false,
     "category": "cli1up0bn000008lac9rpff93",
@@ -9,15 +9,15 @@
   },
   {
     "id": 2,
-    "title": "Write the plan",
-    "completed": false,
+    "title": "Write the plan ok?",
+    "completed": true,
     "thePriority": "CRITICAL",
     "category": "cli1up0bn000008lac9rpff93",
     "dueDate": "2023-06-14"
   },
   {
     "id": 3,
-    "title": "Rest a bit",
+    "title": "Rest a bit hwy not",
     "completed": false,
     "thePriority": "HIGH",
     "category": null,
@@ -33,10 +33,11 @@
   },
   {
     "id": 5,
-    "title": "Review",
+    "title": "coucou2",
     "completed": false,
+    "dueDate": "2023-06-26",
     "thePriority": "HIGH",
     "category": null,
-    "dueDate": "2023-06-14"
+    "userOnServer": ""
   }
 ]
