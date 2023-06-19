@@ -11,7 +11,7 @@
   </li>
 </ul>
 
-<!-- <br />
+<br />
 <H2>Automatic Pages...</H2>
 <ul class="ml-4 list-disc">
   {#each entitiesName as entityName}
@@ -19,9 +19,9 @@
       <Link href="/{entityName}">{entityName}</Link>
     </li>
   {/each}
-</ul> -->
+</ul>
 
-<!-- <br />
+<br />
 <H2>Special Pages...</H2>
 <ul class="ml-4 list-disc">
   <li>
@@ -30,9 +30,9 @@
   <li>
     <Link href="/tasks-graphql">tasks</Link>
   </li>
-</ul> -->
+</ul>
 
-<!-- <br />
+<br />
 <H2>This demo showcase ⭐</H2>
 <ul class="ml-4 list-disc">
   <li>
@@ -44,4 +44,4 @@
   <li>
     <Link href="https://github.com/HoudiniGraphql/houdini" target="_blank">Houdini</Link>
   </li>
-</ul> -->
+</ul>
