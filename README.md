@@ -38,9 +38,9 @@ npm run dev
 - [x] remove "express"?
 - [ ] Test Request hack in graphql security - and test on all servers that security works
 - [ ] fix that loading of child entities will not cause getUser or init request again
-- [ ] node Interface
+- [x] node Interface
   - [x] typedefs
-  - [ ]
+  - [x] resolvers
 - [x] me query
   - [x] merge schema
   - [x] To test with Auth (TODO JYC)
@@ -58,7 +58,7 @@ npm run dev
 
 - [ ] Better support for Compound column id entities
 - [ ] support for id columns that are not called id
-- [ ] Connection (args & sttructure)
+- [ ] Connection (args & structure)
   - [x] typedefs
   - [ ] resolver
 - [ ] dataloader (optimisation)
@@ -72,6 +72,12 @@ npm run dev
   - [ ] contains
   - [ ] null
   - [ ] filter on ref type id
+- [ ] JSON db migration?
+  - When I add a `createdAt` that is non null, how to migrate all previous rows?
+    - [ ] in db
+    - [ ] in JSON
+- [ ] remove tripple Auth
+  - [ ] add a resolver to know who is connected (me? currentUser?)
 
 ## Open questions
 
@@ -79,11 +85,8 @@ npm run dev
   - [x] `SqlDatabase.LogToConsole = true`
   - [ ] Share my clean SQL function?
   - [ ] Tune formats? (provide a function?)
-- In the todo list, where to we set a v1? v2?
 - Adding a nice log on db doesn't exist?
 - Field enum? to have db Enums?
-- Where to throw new GraphQLError(`Forbidden`)? (and all others?)
-- speak about ! or not... (db migration?!)
 
 ## Notes
 

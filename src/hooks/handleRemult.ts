@@ -1,8 +1,11 @@
 import { DATABASE_URL } from '$env/static/private'
 import { controllers } from '$shared/_controllers'
 import { entities } from '$shared/_entities'
+import { SqlDatabase } from 'remult'
 import { createPostgresConnection } from 'remult/postgres'
 import { remultSveltekit } from 'remult/remult-sveltekit'
+
+SqlDatabase.LogToConsole = true
 
 export const handleRemult = remultSveltekit({
   entities,
