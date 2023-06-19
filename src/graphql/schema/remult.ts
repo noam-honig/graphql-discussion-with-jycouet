@@ -1,10 +1,9 @@
+import { entities } from '$shared/_entities'
 import { createSchema } from 'graphql-yoga'
 import { fs } from 'houdini'
-
 import { remultGraphql } from 'remult/graphql'
-import { remultApi } from '../../hooks/handleRemult'
 
-const { typeDefs, resolvers } = remultGraphql(remultApi)
+const { typeDefs, resolvers } = remultGraphql({ entities })
 
 // Houdini needs this file to start! We can write a dummy one so that onstart there is something to real. Then it will be regenerated?
 // TODO JYC

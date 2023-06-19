@@ -1,11 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import {
-    displayValue,
-    entitySytleCols,
-    entitySytleSpan,
-    fieldVisibility,
-  } from '$lib/remult-svelte/helper'
+  import { displayValue, fieldVisibility } from '$lib/remult-svelte/helper'
   import type { FieldMetadata, Repository } from 'remult'
   import { createEventDispatcher } from 'svelte'
   import { writable } from 'svelte/store'
@@ -13,8 +8,6 @@
   import Input from './Input.svelte'
 
   export let repo: Repository<any>
-  export let include: FieldMetadata[] = []
-  export let exclude: FieldMetadata[] = []
   export let mode: 'create' | 'update' | 'readonly' = 'readonly'
   export let id: string | number | null = null
   export let redirect: string | null = null
@@ -69,6 +62,8 @@
   const submit = async (e: Event) => {
     try {
       if (mode === 'update') {
+        console.log(`here`)
+
         $data = await repo.save($data)
       } else if (mode === 'create') {
         $data = await repo.insert($data)
@@ -102,8 +97,10 @@
 </script>
 
 <form on:submit|preventDefault={submit}>
-  <div class={`grid ${entitySytleCols(repo.metadata.options)} gap-4`}>
-    {#each repo.fields.toArray().filter(f => fieldVisibility(f, mode, include, exclude)) as field}
+  <div
+    class={repo.metadata.options.class ?? 'grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3'}
+  >
+    {#each repo.fields.toArray().filter(f => fieldVisibility(f, mode)) as field}
       {@const inputType = field.inputType}
       <div class="form-control">
         <label class="label" for={field.key}>
@@ -136,6 +133,9 @@
               bind:checked={$data[field.key]}
             />
           </div>
+        {:else if typeof field.toInput($data[field.key]) === 'object'}
+          <!-- JYC todo with a select (frontend, backend, ...)...   -->
+          <span class="h-12 pl-4 grid content-center">{displayValue(field, $data)}</span>
         {:else}
           <Input
             class="input-bordered"
@@ -150,8 +150,11 @@
         {/if}
       </div>
     {/each}
-
-    <div class="grid {entitySytleSpan(repo.metadata.options)} justify-items-end">
+    <!-- {`grid ${entitySytleCols()} gap-4`} -->
+    <div
+      class={repo.metadata.options.classActions ??
+        'grid justify-items-end col-span-1 sm:col-span-2 md:col-span-3'}
+    >
       <div class="flex gap-4">
         {#if mode === 'readonly'}
           <Button on:click={() => (mode = 'update')} variant="neutral" type="button">Edit</Button>

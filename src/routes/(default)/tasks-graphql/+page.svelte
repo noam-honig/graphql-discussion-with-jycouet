@@ -1,6 +1,5 @@
 <script lang="ts">
   import H2 from '$lib/svelte-fields/Text/H2.svelte'
-
   import type { PageData } from '../../task-list/$houdini'
 
   export let data: PageData
@@ -11,7 +10,7 @@
 <H2>Tasks List ({$Tasks?.data?.tasks?.totalCount})</H2>
 
 {#each $Tasks?.data?.tasks?.items ?? [] as task}
-  <a href={`/Task/${task.id}`}>
+  <a href={`/tasks/${task.id}`}>
     <pre>{JSON.stringify(task, null, 2)}</pre>
   </a>
 {/each}

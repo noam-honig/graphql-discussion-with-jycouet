@@ -25,7 +25,7 @@ specifiers:
   pg: ^8.11.0
   prettier: ^2.8.8
   prettier-plugin-svelte: ^2.10.1
-  remult: 0.20.5
+  remult: 0.20.5-exp.4
   svelte: ^3.59.1
   svelte-check: ^3.4.3
   svelte-preprocess: ^5.0.3
@@ -47,7 +47,7 @@ dependencies:
   graphql-yoga: 3.9.1_graphql@15.8.0
   houdini: 1.2.5
   houdini-svelte: 1.2.5
-  remult: 0.20.5
+  remult: 0.20.5-exp.4
   svelte-preprocess: 5.0.4_ew3mtnddoirxihfd3dvwoglzia
   tailwindcss: 3.3.2
 
@@ -3579,8 +3579,8 @@ packages:
     resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
     dev: false
 
-  /remult/0.20.5:
-    resolution: {integrity: sha512-wzBCmD5nkZEhWgJYJ6LqfgaUK2MUVPuA4BAm8zqXjXMwHgyu3XQ/RxAcdNppmIwv07EtPzYztKCj+5EBTElPKw==}
+  /remult/0.20.5-exp.4:
+    resolution: {integrity: sha512-GW2U6UM4+MfPfNu+p3qTiG0IKdLXPEjCfkB8tbNzzyRIlD5IylhSKVc8yj7K4BxyNq1TGELGPcBzdDCBdRd2Iw==}
     dependencies:
       cuid: 2.1.8
       reflect-metadata: 0.1.13

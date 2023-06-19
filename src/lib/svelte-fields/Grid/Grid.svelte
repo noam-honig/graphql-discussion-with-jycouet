@@ -2,20 +2,27 @@
   import { browser } from '$app/environment'
   import { fieldVisibility } from '$lib/remult-svelte/helper'
   import { remultLive } from '$lib/remult-svelte/remultLive'
-  import type { Repository } from 'remult'
+  import type { EntityOrderBy, Repository } from 'remult'
   import Link from '../Link/Link.svelte'
 
   export let initData: any[] = []
   export let repo: Repository<any>
-
+  export let orderBy: EntityOrderBy<any> = {}
+  export function sortOn(key: string) {
+    const corrent = orderBy[key]
+    orderBy = { [key]: corrent == 'asc' ? 'desc' : 'asc' }
+  }
   const list = remultLive(repo, initData)
-  $: browser && list.listen()
+  $: browser &&
+    list.listen({
+      orderBy,
+    })
 </script>
 
 <table class="table">
   <tr>
     {#each repo.fields.toArray().filter(f => fieldVisibility(f, 'readonly', [], [])) as field}
-      <th>{field.caption}</th>
+      <th on:click={() => sortOn(field.key)}>{field.caption}</th>
     {/each}
   </tr>
   {#each $list as row}

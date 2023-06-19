@@ -1,24 +1,16 @@
-import { describeClass, Entity, Field, Fields, remult, ValueListFieldType } from 'remult'
+import { describeClass, Entity, Field, Fields, ValueListFieldType } from 'remult'
 import { Category } from './Category'
 
 export
 @Entity('tasks', {
   allowApiCrud: true,
-  style: {
-    // cols: 'grid-cols-4',
-    tablet: { cols: 'grid-cols-2' },
-    mobile: { cols: 'grid-cols-1' },
-  },
-  // We will set this later to see the behavior in GraphQL
   // allowApiInsert: 'admin',
 })
 class Task {
-  // @Fields.cuid()
-  @Fields.autoIncrement()
-  id = 0
+  @Fields.cuid()
+  id = ''
 
   @Fields.string({
-    inputType: 'text', // how to remove? (should be default)
     caption: 'The Title',
     withLink: true,
     validate: task => {
@@ -31,17 +23,15 @@ class Task {
 
   @Fields.boolean({
     caption: 'Is it completed?',
+    hideInCreate: true,
     displayValue: task => (task.completed ? 'Yes' : 'No'),
   })
   completed = false
 
-  @Fields.dateOnly({
-    caption: 'Due Date',
-    allowNull: false,
-  })
+  @Fields.dateOnly({ caption: 'Due Date' })
   dueDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 7)
 
-  @Field(() => TaskPriority, { inputType: 'select' }) // TODO: how to bind this to a select from the type directly?
+  @Field(() => TaskPriority, { inputType: 'select' })
   thePriority = TaskPriority.High
 
   @Field(() => Category, { allowNull: true })

@@ -1,20 +1,16 @@
 import { remult, type Repository } from 'remult'
 import { Category } from './Category'
-import { Tag } from './Tag'
 import { Task } from './Task'
 
 export const entitiesObj = {
   tasks: Task,
   categories: Category,
-  tags: Tag,
 }
 
 export const entitiesName = Object.keys(entitiesObj)
 export const entities = Object.values(entitiesObj)
 
-export const getRepo = (
-  entity?: 'tasks' | 'categories' | 'tags' | string,
-): Repository<Task | Category | Tag> => {
+export const getRepo = (entity?: 'tasks' | 'categories' | string): Repository<Task | Category> => {
   if (!entity) {
     throw new Error(`Need an entity!`)
   }

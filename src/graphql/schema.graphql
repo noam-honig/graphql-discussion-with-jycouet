@@ -69,39 +69,6 @@ Select a dedicated page.
     where: categoriesWhere
   ): CategoryConnection
   """
-  Get `Tag` entity
-  """
-  tag(id: ID!): Tag
-  """
-  List all `Tag` entity (with pagination, sorting and filtering)
-  """
-  tags(
-    """
-    
-For **page by page** pagination.
-Limit the number of result. 
-_Side note: `Math.ceil(totalCount / limit)` to determine how many pages there are._
-    """
-    limit: Int
-  , 
-    """
-    
-For **page by page** pagination.
-Select a dedicated page.
-    """
-    page: Int
-  , 
-    """
-    Remult sorting options
-    """
-    orderBy: tagsOrderBy
-  , 
-    """
-    Remult filtering options
-    """
-    where: tagsWhere
-  ): TagConnection
-  """
   Grab any Remult entity given it's globally unique `ID`
   """
   node(
@@ -140,18 +107,6 @@ type Mutation {
   Delete a `Category`
   """
   deleteCategory(id: ID!, clientMutationId: String): DeleteCategoryPayload
-  """
-  Create a new `Tag`
-  """
-  createTag(input: CreateTagInput!, clientMutationId: String): CreateTagPayload
-  """
-  Update a `Tag`
-  """
-  updateTag(id: ID!, patch: UpdateTagInput!, clientMutationId: String): UpdateTagPayload
-  """
-  Delete a `Tag`
-  """
-  deleteTag(id: ID!, clientMutationId: String): DeleteTagPayload
 }
 
 """
@@ -161,7 +116,7 @@ type Task implements Node {
   """
   Id
   """
-  id: Int!
+  id: String!
   """
   The Title
   """
@@ -182,10 +137,6 @@ type Task implements Node {
   Category
   """
   category: Category
-  """
-  User On Server
-  """
-  userOnServer: String!
   """
   The globally unique `ID` _(_typename:id)_
   """
@@ -208,7 +159,7 @@ input tasksOrderBy {
 Where options for `tasks`
 """
 input tasksWhere {
-  id: WhereInt
+  id: WhereString
   title: WhereString
   completed: WhereBoolean
   dueDate: WhereString
@@ -233,7 +184,6 @@ input CreateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
-    userOnServer: String
 }
 
 """
@@ -253,7 +203,6 @@ input UpdateTaskInput {
     dueDate: String
     thePriority: String
     category: ID
-    userOnServer: String
 }
 
 """
@@ -378,87 +327,6 @@ type UpdateCategoryPayload {
 The type for `DeleteCategoryPayload`
 """
 type DeleteCategoryPayload {
-    id: ID
-    clientMutationId: String
-}
-
-"""
-The type_impl_node for `Tag`
-"""
-type Tag implements Node {
-  """
-  Id
-  """
-  id: String!
-  """
-  Value
-  """
-  value: String!
-  """
-  The globally unique `ID` _(_typename:id)_
-  """
-  nodeId: ID!
-}
-
-"""
-OrderBy options for `tags`
-"""
-input tagsOrderBy {
-  id: OrderByDirection
-  value: OrderByDirection
-}
-
-"""
-Where options for `tags`
-"""
-input tagsWhere {
-  id: WhereString
-  value: WhereString
-  OR: [tagsWhere!]
-}
-
-"""
-The type for `TagConnection`
-"""
-type TagConnection {
-    totalCount: Int!
-    items: [Tag!]!
-}
-
-"""
-The input for `CreateTagInput`
-"""
-input CreateTagInput {
-    value: String
-}
-
-"""
-The type for `CreateTagPayload`
-"""
-type CreateTagPayload {
-    tag: Tag
-    clientMutationId: String
-}
-
-"""
-The input for `UpdateTagInput`
-"""
-input UpdateTagInput {
-    value: String
-}
-
-"""
-The type for `UpdateTagPayload`
-"""
-type UpdateTagPayload {
-    tag: Tag
-    clientMutationId: String
-}
-
-"""
-The type for `DeleteTagPayload`
-"""
-type DeleteTagPayload {
     id: ID
     clientMutationId: String
 }
