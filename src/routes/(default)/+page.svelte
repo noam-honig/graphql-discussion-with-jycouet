@@ -13,8 +13,8 @@
   {/each}
 </ul>
 
+<br />
 <H2>Special Pages...</H2>
-
 <ul class="ml-4 list-disc">
   <li>
     <Link href="/api/graphql" target="_blank">GraphiQL</Link>
@@ -24,8 +24,8 @@
   </li>
 </ul>
 
+<br />
 <H2>This demo showcase</H2>
-
 <ul class="ml-4 list-disc">
   <li>
     <Link href="https://remult.dev/" target="_blank">Remult</Link>
