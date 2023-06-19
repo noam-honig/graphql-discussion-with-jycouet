@@ -1,6 +1,5 @@
-import { getRepo } from '$shared/_entities'
 import { redirect } from '@sveltejs/kit'
-
+import { getRepo } from '$shared/_entities'
 import type { LayoutLoad } from './$types'
 
 export const load = (async ({ params }) => {

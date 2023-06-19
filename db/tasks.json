@@ -1,96 +1,23 @@
 [
   {
-    "id": 1,
-    "title": "Getting organized ooo",
-    "thePriority": "HIGH",
-    "completed": false,
-    "category": "cli1up0bn000008lac9rpff93",
-    "dueDate": "2023-06-14"
-  },
-  {
-    "id": 2,
-    "title": "Write the plan ok?",
-    "completed": true,
-    "thePriority": "CRITICAL",
-    "category": "cli1up0bn000008lac9rpff93",
-    "dueDate": "2023-06-14"
-  },
-  {
-    "id": 3,
-    "title": "Rest a bit hwy not",
-    "completed": false,
-    "thePriority": "HIGH",
-    "category": null,
-    "dueDate": "2023-06-14"
-  },
-  {
-    "id": 4,
-    "title": "Finish v1",
-    "completed": false,
-    "thePriority": "HIGH",
-    "category": null,
-    "dueDate": "2023-06-14"
-  },
-  {
-    "id": 5,
-    "title": "coucou2",
-    "completed": false,
-    "dueDate": "2023-06-26",
-    "thePriority": "HIGH",
-    "category": null,
-    "userOnServer": ""
-  },
-  {
-    "id": 6,
-    "title": "Getting organizzzezeed ooo",
-    "completed": false,
-    "dueDate": "2023-06-14",
-    "thePriority": "HIGH",
-    "category": "cli1up0bn000008lac9rpff93"
-  },
-  {
-    "id": 7,
-    "title": "YES?",
-    "completed": false,
-    "dueDate": "2023-06-14",
-    "thePriority": "HIGH",
-    "category": "cli1up0bn000008lac9rpff93"
-  },
-  {
-    "id": 8,
-    "title": "coucou",
-    "completed": false,
-    "dueDate": "2023-06-14",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 9,
-    "title": "yyyyyyyyyyyyyyyyyy",
+    "id": "clj2s1d4e000az3byh04x4ys1",
+    "title": "Start recording",
     "completed": false,
     "dueDate": "2023-06-26",
     "thePriority": "HIGH",
     "category": null
   },
   {
-    "id": 10,
-    "title": "no?",
+    "id": "clj2s0t700008z3by1e8mdqxo",
+    "title": "Remult in Svelte",
     "completed": false,
     "dueDate": "2023-06-26",
     "thePriority": "HIGH",
     "category": null
   },
   {
-    "id": 11,
-    "title": "no?zsdds",
-    "completed": false,
-    "dueDate": "2023-06-26",
-    "thePriority": "HIGH",
-    "category": null
-  },
-  {
-    "id": 12,
-    "title": "no?zsdds???!",
+    "id": "clj2s11lw0009z3by58seavfq",
+    "title": "GraphQL In Remult",
     "completed": false,
     "dueDate": "2023-06-26",
     "thePriority": "HIGH",

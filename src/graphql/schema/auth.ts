@@ -1,6 +1,5 @@
 import { getSession } from '@auth/sveltekit'
 import { createSchema, type YogaInitialContext } from 'graphql-yoga'
-
 import { authConfig } from '../../hooks/handleAuth'
 import type { KitQLContext } from '../../hooks/handleGraphql'
 

@@ -34,7 +34,7 @@ class Task {
   @Field(() => TaskPriority, { inputType: 'select' })
   thePriority = TaskPriority.High
 
-  @Field(() => Category, { allowNull: true })
+  @Field(() => Category, { allowNull: true, disableFltering: true })
   category?: Category
 }
 
