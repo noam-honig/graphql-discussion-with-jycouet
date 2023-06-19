@@ -18,6 +18,8 @@ services:
         value: utc
       - key: NODE_ENV
         value: production
+      - key: ORIGIN
+        value: https://svienna-remult-2023-06-19.onrender.com
       - key: AUTH_SECRET
         value: something-secret-to-change-for-prod
       - key: DATABASE_URL

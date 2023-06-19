@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import { getRepo } from '$shared/_entities'
-import type { LayoutLoad } from './$types'
+import type { PageLoad } from './$types'
 
 export const load = (async ({ params }) => {
   try {
@@ -9,15 +9,10 @@ export const load = (async ({ params }) => {
     const listPOJO = await repo.find()
     const list = JSON.parse(JSON.stringify(listPOJO))
 
-    return {
-      list,
-      entity: params.entity,
-    }
-  } catch (error) {
-    // console.log(`error`, error);
-  }
+    return { list }
+  } catch (error) {}
 
   // Something was wrong!
   throw redirect(303, '/')
   // @ts-ignore TODO JYC
-}) satisfies LayoutLoad
+}) satisfies PageLoad
