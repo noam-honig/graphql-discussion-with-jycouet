@@ -1,19 +1,35 @@
 [
   {
-    "id": "clj2s1d4e000az3byh04x4ys1",
-    "title": "Start recording",
-    "completed": false,
-    "dueDate": "2023-06-26",
+    "id": "clj2slubs0005e8by2se55koz",
+    "title": "Attend Vienna JS & Discover Remult",
+    "completed": true,
+    "dueDate": "2023-02-22",
     "thePriority": "HIGH",
-    "category": null
+    "category": "cli1upa5e000108lafw5sa8jx"
   },
   {
     "id": "clj2s0t700008z3by1e8mdqxo",
-    "title": "Remult in Svelte",
+    "title": "Play all night to add Remult in Svelte",
+    "completed": true,
+    "dueDate": "2023-02-23",
+    "thePriority": "HIGH",
+    "category": "clj2sp4ll0007e8by341x8cva"
+  },
+  {
+    "id": "clj2svygx0001yqby04w8hmwz",
+    "title": "Release Remult Svelte 🎉",
     "completed": false,
     "dueDate": "2023-06-26",
     "thePriority": "HIGH",
-    "category": null
+    "category": "clj2sp4ll0007e8by341x8cva"
+  },
+  {
+    "id": "clj2s1d4e000az3byh04x4ys1",
+    "title": "Start recording Svienna",
+    "completed": false,
+    "dueDate": "2023-06-19",
+    "thePriority": "HIGH",
+    "category": "cli1upa5e000108lafw5sa8jx"
   },
   {
     "id": "clj2s11lw0009z3by58seavfq",
@@ -22,5 +38,53 @@
     "dueDate": "2023-06-26",
     "thePriority": "HIGH",
     "category": null
+  },
+  {
+    "id": "clj2skla20003e8byh6hx7bgp",
+    "title": "Prepare slides",
+    "completed": false,
+    "dueDate": "2023-06-26",
+    "thePriority": "HIGH",
+    "category": null
+  },
+  {
+    "id": "clj2skrhw0004e8byhf8r6sc4",
+    "title": "Prepare demo",
+    "completed": false,
+    "dueDate": "2023-06-26",
+    "thePriority": "HIGH",
+    "category": null
+  },
+  {
+    "id": "clj2t21wf000056byauvn6t2m",
+    "title": "YOP",
+    "completed": true,
+    "dueDate": "2023-02-22",
+    "thePriority": "HIGH",
+    "category": "cli1upa5e000108lafw5sa8jx"
+  },
+  {
+    "id": "clj2t6z5y00009zbyg2999nxc",
+    "title": "Attend Vienna JS & Discover Remult1",
+    "completed": true,
+    "dueDate": "2023-02-22",
+    "thePriority": "HIGH",
+    "category": "cli1upa5e000108lafw5sa8jx"
+  },
+  {
+    "id": "clj2t851x00019zbycb7y2luh",
+    "title": "Attend Vienna JS & Discover Remult2",
+    "completed": true,
+    "dueDate": "2023-02-22",
+    "thePriority": "HIGH",
+    "category": "cli1upa5e000108lafw5sa8jx"
+  },
+  {
+    "id": "clj2tbb2q00029zbydq2fdocj",
+    "title": "Attend Vienna JS & Discover Remult23",
+    "completed": true,
+    "dueDate": "2023-02-22",
+    "thePriority": "HIGH",
+    "category": "cli1upa5e000108lafw5sa8jx"
   }
 ]

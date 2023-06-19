@@ -1,5 +1,10 @@
 <script>
   import { signOut } from '@auth/sveltekit/client'
+  import { remult } from 'remult'
+  const src =
+    remult.user?.name === 'Ermin'
+      ? 'https://avatars.githubusercontent.com/u/4040457?v=4'
+      : 'https://avatars.githubusercontent.com/u/5312607?v=4'
 </script>
 
 <div class="navbar bg-base-200">
@@ -11,7 +16,7 @@
     <div class="dropdown dropdown-end">
       <sapn tabindex="-1" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img src="https://avatars.githubusercontent.com/u/5312607?v=4" alt="avatar" />
+          <img {src} alt="avatar" />
         </div>
       </sapn>
       <ul

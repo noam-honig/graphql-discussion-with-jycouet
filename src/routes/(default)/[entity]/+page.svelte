@@ -12,9 +12,11 @@
 
 <div class="flex justify-between items-center">
   <H2>List of {repo.metadata.caption} ({#await repo.count() then rez}{rez}{/await})</H2>
-  <div>
-    <Link href={`/${data.entity}/create`}>Create</Link>
-  </div>
+  {#if repo.metadata.apiInsertAllowed()}
+    <div>
+      <Link href={`/${data.entity}/create`}>Create</Link>
+    </div>
+  {/if}
 </div>
 
 <Grid {repo} initData={data.list} />
