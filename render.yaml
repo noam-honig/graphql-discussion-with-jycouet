@@ -6,7 +6,7 @@ services:
     repo: https://github.com/noam-honig/graphql-discussion-with-jycouet
     region: frankfurt
     plan: Free
-    branch: ui_daisyui
+    branch: ui/daisyui
     buildCommand: npm i -g pnpm; pnpm install --production=false; pnpm build
     startCommand: pnpm preview
     numInstances: 1
