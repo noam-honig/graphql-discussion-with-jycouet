@@ -3,10 +3,10 @@ services:
   - type: web
     name: svienna-remult-2023-06-19
     env: node
-    repo: https://github.com/dynamic-process/my-minion-mr
+    repo: https://github.com/noam-honig/graphql-discussion-with-jycouet
     region: frankfurt
     plan: Free
-    branch: ui/daisyui
+    branch: ui_daisyui
     buildCommand: npm i -g pnpm; pnpm install --production=false; pnpm build
     startCommand: pnpm preview
     numInstances: 1
